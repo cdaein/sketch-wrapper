@@ -1,5 +1,8 @@
 # sketch-wrapper
 
+![npm version badge](https://img.shields.io/npm/v/@daeinc/sketch-wrapper)
+![npm bundle size badge](https://img.shields.io/bundlephobia/min/@daeinc/sketch-wrapper)
+
 Helpers for creative coding sketches with HTML5 Canvas. It is written from scratch, and heavily inspired by [`canvas-sketch`](https://github.com/mattdesl/canvas-sketch/). Many of the props and settings are compatible.
 
 > ⚠️ This module is in a very early stage of development, and there may be unexpected bugs.
