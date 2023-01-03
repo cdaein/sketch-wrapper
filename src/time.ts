@@ -40,12 +40,32 @@ export const advanceTime = ({
   props.time = states.timestamp - states.startTime;
   // props.playhead = props.playhead + props.deltaTime / duration
   props.playhead = duration !== Infinity ? props.time / duration : 0;
-  // props.frame =
-  //   duration !== Infinity
-  //     ? Math.floor(props.playhead * totalFrames)
-  //     : // : Math.floor((props.time * fps) / 1000);
-  //       props.frame + 1;
-  props.frame = props.frame + 1;
+  computeFrame({ settings, props });
+};
+
+const computeFrame = ({
+  settings,
+  props,
+}: {
+  settings: SketchSettingsInternal;
+  props: SketchProps;
+}) => {
+  const { duration, playFps, totalFrames } = settings;
+
+  // 4 cases
+  if (duration !== Infinity) {
+    if (playFps !== null) {
+      props.frame = Math.floor(props.playhead * totalFrames);
+    } else {
+      props.frame += 1;
+    }
+  } else {
+    if (playFps !== null) {
+      props.frame = Math.floor((props.time * playFps) / 1000);
+    } else {
+      props.frame += 1;
+    }
+  }
 };
 
 export const advanceFrame = (settings: SketchSettings) => {

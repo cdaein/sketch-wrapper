@@ -113,9 +113,9 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     timeResetted: false,
   };
 
-  console.log("settings", settings); // TEST
-  console.log("props", props); // TEST
-  console.log("states", states); // TEST
+  // console.log("settings", settings); // TEST
+  // console.log("props", props); // TEST
+  // console.log("states", states); // TEST
 
   // init
   const draw = sketch(props);
@@ -154,6 +154,8 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
       props.time = 0;
       states.startTime = states.timestamp;
     }
+
+    // console.log(props.frame);
 
     if (settings.animate && states.isAnimating) {
       draw(props);

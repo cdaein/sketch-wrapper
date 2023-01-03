@@ -51,9 +51,12 @@ sketchWrapper(sketch, settings);
 
 ## Features
 
-### PNG export
+### Keyboard Shortcuts
 
-`CMD(or Ctrl) + S` will export a PNG image.
+|      Shortcut      |                  Description                   |
+| :----------------: | :--------------------------------------------: |
+| `CMD(or Ctrl) + S` |              Export a PNG image.               |
+|     `Spacebar`     | not yet implemented. Pause or resume animation |
 
 ### SketchProps
 
@@ -84,15 +87,15 @@ For `v0.7.0`:
 
 #### Animation
 
-|     name      |   type    | description                                    |
-| :-----------: | :-------: | ---------------------------------------------- |
-|  `duration`   | `number`  | get loop duration in `ms` (ex. `4000` = 4 sec) |
-| `totalFrames` | `number`  | get the number of total frames                 |
-|    `frame`    | `number`  | get current frame count                        |
-|    `time`     | `number`  | get current time in `ms`                       |
-|  `deltaTime`  | `number`  | get delta time between frame renderes in `ms`  |
-|  `playhead`   | `number`  | goes from 0 to 1 over animation duration       |
-|   `animate`   | `boolean` | not yet implemented.                           |
+|     name      |   type    | description                                                                                                       |
+| :-----------: | :-------: | ----------------------------------------------------------------------------------------------------------------- |
+|  `duration`   | `number`  | get loop duration in `ms` (ex. `4000` = 4 sec)                                                                    |
+| `totalFrames` | `number`  | get the number of total frames                                                                                    |
+|    `frame`    | `number`  | get current frame count. starts at `0`                                                                            |
+|    `time`     | `number`  | get current time in `ms`. starts at `0`                                                                           |
+|  `deltaTime`  | `number`  | get delta time between frame renderes in `ms`                                                                     |
+|  `playhead`   | `number`  | goes from `0` to `1` over animation duration. If `duration` is not set, it does not update, and will stay at `0`. |
+|   `animate`   | `boolean` | not yet implemented.                                                                                              |
 
 ### SketchSettings
 
