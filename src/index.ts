@@ -113,9 +113,9 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     timeResetted: false,
   };
 
-  // console.log("settings", settings); // TEST
-  // console.log("props", props); // TEST
-  // console.log("states", states); // TEST
+  console.log("settings", settings); // TEST
+  console.log("props", props); // TEST
+  console.log("states", states); // TEST
 
   // init
   const draw = sketch(props);
@@ -197,3 +197,12 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   );
   addKeydown();
 };
+
+export {
+  Sketch,
+  SketchDraw,
+  SketchSettings,
+  SketchProps,
+  FrameFormat,
+  FramesFormat,
+} from "./types";

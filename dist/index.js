@@ -252,6 +252,9 @@ var sketchWrapper = (sketch, userSettings) => {
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
     timeResetted: false
   };
+  console.log("settings", settings);
+  console.log("props", props);
+  console.log("states", states);
   const draw = sketch(props);
   draw(props);
   const loop = () => {
