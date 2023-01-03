@@ -34,7 +34,7 @@ export interface SketchSettingsInternal {
   background: string;
   // canvas
   parent: HTMLElement | string;
-  canvas: HTMLCanvasElement | null; // null is base value, will be checked internally and new canvas will be created
+  canvas: HTMLCanvasElement | null; // if null, new canvas will be created
   dimensions: [number, number];
   pixelRatio: number;
   centered: boolean;
@@ -42,7 +42,7 @@ export interface SketchSettingsInternal {
   pixelated: boolean;
   // animation
   animate: boolean;
-  playFps: number;
+  playFps: number | null; // if null, will use display's maximum fps
   exportFps: number;
   duration: number;
   totalFrames: number;
@@ -72,7 +72,6 @@ export type SketchSettings = {
   playFps?: number;
   exportFps?: number;
   duration?: number;
-  // totalFrames?: number;
   // out file
   filename?: string;
   prefix?: string;
@@ -91,6 +90,6 @@ export interface SketchStates {
   startTime: number;
   timestamp: number;
   lastTimestamp: number;
-  frameInterval: number;
+  frameInterval: number | null;
   timeResetted: boolean;
 }

@@ -32,7 +32,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     pixelated: false,
     // animation
     animate: true,
-    playFps: 60,
+    playFps: null,
     exportFps: 60,
     duration: Infinity,
     totalFrames: Infinity,
@@ -61,25 +61,23 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
 
   settings.canvas = canvas;
 
-  // fps at least 1
-  settings.playFps = Math.max(Math.floor(settings.playFps), 1);
+  // fps at least 1 or keep at null: will be handled in advanceTime()
+  if (settings.playFps !== null) {
+    settings.playFps = Math.max(Math.floor(settings.playFps), 1);
+  }
   settings.exportFps = Math.max(Math.floor(settings.exportFps), 1);
   // userSettings doesn't have totalFrames, but internally, both will be computed.
   // when both are Infinity, animation will continue to run,
   // time/frame updates, playhead doesn't.
   // REVIEW: use ceil()? will it affect advanceTime()?
-  if (settings.duration !== Infinity) {
+  if (settings.playFps !== null && settings.duration !== Infinity) {
     settings.totalFrames = Math.floor(
       (settings.duration * settings.playFps) / 1000
     );
-  } else if (settings.totalFrames !== Infinity) {
-    settings.duration = (settings.totalFrames / settings.playFps) * 1000;
   }
-
-  // TODO: for now, they are the same
-  // settings.playFps = settings.exportFps;
-
-  console.log(settings); // TEST
+  // else if (settings.playFps !== null && settings.totalFrames !== Infinity) {
+  //   settings.duration = (settings.totalFrames / settings.playFps) * 1000;
+  // }
 
   // sketch props
   const props: SketchProps = {
@@ -111,9 +109,13 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     startTime: 0,
     timestamp: 0,
     lastTimestamp: 0,
-    frameInterval: 1000 / settings.playFps,
+    frameInterval: settings.playFps !== null ? 1000 / settings.playFps : null,
     timeResetted: false,
   };
+
+  console.log("settings", settings); // TEST
+  console.log("props", props); // TEST
+  console.log("states", states); // TEST
 
   // init
   const draw = sketch(props);
@@ -137,32 +139,16 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
       states,
     });
 
-    if (props.deltaTime < states.frameInterval) {
-      window.requestAnimationFrame(loop);
-      return;
+    if (states.frameInterval !== null) {
+      if (props.deltaTime < states.frameInterval) {
+        window.requestAnimationFrame(loop);
+        return;
+      }
     }
 
     states.lastTimestamp = states.timestamp;
 
-    // REVIEW: this is a hack. canvas-capture records 1 extra frame so had to finish capture early.
-    // it seems canva-capture doesn't allow any frame to skip record once it started.
-    // so after exporting if i didn't record last frame, whole playback stops,
-    // but if i record last frame, i get one extra frame.
-    // my hack is finish capture one frame early.
-    // TODO: revisit the issue later. maybe move things around.
-    // control when states.savingFrames change, when draw() gets called, when savingFrames() receive new data.
-    if (props.frame >= props.totalFrames - 1) {
-      if (states.savingFrames) {
-        states.captureDone = true;
-      }
-    }
-
-    // REVIEW: check playhead or frame?
-    // if (props.playhead >= 1) {
-    if (props.frame >= props.totalFrames) {
-      // if (states.savingFrames) {
-      //   states.captureDone = true;
-      // }
+    if (props.playhead >= 1) {
       props.playhead = 0;
       props.frame = 0;
       props.time = 0;

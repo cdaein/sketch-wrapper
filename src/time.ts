@@ -26,14 +26,6 @@ export const advanceTime = ({
   const { playFps, exportFps, duration, totalFrames } = settings;
   const fps = states.savingFrames ? exportFps : playFps;
 
-  // REVIEW BUGGY - but useful for debugging playhead going negative after exporting
-  // if (props.frame >= props.totalFrames) {
-  //   if (states.savingFrames) {
-  //     states.captureDone = true;
-  //     return;
-  //   }
-  // }
-
   // call performance.now() once and re-use.
   // avoid having slight difference between calls.
   states.timestamp = performance.now();
@@ -44,16 +36,16 @@ export const advanceTime = ({
     states.lastTimestamp = states.timestamp;
   }
 
-  props.deltaTime = states.savingFrames
-    ? states.frameInterval
-    : states.timestamp - states.lastTimestamp;
+  props.deltaTime = states.timestamp - states.lastTimestamp;
   props.time = states.timestamp - states.startTime;
   // props.playhead = props.playhead + props.deltaTime / duration
   props.playhead = duration !== Infinity ? props.time / duration : 0;
-  props.frame =
-    duration !== Infinity
-      ? Math.floor(props.playhead * totalFrames)
-      : Math.floor((props.time * fps) / 1000);
+  // props.frame =
+  //   duration !== Infinity
+  //     ? Math.floor(props.playhead * totalFrames)
+  //     : // : Math.floor((props.time * fps) / 1000);
+  //       props.frame + 1;
+  props.frame = props.frame + 1;
 };
 
 export const advanceFrame = (settings: SketchSettings) => {
