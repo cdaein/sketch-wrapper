@@ -2,7 +2,7 @@
  * time keeping
  */
 
-import {
+import type {
   SketchProps,
   SketchSettings,
   SketchSettingsInternal,

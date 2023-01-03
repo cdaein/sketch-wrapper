@@ -1,6 +1,6 @@
 import { createCanvas, resizeCanvas } from "@daeinc/canvas";
 import { toDomElement } from "@daeinc/dom";
-import { SketchSettingsInternal } from "./types";
+import type { SketchSettingsInternal } from "./types";
 
 export const prepareCanvas = (settings: SketchSettingsInternal) => {
   let canvas: HTMLCanvasElement;

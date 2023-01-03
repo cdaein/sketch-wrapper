@@ -3,7 +3,7 @@ import keydownHandler from "./events/keydown";
 import { saveCanvasFrame } from "./file-exports";
 import { advanceTime } from "./time";
 import { combineSettings } from "./helpers";
-import {
+import type {
   Sketch,
   SketchSettings,
   SketchSettingsInternal,
@@ -198,7 +198,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   addKeydown();
 };
 
-export {
+export type {
   Sketch,
   SketchDraw,
   SketchSettings,

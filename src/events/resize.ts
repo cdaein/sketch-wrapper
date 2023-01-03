@@ -1,5 +1,9 @@
 import { resizeCanvas } from "@daeinc/canvas";
-import { SketchProps, SketchSettings, SketchSettingsInternal } from "../types";
+import type {
+  SketchProps,
+  SketchSettings,
+  SketchSettingsInternal,
+} from "../types";
 
 // window resize event
 
