@@ -53,9 +53,9 @@ sketchWrapper(sketch, settings);
 
 ### Keyboard Shortcuts
 
-|      Shortcut      |                  Description                   |
-| :----------------: | :--------------------------------------------: |
-| `CMD(or Ctrl) + S` |              Export a PNG image.               |
+|      Shortcut      | Description                                    |
+| :----------------: | ---------------------------------------------- |
+| `CMD(or Ctrl) + S` | Export a PNG image.                            |
 |     `Spacebar`     | not yet implemented. Pause or resume animation |
 
 ### SketchProps
@@ -68,7 +68,7 @@ Use `width` and `height` to create a composition proportional to canvas size ins
 
 The same `frame` may be repeated if the display refresh rate is higher than the frame rate set.
 
-For `v0.7.0`:
+For `v0.7.1`:
 
 #### DOM
 
@@ -79,18 +79,18 @@ For `v0.7.0`:
 
 #### Canvas
 
-|     name     |   type   | description                                                                   |
-| :----------: | :------: | ----------------------------------------------------------------------------- |
-|   `width`    | `number` | get width in `px`                                                             |
-|   `height`   | `number` | get height in `px`                                                            |
-| `pixelRatio` | `number` | get current pixel ratio. Displays like Apple Retina can use `2`. default: `1` |
+|     name     |   type   | description                                                                                       |
+| :----------: | :------: | ------------------------------------------------------------------------------------------------- |
+|   `width`    | `number` | get width in `px`. When `scaleContext` is `true`, `canvas.width` is multiplied by `pixelRatio`.   |
+|   `height`   | `number` | get height in `px`. When `scaleContext` is `true`, `canvas.height` is multiplied by `pixelRatio`. |
+| `pixelRatio` | `number` | get current pixel ratio. Displays like Apple Retina can use `2`. default: `1`                     |
 
 #### Animation
 
 |     name      |   type    | description                                                                                                       |
 | :-----------: | :-------: | ----------------------------------------------------------------------------------------------------------------- |
-|  `duration`   | `number`  | get loop duration in `ms` (ex. `4000` = 4 sec)                                                                    |
-| `totalFrames` | `number`  | get the number of total frames                                                                                    |
+|  `duration`   | `number`  | get loop duration in `ms` (ex. `4000` = 4 sec). If `settings.duration` is not set, it will be `Infinity`.         |
+| `totalFrames` | `number`  | get the number of total frames. If `settings.duration` is not set, it will be `Infinity`.                         |
 |    `frame`    | `number`  | get current frame count. starts at `0`                                                                            |
 |    `time`     | `number`  | get current time in `ms`. starts at `0`                                                                           |
 |  `deltaTime`  | `number`  | get delta time between frame renderes in `ms`                                                                     |
@@ -101,7 +101,7 @@ For `v0.7.0`:
 
 You can pass any of these settings to `sketchWrapper(sketch, settings)` function. Any undefined settings will use default values.
 
-From `v0.7.0`
+From `v0.7.1`
 
 #### Document
 
@@ -124,12 +124,12 @@ From `v0.7.0`
 
 #### Animation
 
-|    name     |   type    |  default   | description                                    |
-| :---------: | :-------: | :--------: | ---------------------------------------------- |
-|  `animate`  | `boolean` |   `true`   | Set to `true` for animating                    |
-|  `playFps`  | `number`  |    `60`    | Set frame rate for playback                    |
-| `exportFps` | `number`  |    `60`    | not implemented yet                            |
-| `duration`  | `number`  | `Infinity` | Set loop duration in `ms` (ex. `4000` = 4 sec) |
+|    name     |   type    |  default   | description                                                                         |
+| :---------: | :-------: | :--------: | ----------------------------------------------------------------------------------- |
+|  `animate`  | `boolean` |   `true`   | Set to `true` for animating. Set to `false` for static sketches.                    |
+|  `playFps`  | `number`  |   `null`   | Set frame rate for playback. If not set, will use the maximum display refresh rate. |
+| `exportFps` | `number`  |    `60`    | not implemented yet.                                                                |
+| `duration`  | `number`  | `Infinity` | Set loop duration in `ms` (ex. `4000` = 4 sec)                                      |
 
 ### File Export
 
