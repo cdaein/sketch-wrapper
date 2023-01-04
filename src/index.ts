@@ -46,7 +46,9 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     suffix: "",
     frameFormat: "png",
     framesFormat: "mp4",
+    // sketch
     hotkeys: true,
+    mode: "2d",
   };
 
   // combine settings. no undefined.
@@ -142,21 +144,23 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     update,
   };
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("settings", settings); // TEST
-    console.log("props", props); // TEST
-    console.log("states", states); // TEST
-  }
+  // TODO: remove these from dist
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log("settings", settings); // TEST
+  //   console.log("props", props); // TEST
+  //   console.log("states", states); // TEST
+  // }
 
   const returned = sketch(props);
 
-  let render: SketchRender;
-  let resize: SketchResize;
+  // REVIEW: had to assign something but don't like it
+  let render: SketchRender = () => {};
+  let resize: SketchResize = () => {};
   if (typeof returned === "function") {
     render = returned;
-    resize = () => {}; // REVIEW: had to assign something but don't like it
   } else {
-    ({ render, resize } = returned);
+    render = returned.render || render;
+    resize = returned.resize || resize;
   }
 
   // render 1st frame of 1st page refresh to start w/ playhead=0

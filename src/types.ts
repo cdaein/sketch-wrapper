@@ -1,8 +1,8 @@
 // TODO: proper typing
 export type Sketch = (props: SketchProps) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
-  render: SketchRender;
-  resize: SketchResize;
+  render?: SketchRender;
+  resize?: SketchResize;
 }
 export type SketchRender = (props: SketchProps) => void;
 export type SketchResize = (props: SketchProps) => void;
@@ -29,6 +29,8 @@ export interface SketchProps {
   togglePlay: () => void;
   update: (settings: SketchSettings) => void;
 }
+
+export type SketchMode = "2d" | "p5";
 
 // gif is not supported by default
 export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
@@ -61,7 +63,9 @@ export interface SketchSettingsInternal {
   suffix: string;
   frameFormat: FrameFormat;
   framesFormat: FramesFormat;
+  // sketch
   hotkeys: boolean;
+  mode: SketchMode;
 }
 
 // user provided settings. all optional and properties must come from Internal or this type
@@ -88,7 +92,9 @@ export type SketchSettings = {
   suffix?: string;
   frameFormat?: FrameFormat;
   framesFormat?: FramesFormat;
+  // sketch
   hotkeys?: boolean;
+  mode?: SketchMode;
 };
 
 export interface SketchStates {
