@@ -29,13 +29,7 @@ export default (
     } else if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey && ev.key === "s") {
       // save frame (still)
       ev.preventDefault();
-      states.savingFrame = true;
-      states.playMode = "record";
-      saveCanvasFrame({
-        canvas,
-        settings,
-        states,
-      });
+      props.exportFrame();
     } else if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.key === "s") {
       // save frames (video)
       ev.preventDefault();

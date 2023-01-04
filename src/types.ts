@@ -25,6 +25,9 @@ export interface SketchProps {
   deltaTime: number;
   duration: number;
   totalFrames: number;
+  exportFrame: () => void;
+  togglePlay: () => void;
+  update: (settings: SketchSettings) => void;
 }
 
 // gif is not supported by default

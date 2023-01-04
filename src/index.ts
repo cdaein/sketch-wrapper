@@ -14,6 +14,7 @@ import type {
   SketchResize,
 } from "./types";
 import { prepareCanvas } from "./canvas";
+import { saveCanvasFrame } from "./file-exports";
 
 export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // const isServer = typeof module !== "undefined" && module.exports;
@@ -82,24 +83,6 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   //   settings.duration = (settings.totalFrames / settings.playFps) * 1000;
   // }
 
-  // sketch props
-  const props: SketchProps = {
-    // DOM
-    canvas,
-    context,
-    // canvas
-    width,
-    height,
-    pixelRatio,
-    // animation
-    playhead: 0,
-    frame: 0,
-    time: 0,
-    deltaTime: 0,
-    duration: settings.duration,
-    totalFrames: settings.totalFrames,
-  };
-
   // data used internally and may change value during life of sketch
   // REVIEW: i'm probably messing up with naming convention (props, states)
   const states: SketchStates = {
@@ -117,6 +100,45 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1000 / settings.playFps : null,
     timeResetted: false,
+  };
+
+  // sketch props
+  const exportFrame = () => {
+    states.savingFrame = true;
+    states.playMode = "record";
+    saveCanvasFrame({
+      canvas,
+      settings,
+      states,
+    });
+  };
+
+  const togglePlay = () => {
+    //
+  };
+
+  const update = (settings: SketchSettings) => {
+    //
+  };
+
+  const props: SketchProps = {
+    // DOM
+    canvas,
+    context,
+    // canvas
+    width,
+    height,
+    pixelRatio,
+    // animation
+    playhead: 0,
+    frame: 0,
+    time: 0,
+    deltaTime: 0,
+    duration: settings.duration,
+    totalFrames: settings.totalFrames,
+    exportFrame,
+    togglePlay,
+    update,
   };
 
   if (process.env.NODE_ENV === "development") {

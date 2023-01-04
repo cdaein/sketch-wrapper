@@ -12,7 +12,11 @@
  *   - quality?
  */
 
-import type { SketchStates, SketchSettingsInternal } from "./types";
+import type {
+  SketchStates,
+  SketchSettingsInternal,
+  SketchProps,
+} from "./types";
 
 /**
  * save a single frame of canvas
