@@ -20,6 +20,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // const isServer = typeof module !== "undefined" && module.exports;
   // console.log(`is running on server? ${isServer ? "✅" : "❌"}`);
 
+  // data flow: userSettings + defaultSettings => settings => states (mutable) => props => sketch()
   // default settings
   const defaultSettings: SketchSettingsInternal = {
     // document
@@ -232,21 +233,21 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // window resize event
   const { add: addResize, handleResize } = resizeHandler(
     canvas,
-    resize,
     props,
     userSettings,
-    settings
+    settings,
+    render,
+    resize
   );
   handleResize(); // run once when page is first loaded
 
   // keyboard events
-  // TODO: pressing again will stop exporting
   const { add: addKeydown } = keydownHandler(
     canvas,
-    loop,
     props,
     settings,
-    states
+    states,
+    loop
   );
 
   if (settings.hotkeys) {
@@ -258,6 +259,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
 export type {
   Sketch,
   SketchRender,
+  SketchResize,
   SketchSettings,
   SketchProps,
   FrameFormat,

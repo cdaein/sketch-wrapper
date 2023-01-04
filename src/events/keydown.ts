@@ -1,4 +1,3 @@
-import { saveCanvasFrame } from "../file-exports";
 import type {
   SketchLoop,
   SketchProps,
@@ -8,10 +7,10 @@ import type {
 
 export default (
   canvas: HTMLCanvasElement,
-  loop: SketchLoop,
   props: SketchProps,
   settings: SketchSettingsInternal,
-  states: SketchStates
+  states: SketchStates,
+  loop: SketchLoop
 ) => {
   const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key === " ") {
