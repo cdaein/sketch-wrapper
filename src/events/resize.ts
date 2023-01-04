@@ -47,7 +47,7 @@ export default (
           (parentHeight - margin * 2) / props.height
         )
       );
-      canvas.style.transform = "scale(" + scale + ")";
+      canvas.style.transform = `scale(${scale})`;
     }
   };
 

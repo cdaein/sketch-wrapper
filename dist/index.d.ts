@@ -13,7 +13,7 @@ interface SketchProps {
     duration: number;
     totalFrames: number;
 }
-type FrameFormat = "png" | "jpg" | "jpeg" | "gif" | "webp";
+type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
 type SketchSettings = {
     title?: string;

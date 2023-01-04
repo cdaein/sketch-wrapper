@@ -34,9 +34,11 @@ export const saveCanvasFrame = ({
   states: SketchStates;
   settings: SketchSettingsInternal;
 }) => {
-  const { filename, prefix, suffix, frameFormat: format } = settings;
+  let { filename, prefix, suffix, frameFormat: format } = settings;
 
-  const dataURL = canvas.toDataURL("image/png");
+  if (format === "jpg") format = "jpeg";
+  // may add additional quality to string, but will leave at default for now
+  const dataURL = canvas.toDataURL(`image/${format}`);
   const link = document.createElement("a");
   link.download = `${formatFilename({
     filename,

@@ -2,16 +2,30 @@ import { createCanvas, resizeCanvas } from '@daeinc/canvas';
 import { toDomElement } from '@daeinc/dom';
 
 // src/events/resize.ts
-var resize_default = (canvas, props, userSettings, settings, pixelRatio, scaleContext) => {
+var resize_default = (canvas, props, userSettings, settings) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       ({ width: props.width, height: props.height } = resizeCanvas({
         canvas,
         width: window.innerWidth,
         height: window.innerHeight,
-        pixelRatio,
-        scaleContext
+        pixelRatio: Math.max(settings.pixelRatio, 1),
+        scaleContext: settings.scaleContext
       }));
+    }
+    if (settings.centered) {
+      const margin = 50;
+      const canvasParent = canvas.parentElement;
+      const parentWidth = canvasParent.clientWidth;
+      const parentHeight = canvasParent.clientHeight;
+      const scale = Math.min(
+        1,
+        Math.min(
+          (parentWidth - margin * 2) / props.width,
+          (parentHeight - margin * 2) / props.height
+        )
+      );
+      canvas.style.transform = `scale(${scale})`;
     }
   };
   const add = () => {
@@ -20,7 +34,7 @@ var resize_default = (canvas, props, userSettings, settings, pixelRatio, scaleCo
   const remove = () => {
     window.removeEventListener("resize", handleResize);
   };
-  return { add, remove };
+  return { add, remove, handleResize };
 };
 
 // src/events/keydown.ts
@@ -64,8 +78,10 @@ var saveCanvasFrame = ({
   states,
   settings
 }) => {
-  const { filename, prefix, suffix, frameFormat: format } = settings;
-  const dataURL = canvas.toDataURL("image/png");
+  let { filename, prefix, suffix, frameFormat: format } = settings;
+  if (format === "jpg")
+    format = "jpeg";
+  const dataURL = canvas.toDataURL(`image/${format}`);
   const link = document.createElement("a");
   link.download = `${formatFilename({
     filename,
@@ -185,6 +201,11 @@ var prepareCanvas = (settings) => {
     canvasContainer.style.justifyContent = "center";
     canvasContainer.style.alignItems = "center";
     if (settings.scaleContext === false) ;
+  } else {
+    canvas.style.width = 100 + "%";
+    canvas.style.height = 100 + "%";
+    canvas.style.maxWidth = `${settings.dimensions[0]}px`;
+    canvas.style.maxHeight = `${settings.dimensions[1]}px`;
   }
   return { canvas, context, width, height, pixelRatio };
 };
@@ -282,14 +303,6 @@ var sketchWrapper = (sketch, userSettings) => {
         return;
       }
     }
-    if (process.env.NODE_ENV === "development") {
-      console.log({
-        timestamp,
-        "st.timestamp": states.timestamp,
-        "st.pausedStartTime": states.pausedStartTime,
-        "st.pausedEndTime": states.pausedEndTime
-      });
-    }
     states.lastTimestamp = states.timestamp;
     if (props.playhead >= 1) {
       props.playhead = 0;
@@ -310,14 +323,13 @@ var sketchWrapper = (sketch, userSettings) => {
     }
   };
   window.requestAnimationFrame(loop);
-  const { add: addResize } = resize_default(
+  const { add: addResize, handleResize } = resize_default(
     canvas,
     props,
     userSettings,
-    settings,
-    pixelRatio,
-    settings.scaleContext
+    settings
   );
+  handleResize();
   addResize();
   const { add: addKeydown } = keydown_default(
     canvas,

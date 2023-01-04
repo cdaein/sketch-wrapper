@@ -136,13 +136,13 @@ From `v0.7.1`
 
 ### File Export
 
-|      name      |   type   | default | description                                                                   |
-| :------------: | :------: | :-----: | ----------------------------------------------------------------------------- |
-|   `filename`   | `string` |  `""`   | Set file name for exported file. if not set, will use current datetime string |
-|    `prefix`    | `string` |  `""`   | Set prefix to filename                                                        |
-|    `suffix`    | `string` |  `""`   | Set suffix to filename                                                        |
-| `frameFormat`  | `string` |  `png`  | not implemented yet                                                           |
-| `framesFormat` | `string` |  `mp4`  | not implemented yet                                                           |
+|      name      |             type             | default | description                                                                   |
+| :------------: | :--------------------------: | :-----: | ----------------------------------------------------------------------------- |
+|   `filename`   |           `string`           |  `""`   | Set file name for exported file. if not set, will use current datetime string |
+|    `prefix`    |           `string`           |  `""`   | Set prefix to filename                                                        |
+|    `suffix`    |           `string`           |  `""`   | Set suffix to filename                                                        |
+| `frameFormat`  | `png \| jpeg \| jpg \| webp` |  `png`  | Set image export format yet                                                   |
+| `framesFormat` |           `string`           |  `mp4`  | not implemented yet                                                           |
 
 ## References
 

@@ -22,7 +22,8 @@ export interface SketchProps {
   totalFrames: number;
 }
 
-export type FrameFormat = "png" | "jpg" | "jpeg" | "gif" | "webp";
+// gif is not supported by default
+export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 
 // video or image sequence
 export type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
