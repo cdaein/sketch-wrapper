@@ -14,7 +14,7 @@ import type {
   SketchResize,
 } from "./types";
 import { prepareCanvas } from "./canvas";
-import { saveCanvasFrame } from "./file-exports";
+import { createFunctionProps } from "./function-props";
 
 export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // const isServer = typeof module !== "undefined" && module.exports;
@@ -103,16 +103,13 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   };
 
   // sketch props
-  const exportFrame = () => {
-    states.savingFrame = true;
-    states.playMode = "record";
-    saveCanvasFrame({
-      canvas,
-      settings,
-      states,
-    });
-  };
+  const { exportFrame, update } = createFunctionProps({
+    canvas,
+    settings,
+    states,
+  });
 
+  // REVIEW: can't move it inside createFunctionProps b/c it needs loop as argument
   const togglePlay = () => {
     states.paused = !states.paused;
     if (!states.paused) {
@@ -122,10 +119,6 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
       // when paused
       states.pausedStartTime = states.timestamp;
     }
-  };
-
-  const update = (settings: SketchSettings) => {
-    //
   };
 
   const props: SketchProps = {
@@ -187,6 +180,8 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
       return;
     }
 
+    // const newSettings = { ...settings, ...update(settings as SketchSettings) };
+
     advanceTime({
       props,
       settings,
@@ -218,7 +213,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
       states.startTime = states.timestamp;
     }
 
-    // console.log(props.frame);
+    // new settings from update() prop
 
     if (settings.animate && !states.paused) {
       render(props);
