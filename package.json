@@ -1,6 +1,6 @@
 {
   "name": "@daeinc/sketch-wrapper",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Helpers for creative coding sketches with HTML Canvas",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
@@ -20,6 +20,7 @@
   "author": "Daeinc",
   "license": "MIT",
   "devDependencies": {
+    "@daeinc/color": "^0.2.4",
     "@daeinc/draw": "^0.2.1",
     "@daeinc/math": "^0.4.0",
     "@types/node": "^18.11.18",

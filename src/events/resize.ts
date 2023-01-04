@@ -9,7 +9,9 @@ import type {
 } from "../types";
 
 // window resize event
-
+// REVIEW: do i need to separate window resize and canvas resize?
+// canvas style change: window resize
+// resize() return: canvas resize
 export default (
   canvas: HTMLCanvasElement,
   props: SketchProps,
@@ -40,7 +42,9 @@ export default (
         scaleContext: settings.scaleContext,
       }));
 
-      // console.log("resize");
+      // call only when canvas size has changed (ie. fullscreen)
+      resize(props);
+      render(props); // this helps with canvas flicker while resizing
     }
 
     // resizing canvas style (when !fullscreen & centered)
@@ -59,9 +63,6 @@ export default (
       );
       canvas.style.transform = `scale(${scale})`;
     }
-
-    resize(props);
-    render(props); // this helps with canvas flicker while resizing
   };
 
   const add = () => {

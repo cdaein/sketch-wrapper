@@ -13,5 +13,5 @@
     "rootDir": "./src",
     "outDir": "./dist"
   },
-  "exclude": ["./dist", "./demo", "./process/*", "./test/*"]
+  "exclude": ["./dist", "demo", "./process/*", "./test/*"]
 }

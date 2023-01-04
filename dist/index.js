@@ -12,6 +12,8 @@ var resize_default = (canvas, props, userSettings, settings, render, resize) => 
         pixelRatio: Math.max(settings.pixelRatio, 1),
         scaleContext: settings.scaleContext
       }));
+      resize(props);
+      render(props);
     }
     if (userSettings.dimensions !== void 0 && settings.centered) {
       const margin = 50;
@@ -27,8 +29,6 @@ var resize_default = (canvas, props, userSettings, settings, render, resize) => 
       );
       canvas.style.transform = `scale(${scale})`;
     }
-    resize(props);
-    render(props);
   };
   const add = () => {
     window.addEventListener("resize", handleResize);
