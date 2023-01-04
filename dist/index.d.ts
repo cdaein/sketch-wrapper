@@ -47,4 +47,4 @@ type SketchSettings = {
 
 declare const sketchWrapper: (sketch: Sketch, userSettings: SketchSettings) => void;
 
-export { FrameFormat, FramesFormat, Sketch, SketchProps, SketchRender, SketchSettings, sketchWrapper };
+export { FrameFormat, FramesFormat, Sketch, SketchProps, SketchRender, SketchResize, SketchSettings, sketchWrapper };

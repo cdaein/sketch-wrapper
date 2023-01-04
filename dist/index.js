@@ -2,7 +2,7 @@ import { createCanvas, resizeCanvas } from '@daeinc/canvas';
 import { toDomElement } from '@daeinc/dom';
 
 // src/events/resize.ts
-var resize_default = (canvas, resize, props, userSettings, settings) => {
+var resize_default = (canvas, props, userSettings, settings, render, resize) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       ({ width: props.width, height: props.height } = resizeCanvas({
@@ -13,7 +13,7 @@ var resize_default = (canvas, resize, props, userSettings, settings) => {
         scaleContext: settings.scaleContext
       }));
     }
-    if (settings.centered) {
+    if (userSettings.dimensions !== void 0 && settings.centered) {
       const margin = 50;
       const canvasParent = canvas.parentElement;
       const parentWidth = canvasParent.clientWidth;
@@ -28,6 +28,7 @@ var resize_default = (canvas, resize, props, userSettings, settings) => {
       canvas.style.transform = `scale(${scale})`;
     }
     resize(props);
+    render(props);
   };
   const add = () => {
     window.addEventListener("resize", handleResize);
@@ -39,7 +40,7 @@ var resize_default = (canvas, resize, props, userSettings, settings) => {
 };
 
 // src/events/keydown.ts
-var keydown_default = (canvas, loop, props, settings, states) => {
+var keydown_default = (canvas, props, settings, states, loop) => {
   const handleKeydown = (ev) => {
     if (ev.key === " ") {
       ev.preventDefault();
@@ -378,19 +379,18 @@ var sketchWrapper = (sketch, userSettings) => {
   window.requestAnimationFrame(loop);
   const { add: addResize, handleResize } = resize_default(
     canvas,
-    resize,
     props,
     userSettings,
-    settings
+    settings,
+    render,
+    resize
   );
   handleResize();
   const { add: addKeydown } = keydown_default(
     canvas,
-    loop,
     props,
     settings,
-    states
-  );
+    states);
   if (settings.hotkeys) {
     addResize();
     addKeydown();
