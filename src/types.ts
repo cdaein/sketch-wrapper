@@ -1,6 +1,11 @@
 // TODO: proper typing
-export type Sketch = (props: SketchProps) => SketchDraw;
-export type SketchDraw = (props: SketchProps) => void;
+export type Sketch = (props: SketchProps) => SketchRender | SketchReturnObject;
+export interface SketchReturnObject {
+  render: SketchRender;
+  resize: SketchResize;
+}
+export type SketchRender = (props: SketchProps) => void;
+export type SketchResize = (props: SketchProps) => void;
 export type SketchLoop = (timestamp: number) => void;
 
 // REVIEW: updatable/writable props (during life of a sketch), and fixed/readable props

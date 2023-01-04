@@ -1,6 +1,5 @@
 import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
-import { saveCanvasFrame } from "./file-exports";
 import { advanceTime } from "./time";
 import { combineSettings } from "./helpers";
 import type {
@@ -10,6 +9,9 @@ import type {
   SketchProps,
   SketchStates,
   SketchLoop,
+  SketchReturnObject,
+  SketchRender,
+  SketchResize,
 } from "./types";
 import { prepareCanvas } from "./canvas";
 
@@ -117,16 +119,25 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     timeResetted: false,
   };
 
-  console.log("settings", settings); // TEST
-  console.log("props", props); // TEST
-  console.log("states", states); // TEST
+  if (process.env.NODE_ENV === "development") {
+    console.log("settings", settings); // TEST
+    console.log("props", props); // TEST
+    console.log("states", states); // TEST
+  }
 
-  // init
+  const returned = sketch(props);
 
-  const draw = sketch(props);
+  let render: SketchRender;
+  let resize: SketchResize;
+  if (typeof returned === "function") {
+    render = returned;
+    resize = () => {}; // REVIEW: had to assign something but don't like it
+  } else {
+    ({ render, resize } = returned);
+  }
 
   // render 1st frame of 1st page refresh to start w/ playhead=0
-  draw(props);
+  render(props);
 
   // animation render loop
   const loop: SketchLoop = (timestamp: number) => {
@@ -181,7 +192,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     // console.log(props.frame);
 
     if (settings.animate && !states.paused) {
-      draw(props);
+      render(props);
       window.requestAnimationFrame(loop);
     }
 
@@ -197,6 +208,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // window resize event
   const { add: addResize, handleResize } = resizeHandler(
     canvas,
+    resize,
     props,
     userSettings,
     settings
@@ -221,7 +233,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
 
 export type {
   Sketch,
-  SketchDraw,
+  SketchRender,
   SketchSettings,
   SketchProps,
   FrameFormat,

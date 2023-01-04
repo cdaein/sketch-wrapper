@@ -1,5 +1,10 @@
-type Sketch = (props: SketchProps) => SketchDraw;
-type SketchDraw = (props: SketchProps) => void;
+type Sketch = (props: SketchProps) => SketchRender | SketchReturnObject;
+interface SketchReturnObject {
+    render: SketchRender;
+    resize: SketchResize;
+}
+type SketchRender = (props: SketchProps) => void;
+type SketchResize = (props: SketchProps) => void;
 interface SketchProps {
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
@@ -39,4 +44,4 @@ type SketchSettings = {
 
 declare const sketchWrapper: (sketch: Sketch, userSettings: SketchSettings) => void;
 
-export { FrameFormat, FramesFormat, Sketch, SketchDraw, SketchProps, SketchSettings, sketchWrapper };
+export { FrameFormat, FramesFormat, Sketch, SketchProps, SketchRender, SketchSettings, sketchWrapper };

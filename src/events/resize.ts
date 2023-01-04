@@ -1,6 +1,7 @@
 import { resizeCanvas } from "@daeinc/canvas";
 import type {
   SketchProps,
+  SketchResize,
   SketchSettings,
   SketchSettingsInternal,
 } from "../types";
@@ -9,6 +10,7 @@ import type {
 
 export default (
   canvas: HTMLCanvasElement,
+  resize: SketchResize,
   props: SketchProps,
   userSettings: SketchSettings,
   settings: SketchSettingsInternal
@@ -49,6 +51,8 @@ export default (
       );
       canvas.style.transform = `scale(${scale})`;
     }
+
+    resize(props);
   };
 
   const add = () => {

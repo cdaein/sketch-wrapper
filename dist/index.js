@@ -2,7 +2,7 @@ import { createCanvas, resizeCanvas } from '@daeinc/canvas';
 import { toDomElement } from '@daeinc/dom';
 
 // src/events/resize.ts
-var resize_default = (canvas, props, userSettings, settings) => {
+var resize_default = (canvas, resize, props, userSettings, settings) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       ({ width: props.width, height: props.height } = resizeCanvas({
@@ -27,6 +27,7 @@ var resize_default = (canvas, props, userSettings, settings) => {
       );
       canvas.style.transform = `scale(${scale})`;
     }
+    resize(props);
   };
   const add = () => {
     window.addEventListener("resize", handleResize);
@@ -285,11 +286,22 @@ var sketchWrapper = (sketch, userSettings) => {
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
     timeResetted: false
   };
-  console.log("settings", settings);
-  console.log("props", props);
-  console.log("states", states);
-  const draw = sketch(props);
-  draw(props);
+  if (process.env.NODE_ENV === "development") {
+    console.log("settings", settings);
+    console.log("props", props);
+    console.log("states", states);
+  }
+  const returned = sketch(props);
+  let render;
+  let resize;
+  if (typeof returned === "function") {
+    render = returned;
+    resize = () => {
+    };
+  } else {
+    ({ render, resize } = returned);
+  }
+  render(props);
   const loop = (timestamp) => {
     if (!states.paused) {
       states.timestamp = timestamp - states.pausedEndTime;
@@ -317,7 +329,7 @@ var sketchWrapper = (sketch, userSettings) => {
       states.startTime = states.timestamp;
     }
     if (settings.animate && !states.paused) {
-      draw(props);
+      render(props);
       window.requestAnimationFrame(loop);
     }
     if (states.savingFrames) ;
@@ -325,6 +337,7 @@ var sketchWrapper = (sketch, userSettings) => {
   window.requestAnimationFrame(loop);
   const { add: addResize, handleResize } = resize_default(
     canvas,
+    resize,
     props,
     userSettings,
     settings
