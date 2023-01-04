@@ -50,6 +50,12 @@ export const prepareCanvas = (settings: SketchSettingsInternal) => {
     if (settings.scaleContext === false) {
       // TODO: centering does not work at pixelRatio=2
     }
+  } else {
+    // scale canvas even when not centered.
+    canvas.style.width = 100 + "%";
+    canvas.style.height = 100 + "%";
+    canvas.style.maxWidth = `${settings.dimensions[0]}px`;
+    canvas.style.maxHeight = `${settings.dimensions[1]}px`;
   }
 
   return { canvas, context, width, height, pixelRatio };

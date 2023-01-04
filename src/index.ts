@@ -121,6 +121,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   console.log("states", states); // TEST
 
   // init
+
   const draw = sketch(props);
 
   // render 1st frame of 1st page refresh to start w/ playhead=0
@@ -158,14 +159,14 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
       }
     }
 
-    if (process.env.NODE_ENV === "development") {
-      console.log({
-        timestamp,
-        "st.timestamp": states.timestamp,
-        "st.pausedStartTime": states.pausedStartTime,
-        "st.pausedEndTime": states.pausedEndTime,
-      });
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log({
+    //     timestamp,
+    //     "st.timestamp": states.timestamp,
+    //     "st.pausedStartTime": states.pausedStartTime,
+    //     "st.pausedEndTime": states.pausedEndTime,
+    //   });
+    // }
 
     states.lastTimestamp = states.timestamp;
 
@@ -195,16 +196,16 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
 
   window.requestAnimationFrame(loop);
 
+  // event handlers
   // window resize event
   // TODO: avoid resizing canvas while exporting
-  const { add: addResize } = resizeHandler(
+  const { add: addResize, handleResize } = resizeHandler(
     canvas,
     props,
     userSettings,
-    settings,
-    pixelRatio,
-    settings.scaleContext
+    settings
   );
+  handleResize(); // run once when page is first loaded
   addResize();
 
   // keyboard events

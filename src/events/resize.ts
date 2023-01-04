@@ -11,12 +11,11 @@ export default (
   canvas: HTMLCanvasElement,
   props: SketchProps,
   userSettings: SketchSettings,
-  settings: SketchSettingsInternal,
-  pixelRatio: number,
-  scaleContext?: boolean
+  settings: SketchSettingsInternal
 ) => {
   const handleResize = () => {
-    // only when no dimensions(fullscreen) and not existing canvas
+    // keep canvas at full window size
+    // only when no dimensions(fullscreen) and not for existing canvas
     if (
       userSettings.dimensions === undefined &&
       userSettings.canvas === undefined
@@ -29,9 +28,26 @@ export default (
         canvas,
         width: window.innerWidth,
         height: window.innerHeight,
-        pixelRatio,
-        scaleContext,
+        pixelRatio: Math.max(settings.pixelRatio, 1),
+        scaleContext: settings.scaleContext,
       }));
+    }
+
+    // resizing canvas style (when centered)
+    // REVIEW: this should be better done with CSS rules.
+    if (settings.centered) {
+      const margin = 50; // px // TODO: add to settings
+      const canvasParent = canvas.parentElement!;
+      const parentWidth = canvasParent.clientWidth;
+      const parentHeight = canvasParent.clientHeight;
+      const scale = Math.min(
+        1,
+        Math.min(
+          (parentWidth - margin * 2) / props.width,
+          (parentHeight - margin * 2) / props.height
+        )
+      );
+      canvas.style.transform = "scale(" + scale + ")";
     }
   };
 
@@ -43,5 +59,5 @@ export default (
     window.removeEventListener("resize", handleResize);
   };
 
-  return { add, remove };
+  return { add, remove, handleResize };
 };
