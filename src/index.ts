@@ -42,6 +42,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     suffix: "",
     frameFormat: "png",
     framesFormat: "mp4",
+    hotkeys: true,
   };
 
   // combine settings. no undefined.
@@ -194,7 +195,6 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
 
   // event handlers
   // window resize event
-  // TODO: avoid resizing canvas while exporting
   const { add: addResize, handleResize } = resizeHandler(
     canvas,
     props,
@@ -202,7 +202,6 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     settings
   );
   handleResize(); // run once when page is first loaded
-  addResize();
 
   // keyboard events
   // TODO: pressing again will stop exporting
@@ -213,7 +212,11 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     settings,
     states
   );
-  addKeydown();
+
+  if (settings.hotkeys) {
+    addResize();
+    addKeydown();
+  }
 };
 
 export type {

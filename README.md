@@ -143,6 +143,7 @@ From `v0.7.1`
 |    `suffix`    |           `string`           |  `""`   | Set suffix to filename                                                        |
 | `frameFormat`  | `png \| jpeg \| jpg \| webp` |  `png`  | Set image export format yet                                                   |
 | `framesFormat` |           `string`           |  `mp4`  | not implemented yet                                                           |
+|   `hotkeys`    |          `boolean`           | `true`  | Set to `false` disable keyboard shortcuts such as `Cmd + S` to export image   |
 
 ## References
 

@@ -37,41 +37,6 @@ var resize_default = (canvas, props, userSettings, settings) => {
   return { add, remove, handleResize };
 };
 
-// src/events/keydown.ts
-var keydown_default = (canvas, loop, props, settings, states) => {
-  const handleKeydown = (ev) => {
-    if (ev.key === " ") {
-      ev.preventDefault();
-      if (process.env.NODE_ENV === "development")
-        console.log("sketch paused or resumed");
-      states.paused = !states.paused;
-      if (!states.paused) {
-        window.requestAnimationFrame(loop);
-      } else {
-        states.pausedStartTime = states.timestamp;
-      }
-    } else if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey && ev.key === "s") {
-      ev.preventDefault();
-      states.savingFrame = true;
-      states.playMode = "record";
-    } else if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.key === "s") {
-      ev.preventDefault();
-      if (!states.savingFrames) {
-        states.savingFrames = true;
-      } else {
-        states.captureDone = true;
-      }
-    }
-  };
-  const add = () => {
-    window.addEventListener("keydown", handleKeydown);
-  };
-  const remove = () => {
-    window.removeEventListener("keydown", handleKeydown);
-  };
-  return { add, remove };
-};
-
 // src/file-exports.ts
 var saveCanvasFrame = ({
   canvas,
@@ -109,6 +74,46 @@ var formatDatetime = (date) => {
   );
   const formatted = `${yyyy}.${mo}.${dd}-${hh}.${mm}.${ss}`;
   return formatted;
+};
+
+// src/events/keydown.ts
+var keydown_default = (canvas, loop, props, settings, states) => {
+  const handleKeydown = (ev) => {
+    if (ev.key === " ") {
+      ev.preventDefault();
+      if (process.env.NODE_ENV === "development")
+        console.log("sketch paused or resumed");
+      states.paused = !states.paused;
+      if (!states.paused) {
+        window.requestAnimationFrame(loop);
+      } else {
+        states.pausedStartTime = states.timestamp;
+      }
+    } else if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey && ev.key === "s") {
+      ev.preventDefault();
+      states.savingFrame = true;
+      states.playMode = "record";
+      saveCanvasFrame({
+        canvas,
+        settings,
+        states
+      });
+    } else if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.key === "s") {
+      ev.preventDefault();
+      if (!states.savingFrames) {
+        states.savingFrames = true;
+      } else {
+        states.captureDone = true;
+      }
+    }
+  };
+  const add = () => {
+    window.addEventListener("keydown", handleKeydown);
+  };
+  const remove = () => {
+    window.removeEventListener("keydown", handleKeydown);
+  };
+  return { add, remove };
 };
 
 // src/time.ts
@@ -231,7 +236,8 @@ var sketchWrapper = (sketch, userSettings) => {
     prefix: "",
     suffix: "",
     frameFormat: "png",
-    framesFormat: "mp4"
+    framesFormat: "mp4",
+    hotkeys: true
   };
   const settings = combineSettings({
     base: defaultSettings,
@@ -314,13 +320,7 @@ var sketchWrapper = (sketch, userSettings) => {
       draw(props);
       window.requestAnimationFrame(loop);
     }
-    if (states.savingFrame) {
-      saveCanvasFrame({
-        canvas,
-        settings,
-        states
-      });
-    }
+    if (states.savingFrames) ;
   };
   window.requestAnimationFrame(loop);
   const { add: addResize, handleResize } = resize_default(
@@ -330,7 +330,6 @@ var sketchWrapper = (sketch, userSettings) => {
     settings
   );
   handleResize();
-  addResize();
   const { add: addKeydown } = keydown_default(
     canvas,
     loop,
@@ -338,7 +337,10 @@ var sketchWrapper = (sketch, userSettings) => {
     settings,
     states
   );
-  addKeydown();
+  if (settings.hotkeys) {
+    addResize();
+    addKeydown();
+  }
 };
 
 export { sketchWrapper };

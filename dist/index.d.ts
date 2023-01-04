@@ -34,6 +34,7 @@ type SketchSettings = {
     suffix?: string;
     frameFormat?: FrameFormat;
     framesFormat?: FramesFormat;
+    hotkeys?: boolean;
 };
 
 declare const sketchWrapper: (sketch: Sketch, userSettings: SketchSettings) => void;

@@ -53,6 +53,7 @@ export interface SketchSettingsInternal {
   suffix: string;
   frameFormat: FrameFormat;
   framesFormat: FramesFormat;
+  hotkeys: boolean;
 }
 
 // user provided settings. all optional and properties must come from Internal or this type
@@ -79,6 +80,7 @@ export type SketchSettings = {
   suffix?: string;
   frameFormat?: FrameFormat;
   framesFormat?: FramesFormat;
+  hotkeys?: boolean;
 };
 
 export interface SketchStates {
