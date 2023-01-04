@@ -15,10 +15,16 @@ export default (
   const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key === " ") {
       ev.preventDefault();
-      console.log("sketch paused or resumed");
-      states.isAnimating = !states.isAnimating;
-      // FIX: time has advanced when resumed
-      if (states.isAnimating) window.requestAnimationFrame(loop);
+      if (process.env.NODE_ENV === "development")
+        console.log("sketch paused or resumed");
+      states.paused = !states.paused;
+      if (!states.paused) {
+        // when resumed: call loop so animation will continue
+        window.requestAnimationFrame(loop);
+      } else {
+        // when paused
+        states.pausedStartTime = states.timestamp;
+      }
     } else if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey && ev.key === "s") {
       // save frame (still)
       ev.preventDefault();

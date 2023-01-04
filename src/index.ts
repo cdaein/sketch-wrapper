@@ -100,13 +100,16 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // data used internally and may change value during life of sketch
   // REVIEW: i'm probably messing up with naming convention (props, states)
   const states: SketchStates = {
-    isAnimating: true,
+    paused: false,
     playMode: "play",
     savingFrame: false,
     savingFrames: false,
     captureReady: false,
     captureDone: false,
     startTime: 0,
+    lastStartTime: 0,
+    pausedStartTime: 0,
+    pausedEndTime: 0,
     timestamp: 0,
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1000 / settings.playFps : null,
@@ -124,7 +127,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   draw(props);
 
   // animation render loop
-  const loop: SketchLoop = () => {
+  const loop: SketchLoop = (timestamp: number) => {
     // 0. first frame draw (outside loop)
     // 1. update time
     // 2. draw
@@ -132,6 +135,15 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     //   - greater than interval: draw
     // 3. rAF
     // 4. save
+
+    if (!states.paused) {
+      // store performance.now() once and re-use within same loop call
+      states.timestamp = timestamp - states.pausedEndTime;
+    } else {
+      states.pausedEndTime = timestamp - states.pausedStartTime;
+      window.requestAnimationFrame(loop);
+      return;
+    }
 
     advanceTime({
       props,
@@ -146,6 +158,15 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
       }
     }
 
+    if (process.env.NODE_ENV === "development") {
+      console.log({
+        timestamp,
+        "st.timestamp": states.timestamp,
+        "st.pausedStartTime": states.pausedStartTime,
+        "st.pausedEndTime": states.pausedEndTime,
+      });
+    }
+
     states.lastTimestamp = states.timestamp;
 
     if (props.playhead >= 1) {
@@ -157,7 +178,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
 
     // console.log(props.frame);
 
-    if (settings.animate && states.isAnimating) {
+    if (settings.animate && !states.paused) {
       draw(props);
       window.requestAnimationFrame(loop);
     }

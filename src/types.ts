@@ -81,13 +81,16 @@ export type SketchSettings = {
 };
 
 export interface SketchStates {
-  isAnimating: boolean; // regardless of playMode, time is updating
+  paused: boolean; // regardless of playMode, time is updating
   playMode: "play" | "record"; // REVIEW: "play:time", "play:frame" do i need this? or just use savingFrames:boolean?
   savingFrame: boolean;
   savingFrames: boolean;
   captureReady: boolean;
   captureDone: boolean;
   startTime: number;
+  lastStartTime: number;
+  pausedStartTime: number;
+  pausedEndTime: number;
   timestamp: number;
   lastTimestamp: number;
   frameInterval: number | null;

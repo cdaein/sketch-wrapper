@@ -24,15 +24,13 @@ export const advanceTime = ({
   states: SketchStates;
 }) => {
   const { playFps, exportFps, duration, totalFrames } = settings;
-  const fps = states.savingFrames ? exportFps : playFps;
-
-  // call performance.now() once and re-use.
-  // avoid having slight difference between calls.
-  states.timestamp = performance.now();
+  // const fps = states.savingFrames ? exportFps : playFps;
 
   // REVIEW: set inital value to null, instead of 0?
+  // clean start again (this is to avoid calling performance.now again which adds slight discrepancy)
   if (states.startTime === 0) {
     states.startTime = states.timestamp;
+    states.lastStartTime = states.startTime;
     states.lastTimestamp = states.timestamp;
   }
 

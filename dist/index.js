@@ -28,10 +28,14 @@ var keydown_default = (canvas, loop, props, settings, states) => {
   const handleKeydown = (ev) => {
     if (ev.key === " ") {
       ev.preventDefault();
-      console.log("sketch paused or resumed");
-      states.isAnimating = !states.isAnimating;
-      if (states.isAnimating)
+      if (process.env.NODE_ENV === "development")
+        console.log("sketch paused or resumed");
+      states.paused = !states.paused;
+      if (!states.paused) {
         window.requestAnimationFrame(loop);
+      } else {
+        states.pausedStartTime = states.timestamp;
+      }
     } else if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey && ev.key === "s") {
       ev.preventDefault();
       states.savingFrame = true;
@@ -98,10 +102,9 @@ var advanceTime = ({
   states
 }) => {
   const { playFps, exportFps, duration, totalFrames } = settings;
-  states.savingFrames ? exportFps : playFps;
-  states.timestamp = performance.now();
   if (states.startTime === 0) {
     states.startTime = states.timestamp;
+    states.lastStartTime = states.startTime;
     states.lastTimestamp = states.timestamp;
   }
   props.deltaTime = states.timestamp - states.lastTimestamp;
@@ -240,13 +243,16 @@ var sketchWrapper = (sketch, userSettings) => {
     totalFrames: settings.totalFrames
   };
   const states = {
-    isAnimating: true,
+    paused: false,
     playMode: "play",
     savingFrame: false,
     savingFrames: false,
     captureReady: false,
     captureDone: false,
     startTime: 0,
+    lastStartTime: 0,
+    pausedStartTime: 0,
+    pausedEndTime: 0,
     timestamp: 0,
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
@@ -257,7 +263,14 @@ var sketchWrapper = (sketch, userSettings) => {
   console.log("states", states);
   const draw = sketch(props);
   draw(props);
-  const loop = () => {
+  const loop = (timestamp) => {
+    if (!states.paused) {
+      states.timestamp = timestamp - states.pausedEndTime;
+    } else {
+      states.pausedEndTime = timestamp - states.pausedStartTime;
+      window.requestAnimationFrame(loop);
+      return;
+    }
     advanceTime({
       props,
       settings,
@@ -269,6 +282,14 @@ var sketchWrapper = (sketch, userSettings) => {
         return;
       }
     }
+    if (process.env.NODE_ENV === "development") {
+      console.log({
+        timestamp,
+        "st.timestamp": states.timestamp,
+        "st.pausedStartTime": states.pausedStartTime,
+        "st.pausedEndTime": states.pausedEndTime
+      });
+    }
     states.lastTimestamp = states.timestamp;
     if (props.playhead >= 1) {
       props.playhead = 0;
@@ -276,7 +297,7 @@ var sketchWrapper = (sketch, userSettings) => {
       props.time = 0;
       states.startTime = states.timestamp;
     }
-    if (settings.animate && states.isAnimating) {
+    if (settings.animate && !states.paused) {
       draw(props);
       window.requestAnimationFrame(loop);
     }
