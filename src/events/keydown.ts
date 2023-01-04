@@ -1,3 +1,4 @@
+import { saveCanvasFrame } from "../file-exports";
 import type {
   SketchLoop,
   SketchProps,
@@ -30,6 +31,11 @@ export default (
       ev.preventDefault();
       states.savingFrame = true;
       states.playMode = "record";
+      saveCanvasFrame({
+        canvas,
+        settings,
+        states,
+      });
     } else if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.key === "s") {
       // save frames (video)
       ev.preventDefault();

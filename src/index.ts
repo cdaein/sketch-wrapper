@@ -185,12 +185,8 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     }
 
     // save frame(s)
-    if (states.savingFrame) {
-      saveCanvasFrame({
-        canvas,
-        settings,
-        states,
-      });
+    if (states.savingFrames) {
+      //
     }
   };
 
