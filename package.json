@@ -43,7 +43,7 @@
     "vite": "^4.0.3"
   },
   "dependencies": {
-    "@daeinc/canvas": "^0.9.1",
+    "@daeinc/canvas": "^0.10.0",
     "@daeinc/dom": "^0.2.0"
   },
   "publishConfig": {
