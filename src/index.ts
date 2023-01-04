@@ -63,7 +63,9 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   document.title = settings.title;
   document.body.style.background = settings.background;
   // canvas, context
-  const { canvas, context, width, height, pixelRatio } =
+  // REVIEW: problem may be createCanvas() returns context (2d or webgl), gl (webgl or undefined),
+  //         but props doesn't allow it
+  let { canvas, context, gl, width, height, pixelRatio } =
     prepareCanvas(settings);
 
   settings.canvas = canvas;
@@ -125,10 +127,15 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   };
 
   const props: SketchProps = {
-    // DOM
-    canvas,
-    context,
     // canvas
+    canvas,
+    // REVIEW is this good to assert type like this when it very well can be undefined?
+    //        at least, there will be a warning when trying access wrong methods on context
+    //        i think best way is not to export props at all if undefined.
+    //        but optional prop is causing undefined warning at sketch
+    //        also context should always be 2d context, gl = webgl
+    context: context as CanvasRenderingContext2D,
+    gl: gl as WebGLRenderingContext,
     width,
     height,
     pixelRatio,

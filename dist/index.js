@@ -7,6 +7,7 @@ var resize_default = (canvas, props, userSettings, settings, render, resize) => 
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       ({ width: props.width, height: props.height } = resizeCanvas({
         canvas,
+        mode: settings.mode,
         width: window.innerWidth,
         height: window.innerHeight,
         pixelRatio: Math.max(settings.pixelRatio, 1),
@@ -124,16 +125,29 @@ var combineSettings = ({
 var prepareCanvas = (settings) => {
   let canvas;
   let context;
+  let gl;
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
   if (settings.canvas === void 0 || settings.canvas === null) {
-    ({ canvas, context, width, height } = createCanvas({
-      parent: settings.parent,
-      width,
-      height,
-      pixelRatio,
-      scaleContext: settings.scaleContext
-    }));
+    if (settings.mode === "2d") {
+      ({ canvas, context, width, height } = createCanvas({
+        parent: settings.parent,
+        mode: settings.mode,
+        width,
+        height,
+        pixelRatio,
+        scaleContext: settings.scaleContext
+      }));
+    } else {
+      ({ canvas, context, gl, width, height } = createCanvas({
+        parent: settings.parent,
+        mode: settings.mode,
+        width,
+        height,
+        pixelRatio,
+        scaleContext: settings.scaleContext
+      }));
+    }
   } else {
     if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
       throw new Error("provided canvas must be an HTMLCanvasElement");
@@ -142,8 +156,9 @@ var prepareCanvas = (settings) => {
     if (settings.parent) {
       toDomElement(settings.parent).appendChild(canvas);
     }
-    ({ context, width, height } = resizeCanvas({
+    ({ context, gl, width, height } = resizeCanvas({
       canvas,
+      mode: settings.mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
@@ -164,7 +179,7 @@ var prepareCanvas = (settings) => {
     canvas.style.maxWidth = `${settings.dimensions[0]}px`;
     canvas.style.maxHeight = `${settings.dimensions[1]}px`;
   }
-  return { canvas, context, width, height, pixelRatio };
+  return { canvas, context, gl, width, height, pixelRatio };
 };
 
 // src/file-exports.ts
@@ -264,7 +279,8 @@ var sketchWrapper = (sketch, userSettings) => {
     suffix: "",
     frameFormat: "png",
     framesFormat: "mp4",
-    hotkeys: true
+    hotkeys: true,
+    mode: "2d"
   };
   const settings = combineSettings({
     base: defaultSettings,
@@ -272,7 +288,7 @@ var sketchWrapper = (sketch, userSettings) => {
   });
   document.title = settings.title;
   document.body.style.background = settings.background;
-  const { canvas, context, width, height, pixelRatio } = prepareCanvas(settings);
+  let { canvas, context, gl, width, height, pixelRatio } = prepareCanvas(settings);
   settings.canvas = canvas;
   if (settings.playFps !== null) {
     settings.playFps = Math.max(Math.floor(settings.playFps), 1);
@@ -315,6 +331,7 @@ var sketchWrapper = (sketch, userSettings) => {
   const props = {
     canvas,
     context,
+    gl,
     width,
     height,
     pixelRatio,
@@ -328,20 +345,16 @@ var sketchWrapper = (sketch, userSettings) => {
     togglePlay,
     update
   };
-  if (process.env.NODE_ENV === "development") {
-    console.log("settings", settings);
-    console.log("props", props);
-    console.log("states", states);
-  }
   const returned = sketch(props);
-  let render;
-  let resize;
+  let render = () => {
+  };
+  let resize = () => {
+  };
   if (typeof returned === "function") {
     render = returned;
-    resize = () => {
-    };
   } else {
-    ({ render, resize } = returned);
+    render = returned.render || render;
+    resize = returned.resize || resize;
   }
   render(props);
   const loop = (timestamp) => {

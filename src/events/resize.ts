@@ -36,6 +36,7 @@ export default (
 
       ({ width: props.width, height: props.height } = resizeCanvas({
         canvas,
+        mode: settings.mode,
         width: window.innerWidth,
         height: window.innerHeight,
         pixelRatio: Math.max(settings.pixelRatio, 1),

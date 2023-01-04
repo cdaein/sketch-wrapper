@@ -4,19 +4,43 @@ import type { SketchSettingsInternal } from "./types";
 
 export const prepareCanvas = (settings: SketchSettingsInternal) => {
   let canvas: HTMLCanvasElement;
-  let context: CanvasRenderingContext2D;
+  let context: CanvasRenderingContext2D | WebGLRenderingContext;
+  let gl;
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
 
   if (settings.canvas === undefined || settings.canvas === null) {
-    // new canvas
-    ({ canvas, context, width, height } = createCanvas({
-      parent: settings.parent,
-      width,
-      height,
-      pixelRatio,
-      scaleContext: settings.scaleContext,
-    }));
+    if (settings.mode === "2d") {
+      // new 2d canvas
+      ({ canvas, context, width, height } = createCanvas({
+        parent: settings.parent,
+        mode: settings.mode,
+        width,
+        height,
+        pixelRatio,
+        scaleContext: settings.scaleContext,
+      })) as {
+        canvas: HTMLCanvasElement;
+        context: CanvasRenderingContext2D;
+        width: number;
+        height: number;
+      };
+    } else {
+      // new webgl canvas
+      ({ canvas, context, gl, width, height } = createCanvas({
+        parent: settings.parent,
+        mode: settings.mode,
+        width,
+        height,
+        pixelRatio,
+        scaleContext: settings.scaleContext,
+      })) as {
+        canvas: HTMLCanvasElement;
+        gl: WebGLRenderingContext;
+        width: number;
+        height: number;
+      };
+    }
   } else {
     if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
       throw new Error("provided canvas must be an HTMLCanvasElement");
@@ -26,8 +50,10 @@ export const prepareCanvas = (settings: SketchSettingsInternal) => {
     if (settings.parent) {
       toDomElement(settings.parent).appendChild(canvas);
     }
-    ({ context, width, height } = resizeCanvas({
+
+    ({ context, gl, width, height } = resizeCanvas({
       canvas,
+      mode: settings.mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
@@ -58,5 +84,5 @@ export const prepareCanvas = (settings: SketchSettingsInternal) => {
     canvas.style.maxHeight = `${settings.dimensions[1]}px`;
   }
 
-  return { canvas, context, width, height, pixelRatio };
+  return { canvas, context, gl, width, height, pixelRatio };
 };
