@@ -17,6 +17,9 @@ interface SketchProps {
     deltaTime: number;
     duration: number;
     totalFrames: number;
+    exportFrame: () => void;
+    togglePlay: () => void;
+    update: (settings: SketchSettings) => void;
 }
 type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";

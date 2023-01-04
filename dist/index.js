@@ -38,45 +38,6 @@ var resize_default = (canvas, resize, props, userSettings, settings) => {
   return { add, remove, handleResize };
 };
 
-// src/file-exports.ts
-var saveCanvasFrame = ({
-  canvas,
-  states,
-  settings
-}) => {
-  let { filename, prefix, suffix, frameFormat: format } = settings;
-  if (format === "jpg")
-    format = "jpeg";
-  const dataURL = canvas.toDataURL(`image/${format}`);
-  const link = document.createElement("a");
-  link.download = `${formatFilename({
-    filename,
-    prefix,
-    suffix
-  })}.${format}`;
-  link.href = dataURL;
-  link.click();
-  states.savingFrame = false;
-  states.playMode = "play";
-};
-var formatFilename = ({
-  filename,
-  prefix = "",
-  suffix = ""
-}) => {
-  return filename === void 0 || filename === "" ? `${prefix}${formatDatetime(new Date())}${suffix}` : filename;
-};
-var formatDatetime = (date) => {
-  const offset = date.getTimezoneOffset();
-  date.setMinutes(date.getMinutes() - offset);
-  const isoString = date.toISOString();
-  const [full, yyyy, mo, dd, hh, mm, ss] = isoString.match(
-    /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/
-  );
-  const formatted = `${yyyy}.${mo}.${dd}-${hh}.${mm}.${ss}`;
-  return formatted;
-};
-
 // src/events/keydown.ts
 var keydown_default = (canvas, loop, props, settings, states) => {
   const handleKeydown = (ev) => {
@@ -84,21 +45,10 @@ var keydown_default = (canvas, loop, props, settings, states) => {
       ev.preventDefault();
       if (process.env.NODE_ENV === "development")
         console.log("sketch paused or resumed");
-      states.paused = !states.paused;
-      if (!states.paused) {
-        window.requestAnimationFrame(loop);
-      } else {
-        states.pausedStartTime = states.timestamp;
-      }
+      props.togglePlay();
     } else if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey && ev.key === "s") {
       ev.preventDefault();
-      states.savingFrame = true;
-      states.playMode = "record";
-      saveCanvasFrame({
-        canvas,
-        settings,
-        states
-      });
+      props.exportFrame();
     } else if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && ev.key === "s") {
       ev.preventDefault();
       if (!states.savingFrames) {
@@ -216,6 +166,81 @@ var prepareCanvas = (settings) => {
   return { canvas, context, width, height, pixelRatio };
 };
 
+// src/file-exports.ts
+var saveCanvasFrame = ({
+  canvas,
+  states,
+  settings
+}) => {
+  let { filename, prefix, suffix, frameFormat: format } = settings;
+  if (format === "jpg")
+    format = "jpeg";
+  const dataURL = canvas.toDataURL(`image/${format}`);
+  const link = document.createElement("a");
+  link.download = `${formatFilename({
+    filename,
+    prefix,
+    suffix
+  })}.${format}`;
+  link.href = dataURL;
+  link.click();
+  states.savingFrame = false;
+  states.playMode = "play";
+};
+var formatFilename = ({
+  filename,
+  prefix = "",
+  suffix = ""
+}) => {
+  return filename === void 0 || filename === "" ? `${prefix}${formatDatetime(new Date())}${suffix}` : filename;
+};
+var formatDatetime = (date) => {
+  const offset = date.getTimezoneOffset();
+  date.setMinutes(date.getMinutes() - offset);
+  const isoString = date.toISOString();
+  const [full, yyyy, mo, dd, hh, mm, ss] = isoString.match(
+    /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/
+  );
+  const formatted = `${yyyy}.${mo}.${dd}-${hh}.${mm}.${ss}`;
+  return formatted;
+};
+
+// src/function-props.ts
+var createFunctionProps = ({
+  canvas,
+  settings,
+  states
+}) => {
+  return {
+    exportFrame: createExportFrameProp({ canvas, settings, states }),
+    update: createUpdateProp({ canvas, prevSettings: settings, resizeCanvas: resizeCanvas })
+  };
+};
+var createExportFrameProp = ({
+  canvas,
+  settings,
+  states
+}) => {
+  return () => {
+    states.savingFrame = true;
+    states.playMode = "record";
+    saveCanvasFrame({
+      canvas,
+      settings,
+      states
+    });
+  };
+};
+var createUpdateProp = ({
+  canvas,
+  prevSettings,
+  resizeCanvas: resizeCanvas4
+}) => {
+  return (settings) => {
+    console.log("update() prop is not yet implemented.");
+  };
+};
+
 // src/index.ts
 var sketchWrapper = (sketch, userSettings) => {
   const defaultSettings = {
@@ -257,19 +282,6 @@ var sketchWrapper = (sketch, userSettings) => {
       settings.duration * settings.playFps / 1e3
     );
   }
-  const props = {
-    canvas,
-    context,
-    width,
-    height,
-    pixelRatio,
-    playhead: 0,
-    frame: 0,
-    time: 0,
-    deltaTime: 0,
-    duration: settings.duration,
-    totalFrames: settings.totalFrames
-  };
   const states = {
     paused: false,
     playMode: "play",
@@ -285,6 +297,35 @@ var sketchWrapper = (sketch, userSettings) => {
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
     timeResetted: false
+  };
+  const { exportFrame, update } = createFunctionProps({
+    canvas,
+    settings,
+    states
+  });
+  const togglePlay = () => {
+    states.paused = !states.paused;
+    if (!states.paused) {
+      window.requestAnimationFrame(loop);
+    } else {
+      states.pausedStartTime = states.timestamp;
+    }
+  };
+  const props = {
+    canvas,
+    context,
+    width,
+    height,
+    pixelRatio,
+    playhead: 0,
+    frame: 0,
+    time: 0,
+    deltaTime: 0,
+    duration: settings.duration,
+    totalFrames: settings.totalFrames,
+    exportFrame,
+    togglePlay,
+    update
   };
   if (process.env.NODE_ENV === "development") {
     console.log("settings", settings);
