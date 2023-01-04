@@ -114,7 +114,14 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   };
 
   const togglePlay = () => {
-    //
+    states.paused = !states.paused;
+    if (!states.paused) {
+      // when resumed: call loop so animation will continue
+      window.requestAnimationFrame(loop);
+    } else {
+      // when paused
+      states.pausedStartTime = states.timestamp;
+    }
   };
 
   const update = (settings: SketchSettings) => {
