@@ -54,6 +54,8 @@ sketchWrapper(sketch, settings);
 
 ## Features
 
+Features documentation is updated for `v0.7.9`
+
 ### Keyboard Shortcuts
 
 |      Shortcut      | Description                                    |
@@ -70,8 +72,6 @@ The `playhead` prop repeats the range of `0..1` over animation duration. This is
 Use `width` and `height` to create a composition proportional to canvas size instead of hard-coding numbers.
 
 The same `frame` may be repeated if the display refresh rate is higher than the frame rate set.
-
-For `v0.7.1`:
 
 #### DOM
 
@@ -103,8 +103,6 @@ For `v0.7.1`:
 ### SketchSettings
 
 You can pass any of these settings to `sketchWrapper(sketch, settings)` function. Any undefined settings will use default values.
-
-From `v0.7.1`
 
 #### Document
 
@@ -144,6 +142,14 @@ From `v0.7.1`
 | `frameFormat`  | `png \| jpeg \| jpg \| webp` |  `png`  | Set image export format yet                                                   |
 | `framesFormat` |           `string`           |  `mp4`  | not implemented yet                                                           |
 |   `hotkeys`    |          `boolean`           | `true`  | Set to `false` disable keyboard shortcuts such as `Cmd + S` to export image   |
+
+### Function props
+
+|     name      |    type    | description                                                                                      |
+| :-----------: | :--------: | ------------------------------------------------------------------------------------------------ |
+| `exportFrame` | `function` | Call to save a frame. Useful if you want to attach to some event.                                |
+| `togglePlay`  | `function` | Call to toggle play and pause.                                                                   |
+|   `update`    | `function` | not yet implemented. takes `settings` object to update settings. ex. `update({ pixelRatio: 2 })` |
 
 ## References
 
