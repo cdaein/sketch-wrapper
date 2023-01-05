@@ -9,11 +9,13 @@ export const createWebglCanvas = (settings: SketchSettingsInternal) => {
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
 
+  const mode = "webgl";
+
   if (settings.canvas === undefined || settings.canvas === null) {
     // new webgl canvas
     ({ canvas, context, gl, width, height } = createCanvas({
       parent: settings.parent,
-      mode: settings.mode,
+      mode,
       width,
       height,
       pixelRatio,
@@ -36,7 +38,7 @@ export const createWebglCanvas = (settings: SketchSettingsInternal) => {
 
     ({ context, gl, width, height } = resizeCanvas({
       canvas,
-      mode: settings.mode,
+      mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,

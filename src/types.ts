@@ -8,7 +8,7 @@ export type SketchRender = (props: SketchProps) => void;
 export type SketchResize = (props: SketchProps) => void;
 export type SketchLoop = (timestamp: number) => void;
 
-export type SketchMode = "2d" | "webgl";
+export type SketchMode = "2d" | "webgl" | "ogl";
 
 // gif is not supported by default
 export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";

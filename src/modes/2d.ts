@@ -8,11 +8,13 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
 
+  const mode = "2d";
+
   if (settings.canvas === undefined || settings.canvas === null) {
     // new 2d canvas
     ({ canvas, context, width, height } = createCanvas({
       parent: settings.parent,
-      mode: settings.mode,
+      mode,
       width,
       height,
       pixelRatio,
@@ -35,7 +37,7 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
 
     ({ context, width, height } = resizeCanvas({
       canvas,
-      mode: settings.mode,
+      mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,

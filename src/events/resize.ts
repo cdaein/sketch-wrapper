@@ -34,14 +34,16 @@ export default (
 
       // REVIEW: not sure about updating props here. props should be read-only.
 
-      ({ width: props.width, height: props.height } = resizeCanvas({
-        canvas,
-        mode: settings.mode,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        pixelRatio: Math.max(settings.pixelRatio, 1),
-        scaleContext: settings.scaleContext,
-      }));
+      if (settings.mode === "2d" || settings.mode === "webgl") {
+        ({ width: props.width, height: props.height } = resizeCanvas({
+          canvas,
+          mode: settings.mode,
+          width: window.innerWidth,
+          height: window.innerHeight,
+          pixelRatio: Math.max(settings.pixelRatio, 1),
+          scaleContext: settings.scaleContext,
+        }));
+      }
 
       // call only when canvas size has changed (ie. fullscreen)
       resize(props);
