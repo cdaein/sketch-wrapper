@@ -81,23 +81,23 @@ Use `width` and `height` to create a composition proportional to canvas size ins
 
 The same `frame` may be repeated if the display refresh rate is higher than the frame rate set.
 
-### Sketch Modes
+#### Sketch Modes
 
 |  name  |         type         | description                                                   |
 | :----: | :------------------: | ------------------------------------------------------------- |
 | `mode` | `2d \| webgl \| ogl` | Set sketch mode for different types of sketches. default:`2d` |
 
-### Mode-specific Props
+#### Mode-specific Props
 
-#### `2d`
+##### `2d`
 
 - `context` - returns `CanvasRenderingContext2D` object to.
 
-#### `webgl`
+##### `webgl`
 
 - `gl` - returns `WebGLRenderingContext` object.
 
-#### `ogl`
+##### `ogl`
 
 - `oglContext` - returns `OGLRenderingContext` object
 - `oglRenderer` - returns `Renderer` object
