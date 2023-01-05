@@ -37,6 +37,8 @@ type SketchSettings = {
     scaleContext?: boolean;
     /** not yet implemented */
     pixelated?: boolean;
+    /** context attributes for 2d or webgl canvas */
+    attributes?: CanvasRenderingContext2DSettings | WebGLContextAttributes;
     /** set to `true` to play animation */
     animate?: boolean;
     /** set plackback frame rate */

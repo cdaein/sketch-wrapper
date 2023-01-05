@@ -48,6 +48,8 @@ export type SketchSettings = {
   scaleContext?: boolean;
   /** not yet implemented */
   pixelated?: boolean;
+  /** context attributes for 2d or webgl canvas */
+  attributes?: CanvasRenderingContext2DSettings | WebGLContextAttributes;
   // animation
   /** set to `true` to play animation */
   animate?: boolean;
@@ -76,7 +78,7 @@ export type SketchSettings = {
 };
 
 /**
- * Settings that are used internally for development. There should be no undefined values.
+ * Settings that are used internally for development.
  */
 export interface SketchSettingsInternal {
   // document
@@ -90,6 +92,7 @@ export interface SketchSettingsInternal {
   centered: boolean;
   scaleContext: boolean;
   pixelated: boolean;
+  attributes?: CanvasRenderingContext2DSettings | WebGLContextAttributes;
   // animation
   animate: boolean;
   playFps: number | null; // if null, will use display's maximum fps

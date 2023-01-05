@@ -176,11 +176,12 @@ var create2dCanvas = (settings) => {
 var createOglCanvas = (settings) => {
   let [width, height] = settings.dimensions;
   let pixelRatio = Math.max(settings.pixelRatio, 1);
+  const attributes = settings.attributes;
   const renderer = new Renderer({
     width,
     height,
     dpr: settings.pixelRatio,
-    preserveDrawingBuffer: true
+    ...attributes
   });
   const gl = renderer.gl;
   let canvas = gl.canvas;

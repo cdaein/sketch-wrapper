@@ -6,13 +6,16 @@ export const createOglCanvas = (settings: SketchSettingsInternal) => {
   let [width, height] = settings.dimensions;
   let pixelRatio = Math.max(settings.pixelRatio, 1);
 
+  const attributes = settings.attributes as WebGLContextAttributes;
+
   const renderer = new Renderer({
     width,
     height,
     dpr: settings.pixelRatio,
     // TODO: add attributes {} to settings
     //       enalbes image export with OGLContext. but it can make things slower
-    preserveDrawingBuffer: true,
+    // preserveDrawingBuffer: true,
+    ...attributes,
   });
   const gl = renderer.gl;
   let canvas = gl.canvas;
