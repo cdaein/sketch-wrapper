@@ -18,7 +18,9 @@ export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 // video or image sequence
 export type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
 
-// user provided settings. all optional and properties must come from Internal or this type
+/**
+ * User provided settings. all optional properties must either come from user. If not, it will be filled internally with default settings.
+ */
 export type SketchSettings = {
   // document
   title?: string;
@@ -47,7 +49,9 @@ export type SketchSettings = {
   mode?: SketchMode;
 };
 
-// this is what gets used internally. there should be no undefined values.
+/**
+ * Settings that are used internally for development. There should be no undefined values.
+ */
 export interface SketchSettingsInternal {
   // document
   title: string;
@@ -95,6 +99,9 @@ export interface SketchStates {
 }
 
 // REVIEW: separate updatable/writable props (during life of a sketch), and fixed/readable props
+/**
+ * Object that is sent to users to access its properties. some values update while animating.
+ */
 export interface SketchProps {
   // canvas
   canvas: HTMLCanvasElement;

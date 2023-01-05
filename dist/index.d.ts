@@ -10,6 +10,9 @@ type SketchResize = (props: SketchProps) => void;
 type SketchMode = "2d" | "webgl" | "ogl";
 type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
+/**
+ * User provided settings. all optional properties must either come from user. If not, it will be filled internally with default settings.
+ */
 type SketchSettings = {
     title?: string;
     background?: string;
@@ -32,6 +35,9 @@ type SketchSettings = {
     hotkeys?: boolean;
     mode?: SketchMode;
 };
+/**
+ * Object that is sent to users to access its properties. some values update while animating.
+ */
 interface SketchProps {
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
