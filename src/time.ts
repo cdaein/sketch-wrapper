@@ -3,6 +3,7 @@
  */
 
 import type {
+  BaseProps,
   SketchProps,
   SketchSettings,
   SketchSettingsInternal,
@@ -19,7 +20,7 @@ export const advanceTime = ({
   settings,
   states,
 }: {
-  props: SketchProps;
+  props: BaseProps;
   settings: SketchSettingsInternal;
   states: SketchStates;
 }) => {
@@ -46,7 +47,7 @@ const computeFrame = ({
   props,
 }: {
   settings: SketchSettingsInternal;
-  props: SketchProps;
+  props: BaseProps;
 }) => {
   const { duration, playFps, totalFrames } = settings;
 

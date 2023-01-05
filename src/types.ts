@@ -3,13 +3,15 @@ import { Renderer, OGLRenderingContext } from "ogl-typescript";
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
 export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
 /** sketch function to be used as argument for sketchWrapper() */
-export type Sketch = (props: SketchProps) => SketchRender | SketchReturnObject;
+export type Sketch = (
+  props: SketchProps | OglProps | WebGLProps
+) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-export type SketchRender = (props: SketchProps) => void;
+export type SketchRender = (props: SketchProps | OglProps | WebGLProps) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
 export type SketchResize = (props: SketchProps) => void;
 export type SketchLoop = (timestamp: number) => void;
@@ -129,6 +131,7 @@ export type GLContext = WebGLRenderingContext | OGLRenderingContext | undefined;
 //   ? OGLRenderingContext
 //   : undefined;
 
+/** props that are shared by all sketch modes */
 export interface BaseProps {
   /** `HTMLCanvasElement` */
   canvas: HTMLCanvasElement;
@@ -163,43 +166,24 @@ export interface BaseProps {
 /**
  * Object that is sent to users to access its properties. some values update while animating.
  */
-export interface SketchProps {
-  /** `HTMLCanvasElement` */
-  canvas: HTMLCanvasElement;
+export interface SketchProps extends BaseProps {
   // REVIEW: `creteCanvas()` assigns webgl context to both context and gl
   context: CanvasRenderingContext2D;
   // /** webgl context or ogl context. in 2d sketches, `gl` is `undefined` */
-  gl: WebGLRenderingContext | undefined;
-  /** canvas width. may be different from canvas.width due to pixel ratio scaling */
-  width: number;
-  /** canvas height. may be different from canvas.height due to pixel ratio scaling */
-  height: number;
-  /** try `window.devicePixelRatio` to get the high resolution if your display supports */
-  pixelRatio: number;
-  // animation
-  // animate: boolean;
-  /** when `settings.duration` is set, playhead will repeat 0..1 over duration */
-  playhead: number;
-  /** frame count. starting at `0` */
-  frame: number;
-  /** elapsed time. when it reaches `duration`, it will reset to `0` */
-  time: number;
-  /** time it took between renders in milliseconds */
-  deltaTime: number;
-  /** animation duration in milliseconds. when it reaches the end, it will loop back to the beginning */
-  duration: number;
-  /** number of total frames over duration */
-  totalFrames: number;
-  /** call to export canvas as image */
-  exportFrame: () => void;
-  /** call to play or pause sketch */
-  togglePlay: () => void;
-  update: (settings: SketchSettings) => void;
+  // gl: WebGLRenderingContext | undefined;
+}
+
+export interface WebGLProps extends BaseProps {
+  gl: WebGLRenderingContext;
+}
+
+/** props specific to `mode: "ogl"` */
+export interface OglProps extends BaseProps {
   // ogl prop
   /** OGL context */
-  oglContext?: OGLRenderingContext;
+  oglContext: OGLRenderingContext;
   /** OGL renderer object */
-  oglRenderer?: Renderer;
+  oglRenderer: Renderer;
 }
 
 // export type OglProps = Omit<SketchProps, "gl" | "renderer"> & {

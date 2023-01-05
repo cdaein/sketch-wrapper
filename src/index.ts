@@ -12,6 +12,10 @@ import type {
   SketchRender,
   SketchResize,
   SketchWrapper,
+  OglProps,
+  BaseProps,
+  WebGLProps,
+  SketchReturnObject,
 } from "./types";
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
@@ -150,21 +154,11 @@ export const sketchWrapper: SketchWrapper = (
     }
   };
 
-  const props: SketchProps = {
-    // canvas
+  const baseProps = {
     canvas,
-    // REVIEW is this good to assert type like this when it very well can be undefined?
-    //        at least, there will be a warning when trying access wrong methods on context
-    //        i think best way is not to export props at all if undefined.
-    //        but optional prop is causing undefined warning at sketch
-    //        also context should always be 2d context, gl = webgl
-    context: context as CanvasRenderingContext2D,
     width,
     height,
     pixelRatio,
-    gl,
-    oglContext,
-    oglRenderer,
     // animation
     playhead: 0,
     frame: 0,
@@ -177,14 +171,26 @@ export const sketchWrapper: SketchWrapper = (
     update,
   };
 
-  // let oglProps: OglProps = { gl: oglContext, renderer };
-  // if (settings.mode === "ogl") {
-  //   if (typeof oglProps === "object" && oglProps) {
-  //     oglProps.gl = gl as NonNullable<OGLRenderingContext>;
-  //   }
-  // }
+  const props: SketchProps = {
+    ...baseProps,
+    // REVIEW is this good to assert type like this when it very well can be undefined?
+    //        at least, there will be a warning when trying access wrong methods on context
+    //        i think best way is not to export props at all if undefined.
+    //        but optional prop is causing undefined warning at sketch
+    //        also context should always be 2d context, gl = webgl
+    context: context as CanvasRenderingContext2D,
+  };
 
-  // const combinedProps = { ...props, ...oglProps };
+  const webGLProps: WebGLProps = {
+    ...baseProps,
+    gl: gl as WebGLRenderingContext,
+  };
+
+  const oglProps: OglProps = {
+    ...baseProps,
+    oglContext: oglContext as OGLRenderingContext,
+    oglRenderer: oglRenderer as Renderer,
+  };
 
   // TODO: remove these from dist
   // if (process.env.NODE_ENV === "development") {
@@ -193,7 +199,15 @@ export const sketchWrapper: SketchWrapper = (
   //   console.log("states", states); // TEST
   // }
 
-  const returned = sketch(props);
+  let returned: SketchRender | SketchReturnObject;
+  // render 1st frame of 1st page refresh to start w/ playhead=0
+  if (settings.mode === "2d") {
+    returned = sketch(props);
+  } else if (settings.mode === "ogl") {
+    returned = sketch(oglProps);
+  } else {
+    returned = sketch(webGLProps);
+  }
 
   // REVIEW: had to assign something but don't like it
   let render: SketchRender = () => {};
@@ -206,7 +220,13 @@ export const sketchWrapper: SketchWrapper = (
   }
 
   // render 1st frame of 1st page refresh to start w/ playhead=0
-  render(props);
+  if (settings.mode === "2d") {
+    render(props);
+  } else if (settings.mode === "ogl") {
+    render(oglProps);
+  } else if (settings.mode === "webgl") {
+    render(webGLProps);
+  }
 
   // animation render loop
   const loop: SketchLoop = (timestamp: number) => {
@@ -230,7 +250,7 @@ export const sketchWrapper: SketchWrapper = (
     // const newSettings = { ...settings, ...update(settings as SketchSettings) };
 
     advanceTime({
-      props,
+      props: baseProps,
       settings,
       states,
     });
@@ -263,7 +283,13 @@ export const sketchWrapper: SketchWrapper = (
     // new settings from update() prop
 
     if (settings.animate && !states.paused) {
-      render(props);
+      if (settings.mode === "2d") {
+        render({ ...baseProps, ...props });
+      } else if (settings.mode === "ogl") {
+        render({ ...baseProps, ...oglProps });
+      } else if (settings.mode === "webgl") {
+        render({ ...baseProps, ...webGLProps });
+      }
       window.requestAnimationFrame(loop);
     }
 
