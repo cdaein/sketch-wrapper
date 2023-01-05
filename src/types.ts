@@ -4,16 +4,16 @@ import { Renderer, OGLRenderingContext } from "ogl-typescript";
 export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
 /** sketch function to be used as argument for sketchWrapper() */
 export type Sketch = (
-  props: SketchProps | OglProps | WebGLProps
+  props: SketchProps | OGLProps | WebGLProps
 ) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-export type SketchRender = (props: SketchProps | OglProps | WebGLProps) => void;
+export type SketchRender = (props: SketchProps | OGLProps | WebGLProps) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-export type SketchResize = (props: SketchProps | OglProps | WebGLProps) => void;
+export type SketchResize = (props: SketchProps | OGLProps | WebGLProps) => void;
 export type SketchLoop = (timestamp: number) => void;
 
 export type SketchMode = "2d" | "webgl" | "ogl";
@@ -124,13 +124,6 @@ export interface SketchStates {
   timeResetted: boolean;
 }
 
-export type GLContext = WebGLRenderingContext | OGLRenderingContext | undefined;
-// export type GLContext<T> = T extends WebGLRenderingContext
-//   ? WebGLRenderingContext
-//   : T extends OGLRenderingContext
-//   ? OGLRenderingContext
-//   : undefined;
-
 /** props that are shared by all sketch modes */
 export interface BaseProps {
   /** `HTMLCanvasElement` */
@@ -159,34 +152,33 @@ export interface BaseProps {
   exportFrame: () => void;
   /** call to play or pause sketch */
   togglePlay: () => void;
+  /** not yet implemented */
   update: (settings: SketchSettings) => void;
 }
 
 // REVIEW: separate updatable/writable props (during life of a sketch), and fixed/readable props
+
 /**
- * Object that is sent to users to access its properties. some values update while animating.
+ * to use with canvas with 2d sketches
  */
 export interface SketchProps extends BaseProps {
-  // REVIEW: `creteCanvas()` assigns webgl context to both context and gl
   context: CanvasRenderingContext2D;
-  // /** webgl context or ogl context. in 2d sketches, `gl` is `undefined` */
-  // gl: WebGLRenderingContext | undefined;
 }
 
+/**
+ * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
+ */
 export interface WebGLProps extends BaseProps {
+  /** webgl context */
   gl: WebGLRenderingContext;
 }
 
-/** props specific to `mode: "ogl"` */
-export interface OglProps extends BaseProps {
-  // ogl prop
+/**
+ * props type specific to `mode: "ogl"`
+ * */
+export interface OGLProps extends BaseProps {
   /** OGL context */
   oglContext: OGLRenderingContext;
   /** OGL renderer object */
   oglRenderer: Renderer;
 }
-
-// export type OglProps = Omit<SketchProps, "gl" | "renderer"> & {
-// gl: OGLRenderingContext;
-// renderer: Renderer;
-// };

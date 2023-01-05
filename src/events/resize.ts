@@ -1,7 +1,6 @@
 import { resizeCanvas } from "@daeinc/canvas";
 import type {
-  OglProps,
-  SketchLoop,
+  OGLProps,
   SketchProps,
   SketchRender,
   SketchResize,
@@ -16,7 +15,7 @@ import type {
 // resize() return: canvas resize
 export default (
   canvas: HTMLCanvasElement,
-  props: SketchProps | OglProps | WebGLProps,
+  props: SketchProps | OGLProps | WebGLProps,
   userSettings: SketchSettings,
   settings: SketchSettingsInternal,
   render: SketchRender,

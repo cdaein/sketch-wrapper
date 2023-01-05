@@ -12,7 +12,7 @@ import type {
   SketchRender,
   SketchResize,
   SketchWrapper,
-  OglProps,
+  OGLProps,
   BaseProps,
   WebGLProps,
   SketchReturnObject,
@@ -74,7 +74,7 @@ export const sketchWrapper: SketchWrapper = (
   // REVIEW: problem may be createCanvas() returns context (2d or webgl), gl (webgl or undefined),
   //         but props doesn't allow it
 
-  let {
+  const {
     canvas,
     context,
     width,
@@ -172,7 +172,7 @@ export const sketchWrapper: SketchWrapper = (
     gl: gl as WebGLRenderingContext,
   };
 
-  const oglProps: OglProps = {
+  const oglProps: OGLProps = {
     ...baseProps,
     oglContext: oglContext as OGLRenderingContext,
     oglRenderer: oglRenderer as Renderer,
@@ -180,7 +180,7 @@ export const sketchWrapper: SketchWrapper = (
 
   // createCombinedProps(settings.mode)
 
-  let combinedProps: SketchProps | WebGLProps | OglProps;
+  let combinedProps: SketchProps | WebGLProps | OGLProps;
 
   if (settings.mode === "2d") {
     combinedProps = props;
@@ -303,6 +303,8 @@ export type {
   SketchResize,
   SketchSettings,
   SketchProps,
+  OGLProps,
+  WebGLProps,
   FrameFormat,
   FramesFormat,
 } from "./types";

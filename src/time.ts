@@ -24,7 +24,7 @@ export const advanceTime = ({
   settings: SketchSettingsInternal;
   states: SketchStates;
 }) => {
-  const { playFps, exportFps, duration, totalFrames } = settings;
+  const { duration } = settings;
   // const fps = states.savingFrames ? exportFps : playFps;
 
   // REVIEW: set inital value to null, instead of 0?

@@ -78,7 +78,7 @@ var advanceTime = ({
   settings,
   states
 }) => {
-  const { playFps, exportFps, duration, totalFrames } = settings;
+  const { duration } = settings;
   if (states.startTime === 0) {
     states.startTime = states.timestamp;
     states.lastStartTime = states.startTime;
@@ -384,7 +384,7 @@ var sketchWrapper = (sketch, userSettings) => {
   });
   document.title = settings.title;
   document.body.style.background = settings.background;
-  let {
+  const {
     canvas,
     context,
     width,

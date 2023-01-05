@@ -3,15 +3,15 @@ import { OGLRenderingContext, Renderer } from 'ogl-typescript';
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
 type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
 /** sketch function to be used as argument for sketchWrapper() */
-type Sketch = (props: SketchProps | OglProps | WebGLProps) => SketchRender | SketchReturnObject;
+type Sketch = (props: SketchProps | OGLProps | WebGLProps) => SketchRender | SketchReturnObject;
 interface SketchReturnObject {
     render?: SketchRender;
     resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-type SketchRender = (props: SketchProps | OglProps | WebGLProps) => void;
+type SketchRender = (props: SketchProps | OGLProps | WebGLProps) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-type SketchResize = (props: SketchProps | OglProps | WebGLProps) => void;
+type SketchResize = (props: SketchProps | OGLProps | WebGLProps) => void;
 type SketchMode = "2d" | "webgl" | "ogl";
 type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
@@ -86,19 +86,26 @@ interface BaseProps {
     exportFrame: () => void;
     /** call to play or pause sketch */
     togglePlay: () => void;
+    /** not yet implemented */
     update: (settings: SketchSettings) => void;
 }
 /**
- * Object that is sent to users to access its properties. some values update while animating.
+ * to use with canvas with 2d sketches
  */
 interface SketchProps extends BaseProps {
     context: CanvasRenderingContext2D;
 }
+/**
+ * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
+ */
 interface WebGLProps extends BaseProps {
+    /** webgl context */
     gl: WebGLRenderingContext;
 }
-/** props specific to `mode: "ogl"` */
-interface OglProps extends BaseProps {
+/**
+ * props type specific to `mode: "ogl"`
+ * */
+interface OGLProps extends BaseProps {
     /** OGL context */
     oglContext: OGLRenderingContext;
     /** OGL renderer object */
@@ -107,4 +114,4 @@ interface OglProps extends BaseProps {
 
 declare const sketchWrapper: SketchWrapper;
 
-export { FrameFormat, FramesFormat, Sketch, SketchProps, SketchRender, SketchResize, SketchSettings, sketchWrapper };
+export { FrameFormat, FramesFormat, OGLProps, Sketch, SketchProps, SketchRender, SketchResize, SketchSettings, WebGLProps, sketchWrapper };
