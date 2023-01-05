@@ -1,34 +1,29 @@
 import type { SketchSettingsInternal } from "../types";
 import { Renderer } from "ogl-typescript";
-import { createCanvas } from "@daeinc/canvas";
+import { setupCanvas } from "@daeinc/canvas";
 
 export const createOglCanvas = (settings: SketchSettingsInternal) => {
-  let canvas: HTMLCanvasElement;
-  // let context: CanvasRenderingContext2D | WebGLRenderingContext;
-  let gl;
   let [width, height] = settings.dimensions;
-  const pixelRatio = Math.max(settings.pixelRatio, 1);
-
-  // REVIEW: should i create a new canvas for ogl?
-  //         and read as renderer.gl.canvas?
-  //         creating a pure webgl context and overwriting with OGL context seems a bit hacky
-  // create a new canvas
-  ({ canvas, width, height } = createCanvas({
-    parent: settings.parent,
-    mode: "webgl",
-    width,
-    height,
-    pixelRatio,
-    scaleContext: settings.scaleContext,
-  }));
+  let pixelRatio = Math.max(settings.pixelRatio, 1);
 
   const renderer = new Renderer({
-    canvas,
     width,
     height,
     dpr: settings.pixelRatio,
+    // TODO: add attributes {} to settings
+    //       enalbes image export with OGLContext. but it can make things slower
+    preserveDrawingBuffer: true,
   });
-  gl = renderer.gl;
+  const gl = renderer.gl;
+  let canvas = gl.canvas;
+
+  ({ canvas, width, height, pixelRatio } = setupCanvas({
+    parent: settings.parent,
+    canvas,
+    width,
+    height,
+    pixelRatio,
+  }));
 
   // canvas centering
   // TODO: needs extra scaling of style.width & height to fit window/container

@@ -48,7 +48,8 @@ export default (
 
       // call only when canvas size has changed (ie. fullscreen)
       resize(props);
-      render(props); // this helps with canvas flicker while resizing
+      // this helps with canvas flicker while resizing
+      render(props);
     }
 
     // resizing canvas style (when !fullscreen & centered)

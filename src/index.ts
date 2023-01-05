@@ -20,6 +20,7 @@ import type {
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
 import { OGLRenderingContext, Renderer } from "ogl-typescript";
+import { saveCanvasFrame } from "./file-exports";
 
 export const sketchWrapper: SketchWrapper = (
   sketch: Sketch,
@@ -263,7 +264,9 @@ export const sketchWrapper: SketchWrapper = (
     }
 
     // save frame(s)
-    if (states.savingFrames) {
+    if (states.savingFrame) {
+      // saveCanvasFrame({ canvas, settings, states });
+    } else if (states.savingFrames) {
       //
     }
   };

@@ -1,4 +1,4 @@
-import { createCanvas, resizeCanvas } from '@daeinc/canvas';
+import { createCanvas, resizeCanvas, setupCanvas } from '@daeinc/canvas';
 import { toDomElement } from '@daeinc/dom';
 import { Renderer } from 'ogl-typescript';
 
@@ -174,25 +174,23 @@ var create2dCanvas = (settings) => {
   return { canvas, context, width, height, pixelRatio };
 };
 var createOglCanvas = (settings) => {
-  let canvas;
-  let gl;
   let [width, height] = settings.dimensions;
-  const pixelRatio = Math.max(settings.pixelRatio, 1);
-  ({ canvas, width, height } = createCanvas({
-    parent: settings.parent,
-    mode: "webgl",
+  let pixelRatio = Math.max(settings.pixelRatio, 1);
+  const renderer = new Renderer({
     width,
     height,
-    pixelRatio,
-    scaleContext: settings.scaleContext
-  }));
-  const renderer = new Renderer({
+    dpr: settings.pixelRatio,
+    preserveDrawingBuffer: true
+  });
+  const gl = renderer.gl;
+  let canvas = gl.canvas;
+  ({ canvas, width, height, pixelRatio } = setupCanvas({
+    parent: settings.parent,
     canvas,
     width,
     height,
-    dpr: settings.pixelRatio
-  });
-  gl = renderer.gl;
+    pixelRatio
+  }));
   if (settings.centered === true) {
     const canvasContainer = canvas.parentElement;
     canvasContainer.style.width = "100vw";
@@ -512,7 +510,7 @@ var sketchWrapper = (sketch, userSettings) => {
       render(combinedProps);
       window.requestAnimationFrame(loop);
     }
-    if (states.savingFrames) ;
+    if (states.savingFrame) ; else if (states.savingFrames) ;
   };
   window.requestAnimationFrame(loop);
   const { add: addResize, handleResize } = resize_default(
