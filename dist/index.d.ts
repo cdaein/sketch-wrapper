@@ -1,3 +1,5 @@
+import { OGLRenderingContext, Renderer } from 'ogl-typescript';
+
 type Sketch = (props: SketchProps) => SketchRender | SketchReturnObject;
 interface SketchReturnObject {
     render?: SketchRender;
@@ -5,7 +7,7 @@ interface SketchReturnObject {
 }
 type SketchRender = (props: SketchProps) => void;
 type SketchResize = (props: SketchProps) => void;
-type SketchMode = "2d" | "webgl";
+type SketchMode = "2d" | "webgl" | "ogl";
 type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
 type SketchSettings = {
@@ -33,7 +35,7 @@ type SketchSettings = {
 interface SketchProps {
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
-    gl: WebGLRenderingContext;
+    gl: WebGLRenderingContext | OGLRenderingContext;
     width: number;
     height: number;
     pixelRatio: number;
@@ -46,6 +48,7 @@ interface SketchProps {
     exportFrame: () => void;
     togglePlay: () => void;
     update: (settings: SketchSettings) => void;
+    renderer?: Renderer;
 }
 
 declare const sketchWrapper: (sketch: Sketch, userSettings: SketchSettings) => void;
