@@ -85,17 +85,6 @@ export const sketchWrapper: SketchWrapper = (
     oglRenderer,
   } = prepareCanvas(settings);
 
-  // TEST
-  // function isOgl(
-  //   gl: WebGLRenderingContext | OGLRenderingContext | undefined
-  // ): gl is OGLRenderingContext {
-  //   return (gl as OGLRenderingContext).renderer !== undefined;
-  // }
-
-  // if (oglContext !== undefined) {
-  //   gl = oglContext as NonNullable<OGLRenderingContext>;
-  // }
-
   settings.canvas = canvas;
 
   // fps at least 1 or keep at null: will be handled in advanceTime()
@@ -112,9 +101,6 @@ export const sketchWrapper: SketchWrapper = (
       (settings.duration * settings.playFps) / 1000
     );
   }
-  // else if (settings.playFps !== null && settings.totalFrames !== Infinity) {
-  //   settings.duration = (settings.totalFrames / settings.playFps) * 1000;
-  // }
 
   // data used internally and may change value during life of sketch
   // REVIEW: i'm probably messing up with naming convention (props, states)
@@ -178,11 +164,6 @@ export const sketchWrapper: SketchWrapper = (
 
   const props: SketchProps = {
     ...baseProps,
-    // REVIEW is this good to assert type like this when it very well can be undefined?
-    //        at least, there will be a warning when trying access wrong methods on context
-    //        i think best way is not to export props at all if undefined.
-    //        but optional prop is causing undefined warning at sketch
-    //        also context should always be 2d context, gl = webgl
     context: context as CanvasRenderingContext2D,
   };
 
