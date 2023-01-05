@@ -1,13 +1,15 @@
 import type {
+  OglProps,
   SketchLoop,
   SketchProps,
   SketchSettingsInternal,
   SketchStates,
+  WebGLProps,
 } from "../types";
 
 export default (
   canvas: HTMLCanvasElement,
-  props: SketchProps,
+  props: SketchProps | OglProps | WebGLProps,
   settings: SketchSettingsInternal,
   states: SketchStates,
   loop: SketchLoop

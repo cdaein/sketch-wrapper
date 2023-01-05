@@ -207,7 +207,14 @@ var createOglCanvas = (settings) => {
     canvas.style.maxWidth = `${settings.dimensions[0]}px`;
     canvas.style.maxHeight = `${settings.dimensions[1]}px`;
   }
-  return { canvas, gl, renderer, width, height, pixelRatio };
+  return {
+    canvas,
+    oglContext: gl,
+    oglRenderer: renderer,
+    width,
+    height,
+    pixelRatio
+  };
 };
 var createWebglCanvas = (settings) => {
   let canvas;
@@ -377,7 +384,16 @@ var sketchWrapper = (sketch, userSettings) => {
   });
   document.title = settings.title;
   document.body.style.background = settings.background;
-  const { canvas, context, gl, renderer, width, height, pixelRatio } = prepareCanvas(settings);
+  let {
+    canvas,
+    context,
+    width,
+    height,
+    pixelRatio,
+    gl,
+    oglContext,
+    oglRenderer
+  } = prepareCanvas(settings);
   settings.canvas = canvas;
   if (settings.playFps !== null) {
     settings.playFps = Math.max(Math.floor(settings.playFps), 1);
@@ -404,11 +420,6 @@ var sketchWrapper = (sketch, userSettings) => {
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
     timeResetted: false
   };
-  const { exportFrame, update } = createFunctionProps({
-    canvas,
-    settings,
-    states
-  });
   const togglePlay = () => {
     states.paused = !states.paused;
     if (!states.paused) {
@@ -417,11 +428,13 @@ var sketchWrapper = (sketch, userSettings) => {
       states.pausedStartTime = states.timestamp;
     }
   };
-  const props = {
+  const { exportFrame, update } = createFunctionProps({
     canvas,
-    context,
-    gl: settings.mode === "webgl" ? gl : gl,
-    renderer: settings.mode === "ogl" ? renderer : void 0,
+    settings,
+    states
+  });
+  const baseProps = {
+    canvas,
     width,
     height,
     pixelRatio,
@@ -435,7 +448,29 @@ var sketchWrapper = (sketch, userSettings) => {
     togglePlay,
     update
   };
-  const returned = sketch(props);
+  const props = {
+    ...baseProps,
+    context
+  };
+  const webGLProps = {
+    ...baseProps,
+    gl
+  };
+  const oglProps = {
+    ...baseProps,
+    oglContext,
+    oglRenderer
+  };
+  let combinedProps;
+  if (settings.mode === "2d") {
+    combinedProps = props;
+  } else if (settings.mode === "ogl") {
+    combinedProps = oglProps;
+  } else {
+    combinedProps = webGLProps;
+  }
+  let returned;
+  returned = sketch(combinedProps);
   let render = () => {
   };
   let resize = () => {
@@ -446,7 +481,7 @@ var sketchWrapper = (sketch, userSettings) => {
     render = returned.render || render;
     resize = returned.resize || resize;
   }
-  render(props);
+  render(combinedProps);
   const loop = (timestamp) => {
     if (!states.paused) {
       states.timestamp = timestamp - states.pausedEndTime;
@@ -456,25 +491,25 @@ var sketchWrapper = (sketch, userSettings) => {
       return;
     }
     advanceTime({
-      props,
+      props: combinedProps,
       settings,
       states
     });
     if (states.frameInterval !== null) {
-      if (props.deltaTime < states.frameInterval) {
+      if (combinedProps.deltaTime < states.frameInterval) {
         window.requestAnimationFrame(loop);
         return;
       }
     }
     states.lastTimestamp = states.timestamp;
-    if (props.playhead >= 1) {
-      props.playhead = 0;
-      props.frame = 0;
-      props.time = 0;
+    if (combinedProps.playhead >= 1) {
+      combinedProps.playhead = 0;
+      combinedProps.frame = 0;
+      combinedProps.time = 0;
       states.startTime = states.timestamp;
     }
     if (settings.animate && !states.paused) {
-      render(props);
+      render(combinedProps);
       window.requestAnimationFrame(loop);
     }
     if (states.savingFrames) ;
@@ -482,7 +517,7 @@ var sketchWrapper = (sketch, userSettings) => {
   window.requestAnimationFrame(loop);
   const { add: addResize, handleResize } = resize_default(
     canvas,
-    props,
+    combinedProps,
     userSettings,
     settings,
     render,
@@ -491,7 +526,7 @@ var sketchWrapper = (sketch, userSettings) => {
   handleResize();
   const { add: addKeydown } = keydown_default(
     canvas,
-    props,
+    combinedProps,
     settings,
     states);
   if (settings.hotkeys) {

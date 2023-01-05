@@ -135,13 +135,6 @@ export const sketchWrapper: SketchWrapper = (
     timeResetted: false,
   };
 
-  // sketch props
-  const { exportFrame, update } = createFunctionProps({
-    canvas,
-    settings,
-    states,
-  });
-
   // REVIEW: can't move it inside createFunctionProps b/c it needs loop as argument
   const togglePlay = () => {
     states.paused = !states.paused;
@@ -154,7 +147,19 @@ export const sketchWrapper: SketchWrapper = (
     }
   };
 
-  const baseProps = {
+  // sketch props
+  const { exportFrame, update } = createFunctionProps({
+    canvas,
+    settings,
+    states,
+  });
+
+  // REVIEW: for now, i settled on having different prop types for each mode.
+  //    would have been best to use same Type for everything, but had issues with
+  //    union types and users having to assert type on their end.
+  //    there is still room to improve with current method.
+  const baseProps: BaseProps = {
+    // canvas
     canvas,
     width,
     height,
@@ -192,6 +197,19 @@ export const sketchWrapper: SketchWrapper = (
     oglRenderer: oglRenderer as Renderer,
   };
 
+  // createCombinedProps(settings.mode)
+
+  let combinedProps: SketchProps | WebGLProps | OglProps;
+
+  if (settings.mode === "2d") {
+    combinedProps = props;
+  } else if (settings.mode === "ogl") {
+    combinedProps = oglProps;
+  } else {
+    combinedProps = webGLProps;
+  }
+
+  //
   // TODO: remove these from dist
   // if (process.env.NODE_ENV === "development") {
   //   console.log("settings", settings); // TEST
@@ -201,13 +219,7 @@ export const sketchWrapper: SketchWrapper = (
 
   let returned: SketchRender | SketchReturnObject;
   // render 1st frame of 1st page refresh to start w/ playhead=0
-  if (settings.mode === "2d") {
-    returned = sketch(props);
-  } else if (settings.mode === "ogl") {
-    returned = sketch(oglProps);
-  } else {
-    returned = sketch(webGLProps);
-  }
+  returned = sketch(combinedProps);
 
   // REVIEW: had to assign something but don't like it
   let render: SketchRender = () => {};
@@ -220,13 +232,7 @@ export const sketchWrapper: SketchWrapper = (
   }
 
   // render 1st frame of 1st page refresh to start w/ playhead=0
-  if (settings.mode === "2d") {
-    render(props);
-  } else if (settings.mode === "ogl") {
-    render(oglProps);
-  } else if (settings.mode === "webgl") {
-    render(webGLProps);
-  }
+  render(combinedProps);
 
   // animation render loop
   const loop: SketchLoop = (timestamp: number) => {
@@ -247,49 +253,31 @@ export const sketchWrapper: SketchWrapper = (
       return;
     }
 
-    // const newSettings = { ...settings, ...update(settings as SketchSettings) };
-
     advanceTime({
-      props: baseProps,
+      props: combinedProps,
       settings,
       states,
     });
 
     if (states.frameInterval !== null) {
-      if (props.deltaTime < states.frameInterval) {
+      if (combinedProps.deltaTime < states.frameInterval) {
         window.requestAnimationFrame(loop);
         return;
       }
     }
 
-    // if (process.env.NODE_ENV === "development") {
-    //   console.log({
-    //     timestamp,
-    //     "st.timestamp": states.timestamp,
-    //     "st.pausedStartTime": states.pausedStartTime,
-    //     "st.pausedEndTime": states.pausedEndTime,
-    //   });
-    // }
-
     states.lastTimestamp = states.timestamp;
 
-    if (props.playhead >= 1) {
-      props.playhead = 0;
-      props.frame = 0;
-      props.time = 0;
+    if (combinedProps.playhead >= 1) {
+      combinedProps.playhead = 0;
+      combinedProps.frame = 0;
+      combinedProps.time = 0;
       states.startTime = states.timestamp;
     }
 
     // new settings from update() prop
-
     if (settings.animate && !states.paused) {
-      if (settings.mode === "2d") {
-        render({ ...baseProps, ...props });
-      } else if (settings.mode === "ogl") {
-        render({ ...baseProps, ...oglProps });
-      } else if (settings.mode === "webgl") {
-        render({ ...baseProps, ...webGLProps });
-      }
+      render(combinedProps);
       window.requestAnimationFrame(loop);
     }
 
@@ -305,7 +293,7 @@ export const sketchWrapper: SketchWrapper = (
   // window resize event
   const { add: addResize, handleResize } = resizeHandler(
     canvas,
-    props,
+    combinedProps,
     userSettings,
     settings,
     render,
@@ -316,7 +304,7 @@ export const sketchWrapper: SketchWrapper = (
   // keyboard events
   const { add: addKeydown } = keydownHandler(
     canvas,
-    props,
+    combinedProps,
     settings,
     states,
     loop
