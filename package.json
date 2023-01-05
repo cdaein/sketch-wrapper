@@ -44,8 +44,8 @@
     "vite": "^4.0.4"
   },
   "dependencies": {
-    "@daeinc/canvas": "^0.10.1",
-    "@daeinc/dom": "^0.2.0"
+    "@daeinc/canvas": "^0.11.1",
+    "@daeinc/dom": "^0.3.1"
   },
   "publishConfig": {
     "access": "public",
