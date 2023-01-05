@@ -13,6 +13,14 @@ Helpers for creative coding sketches with HTML5 Canvas. It is written from scrat
 npm i @daeinc/sketch-wrapper
 ```
 
+## Features
+
+- Multiple sketch modes: Supports Canvas 2D, Webgl context and OGL(through [`ogl-typescript`](https://github.com/nshen/ogl-typescript)) library.
+- Animation loop: `playhead` repeats `0..1` so it is easy to create a seamless animation loop.
+- Settings: Use `settings` object to set up animation duration, playback frame rate, filename, etc, and reduce boilerplate code in your sketches.
+- Sketch props: Use props for each mode to help your coding.
+- Keyboard shortcuts: play/pause your sketch and export canvas as image.
+
 ## Example Usage
 
 The module supports both JavaScript and TypeScript. For more examples, check out a separate repository [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples).
@@ -52,9 +60,9 @@ const settings = {
 sketchWrapper(sketch, settings);
 ```
 
-## Features
+## How to use
 
-Features documentation is updated for `v0.7.9`
+Documentation is updated for `v0.8.11`
 
 ### Keyboard Shortcuts
 
@@ -72,6 +80,27 @@ The `playhead` prop repeats the range of `0..1` over animation duration. This is
 Use `width` and `height` to create a composition proportional to canvas size instead of hard-coding numbers.
 
 The same `frame` may be repeated if the display refresh rate is higher than the frame rate set.
+
+### Sketch Modes
+
+|  name  |         type         | description                                                   |
+| :----: | :------------------: | ------------------------------------------------------------- |
+| `mode` | `2d \| webgl \| ogl` | Set sketch mode for different types of sketches. default:`2d` |
+
+### Mode-specific Props
+
+#### `2d`
+
+- `context` - returns `CanvasRenderingContext2D` object to.
+
+#### `webgl`
+
+- `gl` - returns `WebGLRenderingContext` object.
+
+#### `ogl`
+
+- `oglContext` - returns `OGLRenderingContext` object
+- `oglRenderer` - returns `Renderer` object
 
 #### DOM
 
