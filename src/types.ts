@@ -1,3 +1,5 @@
+import { Renderer, OGLRenderingContext } from "ogl-typescript";
+
 // TODO: proper typing
 export type Sketch = (props: SketchProps) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
@@ -98,7 +100,7 @@ export interface SketchProps {
   canvas: HTMLCanvasElement;
   // REVIEW: creteCanvas() assigns webgl context to both context and gl
   context: CanvasRenderingContext2D;
-  gl: WebGLRenderingContext;
+  gl: WebGLRenderingContext | OGLRenderingContext;
   width: number;
   height: number;
   pixelRatio: number;
@@ -113,4 +115,6 @@ export interface SketchProps {
   exportFrame: () => void;
   togglePlay: () => void;
   update: (settings: SketchSettings) => void;
+  // ogl prop
+  renderer?: Renderer;
 }

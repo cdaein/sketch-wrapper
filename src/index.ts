@@ -9,12 +9,12 @@ import type {
   SketchProps,
   SketchStates,
   SketchLoop,
-  SketchReturnObject,
   SketchRender,
   SketchResize,
 } from "./types";
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
+import { OGLRenderingContext } from "ogl-typescript";
 
 export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // const isServer = typeof module !== "undefined" && module.exports;
@@ -65,7 +65,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // canvas, context
   // REVIEW: problem may be createCanvas() returns context (2d or webgl), gl (webgl or undefined),
   //         but props doesn't allow it
-  const { canvas, context, gl, width, height, pixelRatio } =
+  const { canvas, context, gl, renderer, width, height, pixelRatio } =
     prepareCanvas(settings);
 
   settings.canvas = canvas;
@@ -135,7 +135,11 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
     //        but optional prop is causing undefined warning at sketch
     //        also context should always be 2d context, gl = webgl
     context: context as CanvasRenderingContext2D,
-    gl: gl as WebGLRenderingContext,
+    gl:
+      settings.mode === "webgl"
+        ? (gl as WebGLRenderingContext)
+        : (gl as OGLRenderingContext),
+    renderer: settings.mode === "ogl" ? renderer : undefined,
     width,
     height,
     pixelRatio,
