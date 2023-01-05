@@ -9,12 +9,12 @@ export const prepareCanvas = (
 ): {
   canvas: HTMLCanvasElement;
   context?: CanvasRenderingContext2D | WebGLRenderingContext;
-  gl?: WebGLRenderingContext;
-  oglContext?: OGLRenderingContext;
-  renderer?: Renderer;
   width: number;
   height: number;
   pixelRatio: number;
+  gl?: WebGLRenderingContext;
+  oglContext?: OGLRenderingContext;
+  oglRenderer?: Renderer;
 } => {
   if (settings.mode === "2d") {
     return create2dCanvas(settings);

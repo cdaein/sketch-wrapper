@@ -12,7 +12,6 @@ import type {
   SketchRender,
   SketchResize,
   SketchWrapper,
-  OglProps,
 } from "./types";
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
@@ -71,8 +70,16 @@ export const sketchWrapper: SketchWrapper = (
   // REVIEW: problem may be createCanvas() returns context (2d or webgl), gl (webgl or undefined),
   //         but props doesn't allow it
 
-  let { canvas, context, gl, oglContext, renderer, width, height, pixelRatio } =
-    prepareCanvas(settings);
+  let {
+    canvas,
+    context,
+    width,
+    height,
+    pixelRatio,
+    gl,
+    oglContext,
+    oglRenderer,
+  } = prepareCanvas(settings);
 
   // TEST
   // function isOgl(
@@ -81,9 +88,9 @@ export const sketchWrapper: SketchWrapper = (
   //   return (gl as OGLRenderingContext).renderer !== undefined;
   // }
 
-  if (oglContext !== undefined) {
-    gl = oglContext as NonNullable<OGLRenderingContext>;
-  }
+  // if (oglContext !== undefined) {
+  //   gl = oglContext as NonNullable<OGLRenderingContext>;
+  // }
 
   settings.canvas = canvas;
 
@@ -152,13 +159,12 @@ export const sketchWrapper: SketchWrapper = (
     //        but optional prop is causing undefined warning at sketch
     //        also context should always be 2d context, gl = webgl
     context: context as CanvasRenderingContext2D,
-    gl,
-    // gl: gl as NonNullable<OGLRenderingContext>,
-    // gl: isOgl(gl) ? (gl as OGLRenderingContext) : (gl as WebGLRenderingContext),
-    // renderer: settings.mode === "ogl" ? renderer : undefined,
     width,
     height,
     pixelRatio,
+    gl,
+    oglContext,
+    oglRenderer,
     // animation
     playhead: 0,
     frame: 0,

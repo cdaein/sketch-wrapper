@@ -129,6 +129,36 @@ export type GLContext = WebGLRenderingContext | OGLRenderingContext | undefined;
 //   ? OGLRenderingContext
 //   : undefined;
 
+export interface BaseProps {
+  /** `HTMLCanvasElement` */
+  canvas: HTMLCanvasElement;
+  /** canvas width. may be different from canvas.width due to pixel ratio scaling */
+  width: number;
+  /** canvas height. may be different from canvas.height due to pixel ratio scaling */
+  height: number;
+  /** try `window.devicePixelRatio` to get the high resolution if your display supports */
+  pixelRatio: number;
+  // animation
+  // animate: boolean;
+  /** when `settings.duration` is set, playhead will repeat 0..1 over duration */
+  playhead: number;
+  /** frame count. starting at `0` */
+  frame: number;
+  /** elapsed time. when it reaches `duration`, it will reset to `0` */
+  time: number;
+  /** time it took between renders in milliseconds */
+  deltaTime: number;
+  /** animation duration in milliseconds. when it reaches the end, it will loop back to the beginning */
+  duration: number;
+  /** number of total frames over duration */
+  totalFrames: number;
+  /** call to export canvas as image */
+  exportFrame: () => void;
+  /** call to play or pause sketch */
+  togglePlay: () => void;
+  update: (settings: SketchSettings) => void;
+}
+
 // REVIEW: separate updatable/writable props (during life of a sketch), and fixed/readable props
 /**
  * Object that is sent to users to access its properties. some values update while animating.
