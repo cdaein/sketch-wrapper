@@ -122,6 +122,13 @@ export interface SketchStates {
   timeResetted: boolean;
 }
 
+export type GLContext = WebGLRenderingContext | OGLRenderingContext | undefined;
+// export type GLContext<T> = T extends WebGLRenderingContext
+//   ? WebGLRenderingContext
+//   : T extends OGLRenderingContext
+//   ? OGLRenderingContext
+//   : undefined;
+
 // REVIEW: separate updatable/writable props (during life of a sketch), and fixed/readable props
 /**
  * Object that is sent to users to access its properties. some values update while animating.
@@ -129,20 +136,21 @@ export interface SketchStates {
 export interface SketchProps {
   /** `HTMLCanvasElement` */
   canvas: HTMLCanvasElement;
-  // REVIEW: creteCanvas() assigns webgl context to both context and gl
+  // REVIEW: `creteCanvas()` assigns webgl context to both context and gl
   context: CanvasRenderingContext2D;
-  gl: WebGLRenderingContext | OGLRenderingContext;
+  // /** webgl context or ogl context. in 2d sketches, `gl` is `undefined` */
+  gl: WebGLRenderingContext | undefined;
   /** canvas width. may be different from canvas.width due to pixel ratio scaling */
   width: number;
   /** canvas height. may be different from canvas.height due to pixel ratio scaling */
   height: number;
-  /** try window.devicePixelRatio to get the high resolution if your display supports */
+  /** try `window.devicePixelRatio` to get the high resolution if your display supports */
   pixelRatio: number;
   // animation
   // animate: boolean;
   /** when `settings.duration` is set, playhead will repeat 0..1 over duration */
   playhead: number;
-  /** frame count. starting at 0 */
+  /** frame count. starting at `0` */
   frame: number;
   /** elapsed time. when it reaches `duration`, it will reset to `0` */
   time: number;
@@ -158,6 +166,13 @@ export interface SketchProps {
   togglePlay: () => void;
   update: (settings: SketchSettings) => void;
   // ogl prop
+  /** OGL context */
+  oglContext?: OGLRenderingContext;
   /** OGL renderer object */
-  renderer?: Renderer;
+  oglRenderer?: Renderer;
 }
+
+// export type OglProps = Omit<SketchProps, "gl" | "renderer"> & {
+// gl: OGLRenderingContext;
+// renderer: Renderer;
+// };

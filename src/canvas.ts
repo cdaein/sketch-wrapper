@@ -9,7 +9,8 @@ export const prepareCanvas = (
 ): {
   canvas: HTMLCanvasElement;
   context?: CanvasRenderingContext2D | WebGLRenderingContext;
-  gl?: WebGLRenderingContext | OGLRenderingContext;
+  gl?: WebGLRenderingContext;
+  oglContext?: OGLRenderingContext;
   renderer?: Renderer;
   width: number;
   height: number;
@@ -22,6 +23,7 @@ export const prepareCanvas = (
   } else if (settings.mode === "ogl") {
     return createOglCanvas(settings);
   }
+
   // fallback
   return create2dCanvas(settings);
 };

@@ -53,5 +53,5 @@ export const createOglCanvas = (settings: SketchSettingsInternal) => {
     canvas.style.maxHeight = `${settings.dimensions[1]}px`;
   }
 
-  return { canvas, gl, renderer, width, height, pixelRatio };
+  return { canvas, oglContext: gl, renderer, width, height, pixelRatio };
 };

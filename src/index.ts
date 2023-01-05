@@ -12,10 +12,11 @@ import type {
   SketchRender,
   SketchResize,
   SketchWrapper,
+  OglProps,
 } from "./types";
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
-import { OGLRenderingContext } from "ogl-typescript";
+import { OGLRenderingContext, Renderer } from "ogl-typescript";
 
 export const sketchWrapper: SketchWrapper = (
   sketch: Sketch,
@@ -69,8 +70,20 @@ export const sketchWrapper: SketchWrapper = (
   // canvas, context
   // REVIEW: problem may be createCanvas() returns context (2d or webgl), gl (webgl or undefined),
   //         but props doesn't allow it
-  const { canvas, context, gl, renderer, width, height, pixelRatio } =
+
+  let { canvas, context, gl, oglContext, renderer, width, height, pixelRatio } =
     prepareCanvas(settings);
+
+  // TEST
+  // function isOgl(
+  //   gl: WebGLRenderingContext | OGLRenderingContext | undefined
+  // ): gl is OGLRenderingContext {
+  //   return (gl as OGLRenderingContext).renderer !== undefined;
+  // }
+
+  if (oglContext !== undefined) {
+    gl = oglContext as NonNullable<OGLRenderingContext>;
+  }
 
   settings.canvas = canvas;
 
@@ -139,11 +152,10 @@ export const sketchWrapper: SketchWrapper = (
     //        but optional prop is causing undefined warning at sketch
     //        also context should always be 2d context, gl = webgl
     context: context as CanvasRenderingContext2D,
-    gl:
-      settings.mode === "webgl"
-        ? (gl as WebGLRenderingContext)
-        : (gl as OGLRenderingContext),
-    renderer: settings.mode === "ogl" ? renderer : undefined,
+    gl,
+    // gl: gl as NonNullable<OGLRenderingContext>,
+    // gl: isOgl(gl) ? (gl as OGLRenderingContext) : (gl as WebGLRenderingContext),
+    // renderer: settings.mode === "ogl" ? renderer : undefined,
     width,
     height,
     pixelRatio,
@@ -158,6 +170,15 @@ export const sketchWrapper: SketchWrapper = (
     togglePlay,
     update,
   };
+
+  // let oglProps: OglProps = { gl: oglContext, renderer };
+  // if (settings.mode === "ogl") {
+  //   if (typeof oglProps === "object" && oglProps) {
+  //     oglProps.gl = gl as NonNullable<OGLRenderingContext>;
+  //   }
+  // }
+
+  // const combinedProps = { ...props, ...oglProps };
 
   // TODO: remove these from dist
   // if (process.env.NODE_ENV === "development") {
