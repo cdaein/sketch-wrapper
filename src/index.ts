@@ -11,12 +11,16 @@ import type {
   SketchLoop,
   SketchRender,
   SketchResize,
+  SketchWrapper,
 } from "./types";
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
 import { OGLRenderingContext } from "ogl-typescript";
 
-export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
+export const sketchWrapper: SketchWrapper = (
+  sketch: Sketch,
+  userSettings: SketchSettings
+) => {
   // const isServer = typeof module !== "undefined" && module.exports;
   // console.log(`is running on server? ${isServer ? "✅" : "❌"}`);
 

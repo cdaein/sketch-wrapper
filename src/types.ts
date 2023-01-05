@@ -1,12 +1,16 @@
 import { Renderer, OGLRenderingContext } from "ogl-typescript";
 
-// TODO: proper typing
+/** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
+export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
+/** sketch function to be used as argument for sketchWrapper() */
 export type Sketch = (props: SketchProps) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;
 }
+/** sketch render callback function; will be called every frame */
 export type SketchRender = (props: SketchProps) => void;
+/** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
 export type SketchResize = (props: SketchProps) => void;
 export type SketchLoop = (timestamp: number) => void;
 
@@ -23,29 +27,49 @@ export type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
  */
 export type SketchSettings = {
   // document
+  /** set HTML webpage title. it is placed inside `<title>` tag and displayed on top of browser window */
   title?: string;
+  /** set background color of HTML page. uses CSS color string. ex. `#aaa` */
   background?: string;
   // canvas
+  /** set canvas parent either as `HTMLElement` object or string selector. ex. `div#app` */
   parent?: HTMLElement | string;
+  /** set it to use an existing canvas instead of using one provided by sketch-wrapper */
   canvas?: HTMLCanvasElement;
+  /** [width, height] */
   dimensions?: [number, number];
+  /** set pixel ratio */
   pixelRatio?: number;
+  /** center canvas */
   centered?: boolean;
+  /** scale context to account for pixelRatio */
   scaleContext?: boolean;
+  /** not yet implemented */
   pixelated?: boolean;
   // animation
+  /** set to `true` to play animation */
   animate?: boolean;
+  /** set plackback frame rate */
   playFps?: number;
+  /** set export frame rate for videos. (doesn't work yet) */
   exportFps?: number;
+  /** set animation loop duration in milliseconds */
   duration?: number;
   // out file
+  /** set export file name. if not set, sketch-wrapper uses datetime string */
   filename?: string;
+  /** set prefix to file name */
   prefix?: string;
+  /** set suffix to file name */
   suffix?: string;
+  /** set file format for image export */
   frameFormat?: FrameFormat;
+  /** set file format for video/sequence export (doesn't work yet) */
   framesFormat?: FramesFormat;
   // sketch
+  /** set to `false` to not use sketch-wrapper provided hot keys (ex. `CMD+S` for image export) */
   hotkeys?: boolean;
+  /** set sketch mode to use or integrate with other libraries */
   mode?: SketchMode;
 };
 
