@@ -65,7 +65,7 @@ export const sketchWrapper = (sketch: Sketch, userSettings: SketchSettings) => {
   // canvas, context
   // REVIEW: problem may be createCanvas() returns context (2d or webgl), gl (webgl or undefined),
   //         but props doesn't allow it
-  let { canvas, context, gl, width, height, pixelRatio } =
+  const { canvas, context, gl, width, height, pixelRatio } =
     prepareCanvas(settings);
 
   settings.canvas = canvas;
