@@ -15,15 +15,18 @@ npm i @daeinc/sketch-wrapper
 
 ## Features
 
-- Multiple sketch modes: Supports Canvas 2D, Webgl context and OGL(through [`ogl-typescript`](https://github.com/nshen/ogl-typescript)) library.
-- Animation loop: `playhead` repeats `0..1` so it is easy to create a seamless animation loop.
-- Settings: Use `settings` object to set up animation duration, playback frame rate, filename, etc, and reduce boilerplate code in your sketches.
+- TypeScript: It can work both in JavaScript or TypeScript projects.
+- Multiple sketch modes: It supports Canvas 2D context, Webgl context and OGL(through [`ogl-typescript`](https://github.com/nshen/ogl-typescript)) library, or use any other Canvas libraries as long as they support an existing canvas.
+- Animation loop: It  has `playhead` prop that repeats `0..1` and makes it easy to create a seamless animation loop.
+- Settings: Use `settings` object to reduce boilerplate code in your sketch - set up animation duration, playback frame rate, filename, etc.
 - Sketch props: Use props for each mode to help your coding.
-- Keyboard shortcuts: play/pause your sketch and export canvas as image.
+- Keyboard shortcuts: Play/pause your sketch and export canvas as image.
 
 ## Example Usage
 
-The module supports both JavaScript and TypeScript. For more examples, check out a separate repository [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples).
+The module supports both JavaScript and TypeScript. 
+
+Check out a separate repository [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples) for more examples.
 
 ```js
 import { sketchWrapper } from "@daeinc/sketch-wrapper";
