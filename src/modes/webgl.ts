@@ -20,6 +20,7 @@ export const createWebglCanvas = (settings: SketchSettingsInternal) => {
       height,
       pixelRatio,
       scaleContext: settings.scaleContext,
+      attributes: settings.attributes,
     })) as {
       canvas: HTMLCanvasElement;
       gl: WebGLRenderingContext;
@@ -43,6 +44,7 @@ export const createWebglCanvas = (settings: SketchSettingsInternal) => {
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
       scaleContext: settings.scaleContext,
+      attributes: settings.attributes,
     }));
   }
 

@@ -138,7 +138,8 @@ var create2dCanvas = (settings) => {
       width,
       height,
       pixelRatio,
-      scaleContext: settings.scaleContext
+      scaleContext: settings.scaleContext,
+      attributes: settings.attributes
     }));
   } else {
     if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
@@ -154,7 +155,8 @@ var create2dCanvas = (settings) => {
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
-      scaleContext: settings.scaleContext
+      scaleContext: settings.scaleContext,
+      attributes: settings.attributes
     }));
   }
   if (settings.centered === true) {
@@ -229,7 +231,8 @@ var createWebglCanvas = (settings) => {
       width,
       height,
       pixelRatio,
-      scaleContext: settings.scaleContext
+      scaleContext: settings.scaleContext,
+      attributes: settings.attributes
     }));
   } else {
     if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
@@ -245,7 +248,8 @@ var createWebglCanvas = (settings) => {
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
-      scaleContext: settings.scaleContext
+      scaleContext: settings.scaleContext,
+      attributes: settings.attributes
     }));
   }
   if (settings.centered === true) {

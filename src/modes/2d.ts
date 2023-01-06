@@ -19,6 +19,7 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
       height,
       pixelRatio,
       scaleContext: settings.scaleContext,
+      attributes: settings.attributes,
     })) as {
       canvas: HTMLCanvasElement;
       context: CanvasRenderingContext2D;
@@ -42,6 +43,7 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
       scaleContext: settings.scaleContext,
+      attributes: settings.attributes,
     }));
   }
 

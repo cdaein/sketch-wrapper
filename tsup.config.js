@@ -10,5 +10,5 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   // minify: true,
-  external: ["ogl-typescript"],
+  external: ["ogl-typescript", "p5"],
 });
