@@ -17,8 +17,8 @@ export default (
   const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key === " ") {
       ev.preventDefault();
-      if (process.env.NODE_ENV === "development")
-        console.log("sketch paused or resumed");
+      // if (process.env.NODE_ENV === "development")
+      // console.log("sketch paused or resumed");
       props.togglePlay();
       // states.paused = !states.paused;
       // if (!states.paused) {

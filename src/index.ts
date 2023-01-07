@@ -168,17 +168,6 @@ export const sketchWrapper: SketchWrapper = (
     context: context as CanvasRenderingContext2D,
   };
 
-  const webGLProps: WebGLProps = {
-    ...baseProps,
-    gl: gl as WebGLRenderingContext,
-  };
-
-  const oglProps: OGLProps = {
-    ...baseProps,
-    oglContext: oglContext as OGLRenderingContext,
-    oglRenderer: oglRenderer as Renderer,
-  };
-
   // createCombinedProps(settings.mode)
 
   let combinedProps: SketchProps | WebGLProps | OGLProps;
@@ -186,9 +175,16 @@ export const sketchWrapper: SketchWrapper = (
   if (settings.mode === "2d") {
     combinedProps = props;
   } else if (settings.mode === "ogl") {
-    combinedProps = oglProps;
+    combinedProps = {
+      ...baseProps,
+      oglContext: oglContext as OGLRenderingContext,
+      oglRenderer: oglRenderer as Renderer,
+    } as OGLProps;
   } else {
-    combinedProps = webGLProps;
+    combinedProps = {
+      ...baseProps,
+      gl: gl as WebGLRenderingContext,
+    } as WebGLProps;
   }
 
   //
@@ -271,7 +267,7 @@ export const sketchWrapper: SketchWrapper = (
     }
   };
 
-  window.requestAnimationFrame(loop);
+  if (settings.animate) window.requestAnimationFrame(loop);
 
   // event handlers
   // window resize event
