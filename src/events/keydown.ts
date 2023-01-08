@@ -17,9 +17,12 @@ export default (
   const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key === " ") {
       ev.preventDefault();
-      // if (process.env.NODE_ENV === "development")
-      // console.log("sketch paused or resumed");
       props.togglePlay();
+      if (states.paused) {
+        // playhead-based calculation is too precise for low-fps calulation
+        // when key press paused, it's already greater than the paused frame at playFps.
+        console.log("keydown playhead", props.playhead);
+      }
       // states.paused = !states.paused;
       // if (!states.paused) {
       //   // when resumed: call loop so animation will continue

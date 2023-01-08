@@ -15,12 +15,42 @@ import type {
   OGLProps,
   BaseProps,
   WebGLProps,
-  SketchReturnObject,
 } from "./types";
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
 import { OGLRenderingContext, Renderer } from "ogl-typescript";
-import { saveCanvasFrame } from "./file-exports";
+
+// data flow: userSettings + defaultSettings => settings => states (mutable) => props => sketch()
+// default settings
+// TODO: create settings.ts
+const defaultSettings: SketchSettingsInternal = {
+  // document
+  title: "Sketch",
+  background: "#333",
+  // canvas
+  parent: "body",
+  canvas: null,
+  dimensions: [window.innerWidth, window.innerHeight],
+  pixelRatio: 1,
+  centered: true,
+  scaleContext: true,
+  pixelated: false,
+  // animation
+  animate: true,
+  playFps: null,
+  exportFps: 60,
+  duration: Infinity,
+  totalFrames: Infinity,
+  // file
+  filename: "",
+  prefix: "",
+  suffix: "",
+  frameFormat: "png",
+  framesFormat: "mp4",
+  // sketch
+  hotkeys: true,
+  mode: "2d",
+};
 
 export const sketchWrapper: SketchWrapper = (
   sketch: Sketch,
@@ -29,39 +59,7 @@ export const sketchWrapper: SketchWrapper = (
   // const isServer = typeof module !== "undefined" && module.exports;
   // console.log(`is running on server? ${isServer ? "✅" : "❌"}`);
 
-  // data flow: userSettings + defaultSettings => settings => states (mutable) => props => sketch()
-  // default settings
-  const defaultSettings: SketchSettingsInternal = {
-    // document
-    title: "Sketch",
-    background: "#333",
-    // canvas
-    parent: "body",
-    canvas: null,
-    dimensions: [window.innerWidth, window.innerHeight],
-    pixelRatio: 1,
-    centered: true,
-    scaleContext: true,
-    pixelated: false,
-    // animation
-    animate: true,
-    playFps: null,
-    exportFps: 60,
-    duration: Infinity,
-    totalFrames: Infinity,
-    // file
-    filename: "",
-    prefix: "",
-    suffix: "",
-    frameFormat: "png",
-    framesFormat: "mp4",
-    // sketch
-    hotkeys: true,
-    mode: "2d",
-  };
-
-  // combine settings. no undefined.
-  // may have null values (ex. canvas)
+  // combine settings; a few may have null or undefined values (ex. canvas)
   const settings = combineSettings({
     base: defaultSettings,
     main: userSettings,
@@ -69,6 +67,8 @@ export const sketchWrapper: SketchWrapper = (
 
   // use and update some settings
   // document
+  // REVIEW: move inside combineSettings()?
+  //         or updateSettings({ ... })
   document.title = settings.title;
   document.body.style.background = settings.background;
   // canvas, context
@@ -86,6 +86,9 @@ export const sketchWrapper: SketchWrapper = (
     oglRenderer,
   } = prepareCanvas(settings);
 
+  // REVIEW: instead of directly assign to settings[..],
+  //         use states if it may update later during sketch lifetime
+  //         ex. user provided props.update({ ... })
   settings.canvas = canvas;
 
   // fps at least 1 or keep at null: will be handled in advanceTime()
@@ -120,9 +123,12 @@ export const sketchWrapper: SketchWrapper = (
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1000 / settings.playFps : null,
     timeResetted: false,
+    temp: 0,
+    resized: false, // REVIEW
   };
 
   // REVIEW: can't move it inside createFunctionProps b/c it needs loop as argument
+  //         then, create a callback function that takes loop as argument
   const togglePlay = () => {
     states.paused = !states.paused;
     if (!states.paused) {
@@ -195,9 +201,9 @@ export const sketchWrapper: SketchWrapper = (
   //   console.log("states", states); // TEST
   // }
 
-  let returned: SketchRender | SketchReturnObject;
   // render 1st frame of 1st page refresh to start w/ playhead=0
-  returned = sketch(combinedProps);
+  const returned = sketch(combinedProps);
+  debugger;
 
   // REVIEW: had to assign something but don't like it
   let render: SketchRender = () => {};
@@ -209,12 +215,26 @@ export const sketchWrapper: SketchWrapper = (
     resize = returned.resize || resize;
   }
 
-  // render 1st frame of 1st page refresh to start w/ playhead=0
-  render(combinedProps);
+  // window resize event
+  const { add: addResize, handleResize } = resizeHandler(
+    canvas,
+    combinedProps,
+    userSettings,
+    settings,
+    states,
+    render,
+    resize
+  );
+  // run once when page is first loaded (after sketch init code)
+  // resize will also render 1st frame of 1st page refresh to start w/ playhead=0
+  handleResize();
+
+  // TODO: render inside resize? or here?
+  //       problem of NOT calling in resize is when resized, canvas disappears.
+  // render(combinedProps);
 
   // animation render loop
   const loop: SketchLoop = (timestamp: number) => {
-    // 0. first frame draw (outside loop)
     // 1. update time
     // 2. draw
     //   - less than interval: too early, don't draw (request again)
@@ -222,11 +242,14 @@ export const sketchWrapper: SketchWrapper = (
     // 3. rAF
     // 4. save
 
+    // console.log("%c loop", "color:blue;");
+
     if (!states.paused) {
       // store performance.now() once and re-use within same loop call
       states.timestamp = timestamp - states.pausedEndTime;
     } else {
       states.pausedEndTime = timestamp - states.pausedStartTime;
+      console.log("loop paused playhead", combinedProps.playhead); // already greater
       window.requestAnimationFrame(loop);
       return;
     }
@@ -256,6 +279,7 @@ export const sketchWrapper: SketchWrapper = (
     // new settings from update() prop
     if (settings.animate && !states.paused) {
       render(combinedProps);
+      debugger;
       window.requestAnimationFrame(loop);
     }
 
@@ -270,16 +294,6 @@ export const sketchWrapper: SketchWrapper = (
   if (settings.animate) window.requestAnimationFrame(loop);
 
   // event handlers
-  // window resize event
-  const { add: addResize, handleResize } = resizeHandler(
-    canvas,
-    combinedProps,
-    userSettings,
-    settings,
-    render,
-    resize
-  );
-  handleResize(); // run once when page is first loaded
 
   // keyboard events
   const { add: addKeydown } = keydownHandler(

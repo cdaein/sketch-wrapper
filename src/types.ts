@@ -125,6 +125,8 @@ export interface SketchStates {
   lastTimestamp: number;
   frameInterval: number | null;
   timeResetted: boolean;
+  temp: number;
+  resized: boolean;
 }
 
 /** props that are shared by all sketch modes */

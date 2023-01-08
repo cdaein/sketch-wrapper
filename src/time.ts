@@ -10,6 +10,8 @@ import type {
   SketchStates,
 } from "./types";
 
+import { snapBy } from "@daeinc/math";
+
 /**
  *  REVIEW: props.deltaTime is 0 at start. to calculate a value, set it BEFORE draw(props) in loop(), but for now, this will do.
  *
@@ -36,11 +38,29 @@ export const advanceTime = ({
   }
 
   props.deltaTime = states.timestamp - states.lastTimestamp;
+
   props.time = states.timestamp - states.startTime;
   // props.playhead = props.playhead + props.deltaTime / duration
-  props.playhead = duration !== Infinity ? props.time / duration : 0;
+  // props.playhead = duration !== Infinity ? props.time / duration : 0;
+
+  if (duration === Infinity) {
+    props.playhead = 0;
+    // FIX: fps throttle doesn't work if duration and playFps is both set.
+    //      also, snapping is not accurate representation of time at any moment
+    //      as it adds or subtracts from current time
+    //      maybe, useful for recording for precise time advance,
+    //      but users can do it on their end.
+  } else {
+    props.playhead =
+      states.frameInterval !== null
+        ? snapFloorBy(props.time / duration, states.frameInterval / duration)
+        : props.time / duration;
+  }
+
   computeFrame({ settings, props });
 };
+
+const snapFloorBy = (n: number, inc: number) => Math.floor(n / inc) * inc;
 
 const computeFrame = ({
   settings,

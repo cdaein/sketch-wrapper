@@ -6,6 +6,7 @@ import type {
   SketchResize,
   SketchSettings,
   SketchSettingsInternal,
+  SketchStates,
   WebGLProps,
 } from "../types";
 
@@ -18,6 +19,7 @@ export default (
   props: SketchProps | OGLProps | WebGLProps,
   userSettings: SketchSettings,
   settings: SketchSettingsInternal,
+  states: SketchStates,
   render: SketchRender,
   resize: SketchResize
 ) => {
@@ -46,9 +48,13 @@ export default (
         }));
       }
 
+      states.temp = Math.random();
+      states.resized = true;
+
       // call only when canvas size has changed (ie. fullscreen)
       resize(props);
       // this helps with canvas flicker while resizing
+      // REVIEW: this render should keep current playhead
       render(props);
     }
 
