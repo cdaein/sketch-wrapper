@@ -3,7 +3,7 @@ import { toDomElement } from '@daeinc/dom';
 import { Renderer } from 'ogl-typescript';
 
 // src/events/resize.ts
-var resize_default = (canvas, props, userSettings, settings, render, resize) => {
+var resize_default = (canvas, props, userSettings, settings, states, render, resize) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       if (settings.mode === "2d" || settings.mode === "webgl") {
@@ -48,8 +48,6 @@ var keydown_default = (canvas, props, settings, states, loop) => {
   const handleKeydown = (ev) => {
     if (ev.key === " ") {
       ev.preventDefault();
-      if (process.env.NODE_ENV === "development")
-        console.log("sketch paused or resumed");
       props.togglePlay();
     } else if ((ev.metaKey || ev.ctrlKey) && !ev.shiftKey && ev.key === "s") {
       ev.preventDefault();
@@ -73,21 +71,12 @@ var keydown_default = (canvas, props, settings, states, loop) => {
 };
 
 // src/time.ts
-var advanceTime = ({
-  props,
+var computePlayhead = ({
   settings,
-  states
+  props
 }) => {
   const { duration } = settings;
-  if (states.startTime === 0) {
-    states.startTime = states.timestamp;
-    states.lastStartTime = states.startTime;
-    states.lastTimestamp = states.timestamp;
-  }
-  props.deltaTime = states.timestamp - states.lastTimestamp;
-  props.time = states.timestamp - states.startTime;
   props.playhead = duration !== Infinity ? props.time / duration : 0;
-  computeFrame({ settings, props });
 };
 var computeFrame = ({
   settings,
@@ -107,6 +96,12 @@ var computeFrame = ({
       props.frame += 1;
     }
   }
+};
+var computeLastTimestamp = ({
+  states,
+  props
+}) => {
+  states.lastTimestamp = states.frameInterval ? states.timestamp - props.deltaTime % states.frameInterval : states.timestamp;
 };
 
 // src/helpers.ts
@@ -357,30 +352,30 @@ var createUpdateProp = ({
 };
 
 // src/index.ts
+var defaultSettings = {
+  title: "Sketch",
+  background: "#333",
+  parent: "body",
+  canvas: null,
+  dimensions: [window.innerWidth, window.innerHeight],
+  pixelRatio: 1,
+  centered: true,
+  scaleContext: true,
+  pixelated: false,
+  animate: true,
+  playFps: null,
+  exportFps: 60,
+  duration: Infinity,
+  totalFrames: Infinity,
+  filename: "",
+  prefix: "",
+  suffix: "",
+  frameFormat: "png",
+  framesFormat: "mp4",
+  hotkeys: true,
+  mode: "2d"
+};
 var sketchWrapper = (sketch, userSettings) => {
-  const defaultSettings = {
-    title: "Sketch",
-    background: "#333",
-    parent: "body",
-    canvas: null,
-    dimensions: [window.innerWidth, window.innerHeight],
-    pixelRatio: 1,
-    centered: true,
-    scaleContext: true,
-    pixelated: false,
-    animate: true,
-    playFps: null,
-    exportFps: 60,
-    duration: Infinity,
-    totalFrames: Infinity,
-    filename: "",
-    prefix: "",
-    suffix: "",
-    frameFormat: "png",
-    framesFormat: "mp4",
-    hotkeys: true,
-    mode: "2d"
-  };
   const settings = combineSettings({
     base: defaultSettings,
     main: userSettings
@@ -417,17 +412,17 @@ var sketchWrapper = (sketch, userSettings) => {
     startTime: 0,
     lastStartTime: 0,
     pausedStartTime: 0,
-    pausedEndTime: 0,
+    pausedDuration: 0,
     timestamp: 0,
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
-    timeResetted: false
+    timeResetted: false,
+    temp: 0,
+    resized: false
   };
   const togglePlay = () => {
     states.paused = !states.paused;
-    if (!states.paused) {
-      window.requestAnimationFrame(loop);
-    } else {
+    if (!states.paused) ; else {
       states.pausedStartTime = states.timestamp;
     }
   };
@@ -455,25 +450,22 @@ var sketchWrapper = (sketch, userSettings) => {
     ...baseProps,
     context
   };
-  const webGLProps = {
-    ...baseProps,
-    gl
-  };
-  const oglProps = {
-    ...baseProps,
-    oglContext,
-    oglRenderer
-  };
   let combinedProps;
   if (settings.mode === "2d") {
     combinedProps = props;
   } else if (settings.mode === "ogl") {
-    combinedProps = oglProps;
+    combinedProps = {
+      ...baseProps,
+      oglContext,
+      oglRenderer
+    };
   } else {
-    combinedProps = webGLProps;
+    combinedProps = {
+      ...baseProps,
+      gl
+    };
   }
-  let returned;
-  returned = sketch(combinedProps);
+  const returned = sketch(combinedProps);
   let render = () => {
   };
   let resize = () => {
@@ -484,49 +476,45 @@ var sketchWrapper = (sketch, userSettings) => {
     render = returned.render || render;
     resize = returned.resize || resize;
   }
-  render(combinedProps);
+  const { add: addResize, handleResize } = resize_default(
+    canvas,
+    combinedProps,
+    userSettings,
+    settings,
+    states,
+    render,
+    resize
+  );
+  handleResize();
   const loop = (timestamp) => {
-    if (!states.paused) {
-      states.timestamp = timestamp - states.pausedEndTime;
-    } else {
-      states.pausedEndTime = timestamp - states.pausedStartTime;
+    states.timestamp = timestamp - states.pausedDuration;
+    if (states.paused) {
+      states.pausedDuration = timestamp - states.pausedStartTime;
       window.requestAnimationFrame(loop);
       return;
     }
-    advanceTime({
-      props: combinedProps,
-      settings,
-      states
-    });
+    combinedProps.time = (states.timestamp - states.startTime) % combinedProps.duration;
+    combinedProps.deltaTime = states.timestamp - states.lastTimestamp;
     if (states.frameInterval !== null) {
       if (combinedProps.deltaTime < states.frameInterval) {
         window.requestAnimationFrame(loop);
         return;
       }
     }
-    states.lastTimestamp = states.timestamp;
-    if (combinedProps.playhead >= 1) {
-      combinedProps.playhead = 0;
-      combinedProps.frame = 0;
-      combinedProps.time = 0;
-      states.startTime = states.timestamp;
-    }
+    computePlayhead({
+      settings,
+      props: combinedProps
+    });
+    computeFrame({ settings, props: combinedProps });
+    computeLastTimestamp({ states, props: combinedProps });
     if (settings.animate && !states.paused) {
       render(combinedProps);
       window.requestAnimationFrame(loop);
     }
     if (states.savingFrame) ; else if (states.savingFrames) ;
   };
-  window.requestAnimationFrame(loop);
-  const { add: addResize, handleResize } = resize_default(
-    canvas,
-    combinedProps,
-    userSettings,
-    settings,
-    render,
-    resize
-  );
-  handleResize();
+  if (settings.animate)
+    window.requestAnimationFrame(loop);
   const { add: addKeydown } = keydown_default(
     canvas,
     combinedProps,
