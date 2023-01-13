@@ -12,10 +12,13 @@
  *   - quality?
  */
 
+import { Stream } from "stream";
 import type {
   SketchStates,
   SketchSettingsInternal,
   SketchProps,
+  WebGLProps,
+  OGLProps,
 } from "./types";
 
 /**
@@ -54,6 +57,79 @@ export const saveCanvasFrame = ({
 
   states.savingFrame = false;
   states.playMode = "play";
+};
+
+let stream: MediaStream;
+let recorder: MediaRecorder;
+const chunks: Blob[] = [];
+
+export const saveCanvasFrames = ({
+  canvas,
+  settings,
+  states,
+  props,
+}: {
+  canvas: HTMLCanvasElement;
+  states: SketchStates;
+  settings: SketchSettingsInternal;
+  props: SketchProps | WebGLProps | OGLProps;
+}) => {
+  const { filename, prefix, suffix, framesFormat: format } = settings;
+
+  if (format !== "webm") {
+    throw new Error("currently, only webm video format is supported");
+  }
+
+  // set up recording once at beginning of recording
+  if (!states.captureReady) {
+    stream = canvas.captureStream(2);
+    const options: MediaRecorderOptions = {
+      // default is 2.5Mbps = 2500 * 1000
+      videoBitsPerSecond: 50000 * 1000, // bps * 1000 = kbps
+      mimeType: "video/webm; codecs=vp9",
+    };
+    recorder = new MediaRecorder(stream, options);
+
+    recorder.ondataavailable = (e: BlobEvent) => {
+      chunks.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      console.log("video recording complete");
+      const blob = new Blob(chunks, { type: "video/webm" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `${formatFilename({
+        filename,
+        prefix,
+        suffix,
+      })}.${format}`;
+      link.href = url;
+      link.click();
+    };
+
+    // TODO: recording should start from 0
+    states.startTime = 0;
+    props.time = 0;
+    props.playhead = 0;
+    props.frame = 0;
+
+    states.captureReady = true;
+    recorder.start();
+
+    console.log("video recording started");
+  }
+
+  // record frame
+  (stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack).requestFrame();
+  console.log(props.frame, props.totalFrames);
+
+  if (states.captureDone) {
+    recorder.stop();
+    states.captureDone = false;
+    states.savingFrames = false;
+    states.captureReady = false;
+  }
 };
 
 /**

@@ -47,8 +47,8 @@ export default (
       }
       // call only when canvas size has changed (ie. fullscreen)
       resize(props);
-      render(props);
     }
+    render(props);
 
     // resizing canvas style (when !fullscreen & centered)
     // REVIEW: this should be better done with CSS rules.

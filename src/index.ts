@@ -24,6 +24,7 @@ import type {
 import { prepareCanvas } from "./canvas";
 import { createFunctionProps } from "./function-props";
 import { OGLRenderingContext, Renderer } from "ogl-typescript";
+import { saveCanvasFrames } from "./file-exports";
 
 // data flow: userSettings + defaultSettings => settings => states (mutable) => props => sketch()
 // default settings
@@ -51,7 +52,7 @@ const defaultSettings: SketchSettingsInternal = {
   prefix: "",
   suffix: "",
   frameFormat: "png",
-  framesFormat: "mp4",
+  framesFormat: "webm",
   // sketch
   hotkeys: true,
   mode: "2d",
@@ -199,14 +200,6 @@ export const sketchWrapper: SketchWrapper = (
     } as WebGLProps;
   }
 
-  //
-  // TODO: remove these from dist
-  // if (process.env.NODE_ENV === "development") {
-  //   console.log("settings", settings); // TEST
-  //   console.log("props", props); // TEST
-  //   console.log("states", states); // TEST
-  // }
-
   // render 1st frame of 1st page refresh to start w/ playhead=0
   const returned = sketch(combinedProps);
 
@@ -257,6 +250,8 @@ export const sketchWrapper: SketchWrapper = (
       }
     }
 
+    console.log(combinedProps.time);
+
     computePlayhead({
       settings,
       props: combinedProps,
@@ -270,11 +265,12 @@ export const sketchWrapper: SketchWrapper = (
       window.requestAnimationFrame(loop);
     }
 
-    // save frame(s)
-    if (states.savingFrame) {
-      //
-    } else if (states.savingFrames) {
-      //
+    // save frames
+    if (states.savingFrames) {
+      if (combinedProps.frame >= combinedProps.totalFrames - 1) {
+        states.captureDone = true;
+      }
+      saveCanvasFrames({ canvas, settings, states, props: combinedProps });
     }
   };
 
