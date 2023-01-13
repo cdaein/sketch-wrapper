@@ -9,6 +9,57 @@ import type {
   SketchStates,
 } from "./types";
 
+export const computePlayhead = ({
+  settings,
+  props,
+}: {
+  settings: SketchSettingsInternal;
+  props: BaseProps;
+}) => {
+  const { duration } = settings;
+  props.playhead = duration !== Infinity ? props.time / duration : 0;
+};
+
+export const computeFrame = ({
+  settings,
+  props,
+}: {
+  settings: SketchSettingsInternal;
+  props: BaseProps;
+}) => {
+  const { duration, playFps, totalFrames } = settings;
+
+  // 4 cases
+  // TODO: convert to 3 cases (playFps === null => +=1)
+  if (duration !== Infinity) {
+    if (playFps !== null) {
+      props.frame = Math.floor(props.playhead * totalFrames);
+    } else {
+      props.frame += 1;
+    }
+  } else {
+    if (playFps !== null) {
+      props.frame = Math.floor((props.time * playFps) / 1000);
+    } else {
+      props.frame += 1;
+    }
+  }
+};
+
+export const computeLastTimestamp = ({
+  states,
+  props,
+}: {
+  states: SketchStates;
+  props: BaseProps;
+}) => {
+  states.lastTimestamp = states.frameInterval
+    ? states.timestamp - (props.deltaTime % states.frameInterval)
+    : states.timestamp;
+};
+
+//---------- unused below
+
 /**
  *  REVIEW: props.deltaTime is 0 at start. to calculate a value, set it BEFORE draw(props) in loop(), but for now, this will do.
  *
@@ -62,34 +113,6 @@ export const advanceTime = ({
   // }
 
   computeFrame({ settings, props });
-};
-
-const snapFloorBy = (n: number, inc: number) => Math.floor(n / inc) * inc;
-
-const computeFrame = ({
-  settings,
-  props,
-}: {
-  settings: SketchSettingsInternal;
-  props: BaseProps;
-}) => {
-  const { duration, playFps, totalFrames } = settings;
-
-  // 4 cases
-  // TODO: convert to 3 cases (playFps === null => +=1)
-  if (duration !== Infinity) {
-    if (playFps !== null) {
-      props.frame = Math.floor(props.playhead * totalFrames);
-    } else {
-      props.frame += 1;
-    }
-  } else {
-    if (playFps !== null) {
-      props.frame = Math.floor((props.time * playFps) / 1000);
-    } else {
-      props.frame += 1;
-    }
-  }
 };
 
 export const advanceFrame = (settings: SketchSettings) => {

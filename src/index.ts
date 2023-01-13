@@ -1,6 +1,11 @@
 import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
-import { advanceTime } from "./time";
+import {
+  advanceTime,
+  computeFrame,
+  computeLastTimestamp,
+  computePlayhead,
+} from "./time";
 import { combineSettings } from "./helpers";
 import type {
   Sketch,
@@ -241,28 +246,24 @@ export const sketchWrapper: SketchWrapper = (
     // time
     combinedProps.time =
       (states.timestamp - states.startTime) % combinedProps.duration;
-
     // deltaTime
     combinedProps.deltaTime = states.timestamp - states.lastTimestamp;
 
-    // throttle frame rate
     if (states.frameInterval !== null) {
+      // throttle frame rate
       if (combinedProps.deltaTime < states.frameInterval) {
         window.requestAnimationFrame(loop);
         return;
       }
-
-      // playhead
-      combinedProps.playhead = combinedProps.time / combinedProps.duration;
-
-      // frame
-      combinedProps.frame = Math.floor(
-        combinedProps.playhead * combinedProps.totalFrames
-      );
-
-      states.lastTimestamp =
-        states.timestamp - (combinedProps.deltaTime % states.frameInterval);
     }
+
+    computePlayhead({
+      settings,
+      props: combinedProps,
+    });
+    computeFrame({ settings, props: combinedProps });
+    // update lastTimestamp for deltaTime calculation
+    computeLastTimestamp({ states, props: combinedProps });
 
     if (settings.animate && !states.paused) {
       render(combinedProps);
@@ -278,8 +279,6 @@ export const sketchWrapper: SketchWrapper = (
   };
 
   if (settings.animate) window.requestAnimationFrame(loop);
-
-  // event handlers
 
   // keyboard events
   const { add: addKeydown } = keydownHandler(
