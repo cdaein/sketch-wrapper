@@ -4,13 +4,10 @@
 
 import type {
   BaseProps,
-  SketchProps,
   SketchSettings,
   SketchSettingsInternal,
   SketchStates,
 } from "./types";
-
-import { snapBy } from "@daeinc/math";
 
 /**
  *  REVIEW: props.deltaTime is 0 at start. to calculate a value, set it BEFORE draw(props) in loop(), but for now, this will do.
@@ -31,31 +28,38 @@ export const advanceTime = ({
 
   // REVIEW: set inital value to null, instead of 0?
   // clean start again (this is to avoid calling performance.now again which adds slight discrepancy)
-  if (states.startTime === 0) {
-    states.startTime = states.timestamp;
-    states.lastStartTime = states.startTime;
-    states.lastTimestamp = states.timestamp;
-  }
+  // if (states.startTime === 0) {
+  //   states.startTime = states.timestamp;
+  //   states.lastStartTime = states.startTime;
+  //   states.lastTimestamp = states.timestamp;
+  // }
 
+  // time
+  props.time = (states.timestamp - states.startTime) % duration;
+
+  // deltaTime
   props.deltaTime = states.timestamp - states.lastTimestamp;
 
-  props.time = states.timestamp - states.startTime;
+  // old
   // props.playhead = props.playhead + props.deltaTime / duration
-  // props.playhead = duration !== Infinity ? props.time / duration : 0;
 
-  if (duration === Infinity) {
-    props.playhead = 0;
-    // FIX: fps throttle doesn't work if duration and playFps is both set.
-    //      also, snapping is not accurate representation of time at any moment
-    //      as it adds or subtracts from current time
-    //      maybe, useful for recording for precise time advance,
-    //      but users can do it on their end.
-  } else {
-    props.playhead =
-      states.frameInterval !== null
-        ? snapFloorBy(props.time / duration, states.frameInterval / duration)
-        : props.time / duration;
-  }
+  // current
+  props.playhead = duration !== Infinity ? props.time / duration : 0;
+
+  // trying
+  // if (duration === Infinity) {
+  //   // FIX: fps throttle doesn't work when using "time", instead of "playhead"
+  //   //      also, snapping is not accurate representation of time at any moment
+  //   //      as it adds or subtracts from current time
+  //   //      maybe, useful for recording for precise time advance,
+  //   //      but users can do it on their end.
+  //   props.playhead = states.frameInterval !== null ? 0 : 0;
+  // } else {
+  //   props.playhead =
+  //     states.frameInterval !== null
+  //       ? snapFloorBy(props.time / duration, states.frameInterval / duration)
+  //       : props.time / duration;
+  // }
 
   computeFrame({ settings, props });
 };
@@ -72,6 +76,7 @@ const computeFrame = ({
   const { duration, playFps, totalFrames } = settings;
 
   // 4 cases
+  // TODO: convert to 3 cases (playFps === null => +=1)
   if (duration !== Infinity) {
     if (playFps !== null) {
       props.frame = Math.floor(props.playhead * totalFrames);

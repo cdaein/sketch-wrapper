@@ -35,8 +35,6 @@ export default (
       //  2. if parent, don't go into fullscreen at all.
       //  3. inline-styling will override anyways...
 
-      // REVIEW: not sure about updating props here. props should be read-only.
-
       if (settings.mode === "2d" || settings.mode === "webgl") {
         ({ width: props.width, height: props.height } = resizeCanvas({
           canvas,
@@ -47,14 +45,8 @@ export default (
           scaleContext: settings.scaleContext,
         }));
       }
-
-      states.temp = Math.random();
-      states.resized = true;
-
       // call only when canvas size has changed (ie. fullscreen)
       resize(props);
-      // this helps with canvas flicker while resizing
-      // REVIEW: this render should keep current playhead
       render(props);
     }
 

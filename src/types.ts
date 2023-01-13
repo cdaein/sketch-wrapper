@@ -120,7 +120,7 @@ export interface SketchStates {
   startTime: number;
   lastStartTime: number;
   pausedStartTime: number;
-  pausedEndTime: number;
+  pausedDuration: number;
   timestamp: number;
   lastTimestamp: number;
   frameInterval: number | null;

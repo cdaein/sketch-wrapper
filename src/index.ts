@@ -118,7 +118,7 @@ export const sketchWrapper: SketchWrapper = (
     startTime: 0,
     lastStartTime: 0,
     pausedStartTime: 0,
-    pausedEndTime: 0,
+    pausedDuration: 0,
     timestamp: 0,
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1000 / settings.playFps : null,
@@ -133,7 +133,8 @@ export const sketchWrapper: SketchWrapper = (
     states.paused = !states.paused;
     if (!states.paused) {
       // when resumed: call loop so animation will continue
-      window.requestAnimationFrame(loop);
+      // states.timestamp = performance.now() - states.pausedDuration;
+      // window.requestAnimationFrame(loop); // not needed?
     } else {
       // when paused
       states.pausedStartTime = states.timestamp;
@@ -203,7 +204,6 @@ export const sketchWrapper: SketchWrapper = (
 
   // render 1st frame of 1st page refresh to start w/ playhead=0
   const returned = sketch(combinedProps);
-  debugger;
 
   // REVIEW: had to assign something but don't like it
   let render: SketchRender = () => {};
@@ -225,67 +225,53 @@ export const sketchWrapper: SketchWrapper = (
     render,
     resize
   );
-  // run once when page is first loaded (after sketch init code)
-  // resize will also render 1st frame of 1st page refresh to start w/ playhead=0
   handleResize();
-
-  // TODO: render inside resize? or here?
-  //       problem of NOT calling in resize is when resized, canvas disappears.
-  // render(combinedProps);
 
   // animation render loop
   const loop: SketchLoop = (timestamp: number) => {
-    // 1. update time
-    // 2. draw
-    //   - less than interval: too early, don't draw (request again)
-    //   - greater than interval: draw
-    // 3. rAF
-    // 4. save
+    states.timestamp = timestamp - states.pausedDuration;
 
-    // console.log("%c loop", "color:blue;");
-
-    if (!states.paused) {
-      // store performance.now() once and re-use within same loop call
-      states.timestamp = timestamp - states.pausedEndTime;
-    } else {
-      states.pausedEndTime = timestamp - states.pausedStartTime;
-      console.log("loop paused playhead", combinedProps.playhead); // already greater
+    // when paused, accumulate pausedDuration
+    if (states.paused) {
+      states.pausedDuration = timestamp - states.pausedStartTime;
       window.requestAnimationFrame(loop);
       return;
     }
 
-    advanceTime({
-      props: combinedProps,
-      settings,
-      states,
-    });
+    // time
+    combinedProps.time =
+      (states.timestamp - states.startTime) % combinedProps.duration;
 
+    // deltaTime
+    combinedProps.deltaTime = states.timestamp - states.lastTimestamp;
+
+    // throttle frame rate
     if (states.frameInterval !== null) {
       if (combinedProps.deltaTime < states.frameInterval) {
         window.requestAnimationFrame(loop);
         return;
       }
+
+      // playhead
+      combinedProps.playhead = combinedProps.time / combinedProps.duration;
+
+      // frame
+      combinedProps.frame = Math.floor(
+        combinedProps.playhead * combinedProps.totalFrames
+      );
+
+      states.lastTimestamp =
+        states.timestamp - (combinedProps.deltaTime % states.frameInterval);
     }
 
-    states.lastTimestamp = states.timestamp;
-
-    if (combinedProps.playhead >= 1) {
-      combinedProps.playhead = 0;
-      combinedProps.frame = 0;
-      combinedProps.time = 0;
-      states.startTime = states.timestamp;
-    }
-
-    // new settings from update() prop
     if (settings.animate && !states.paused) {
       render(combinedProps);
-      debugger;
       window.requestAnimationFrame(loop);
     }
 
     // save frame(s)
     if (states.savingFrame) {
-      // saveCanvasFrame({ canvas, settings, states });
+      //
     } else if (states.savingFrames) {
       //
     }
