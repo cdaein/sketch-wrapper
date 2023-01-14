@@ -5,7 +5,7 @@
 
 Helpers for creative coding sketches with HTML5 Canvas. It is written from scratch, and heavily inspired by [`canvas-sketch`](https://github.com/mattdesl/canvas-sketch/). Many of the props and settings are compatible.
 
-Documentation is updated for `v0.9.5`
+Documentation is updated for `v0.10.1`
 
 > ⚠️ This module is in a very early stage of development, and there may be unexpected bugs.
 
