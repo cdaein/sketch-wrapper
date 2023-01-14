@@ -2,7 +2,9 @@
 
 import { resolve } from "path";
 import { defineConfig } from "vite";
-import dts from "rollup-plugin-dts";
+// import dts from "rollup-plugin-dts";
+import dts from "vite-plugin-dts";
+// import ts from "vite-plugin-typescript";
 
 export default defineConfig({
   build: {
@@ -16,7 +18,9 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["@daeinc/dom", "@daeinc/canvas"],
+      external: ["@daeinc/dom", "@daeinc/canvas", "ogl-typescript", "p5"],
+      // plugins: [dts()],
     },
   },
+  // plugins: [dts()],
 });

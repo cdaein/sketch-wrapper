@@ -1,73 +1,5 @@
-import { createCanvas, resizeCanvas, setupCanvas } from '@daeinc/canvas';
+import { createCanvas, resizeCanvas } from '@daeinc/canvas';
 import { toDomElement } from '@daeinc/dom';
-
-var __defProp = Object.defineProperty;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-};
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-
-// src/modes/ogl.ts
-var ogl_exports = {};
-__export(ogl_exports, {
-  createOglCanvas: () => createOglCanvas
-});
-var createOglCanvas;
-var init_ogl = __esm({
-  "src/modes/ogl.ts"() {
-    createOglCanvas = async (settings) => {
-      let [width, height] = settings.dimensions;
-      let pixelRatio = Math.max(settings.pixelRatio, 1);
-      const attributes = settings.attributes;
-      try {
-        const Renderer = (await import('ogl-typescript')).Renderer;
-        const renderer = new Renderer({
-          width,
-          height,
-          dpr: settings.pixelRatio,
-          ...attributes
-        });
-        const gl = renderer.gl;
-        let canvas = gl.canvas;
-        ({ canvas, width, height, pixelRatio } = setupCanvas({
-          parent: settings.parent,
-          canvas,
-          width,
-          height,
-          pixelRatio
-        }));
-        if (settings.centered === true) {
-          const canvasContainer = canvas.parentElement;
-          canvasContainer.style.width = "100vw";
-          canvasContainer.style.height = "100vh";
-          canvasContainer.style.display = "flex";
-          canvasContainer.style.justifyContent = "center";
-          canvasContainer.style.alignItems = "center";
-          if (settings.scaleContext === false) {
-          }
-        } else {
-          canvas.style.width = 100 + "%";
-          canvas.style.height = 100 + "%";
-          canvas.style.maxWidth = `${settings.dimensions[0]}px`;
-          canvas.style.maxHeight = `${settings.dimensions[1]}px`;
-        }
-        return {
-          canvas,
-          oglContext: gl,
-          oglRenderer: renderer,
-          width,
-          height,
-          pixelRatio
-        };
-      } catch (e) {
-      }
-    };
-  }
-});
 
 // src/time.ts
 var computePlayhead = ({
@@ -267,7 +199,7 @@ var prepareCanvas = async (settings) => {
   } else if (settings.mode === "webgl") {
     return createWebglCanvas(settings);
   } else if (settings.mode === "ogl") {
-    return (await Promise.resolve().then(() => (init_ogl(), ogl_exports))).createOglCanvas(settings);
+    return (await import('./ogl-U7V5DNAD.js')).createOglCanvas(settings);
   }
   return create2dCanvas(settings);
 };
