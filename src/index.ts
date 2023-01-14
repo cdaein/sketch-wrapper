@@ -84,7 +84,7 @@ export const sketchWrapper: SketchWrapper = async (
         }
       }
 
-      console.log(props.time / props.duration);
+      // console.log(props.time / props.duration);
 
       computePlayhead({
         settings,

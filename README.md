@@ -65,9 +65,9 @@ sketchWrapper(sketch, settings);
 
 ## How to use
 
-Documentation is updated for `v0.8.11`
+Documentation is updated for `v0.9.5`
 
-> Note: [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper. Your bundler may complain that it cannot find `ogl-typescript` at bundle time as it is not part of the dependency. You can configure your bundler so that it does not pre-bundle it and only loads when you are using it with `ogl` mode. In Vitejs, use [`optimizeDeps.exclude`](https://vitejs.dev/guide/dep-pre-bundling.html). See below for example:
+> Note: Sketch Wrapper uses dynamic import of optional dependencies (ex. `ogl-typescript`) to reduce the package size. Your bundler may complain that it cannot find these dependencies. To get around this, you will need to exclude them at bundle time. [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper and you can use [`optimizeDeps.exclude`](https://vitejs.dev/guide/dep-pre-bundling.html) to configure like below:
 
 ```js
 // vite.config.js
@@ -113,15 +113,16 @@ The same `frame` may be repeated if the display refresh rate is higher than the 
 
 ##### `ogl`
 
+> Note: To use `ogl` mode, you will need to install it separately using `npm i ogl-typescript`.
+
 - `oglContext` - returns `OGLRenderingContext` object
 - `oglRenderer` - returns `Renderer` object
 
 #### DOM
 
-|   name    |            type            | description                  |
-| :-------: | :------------------------: | ---------------------------- |
-| `canvas`  |    `HTMLCanvasElement`     | get canvas object reference  |
-| `context` | `CanvasRenderingContext2D` | get context object reference |
+|   name   |        type         | description                 |
+| :------: | :-----------------: | --------------------------- |
+| `canvas` | `HTMLCanvasElement` | get canvas object reference |
 
 #### Canvas
 
