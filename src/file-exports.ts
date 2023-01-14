@@ -12,7 +12,6 @@
  *   - quality?
  */
 
-import { Stream } from "stream";
 import type {
   SketchStates,
   SketchSettingsInternal,
@@ -82,7 +81,7 @@ export const saveCanvasFrames = ({
 
   // set up recording once at beginning of recording
   if (!states.captureReady) {
-    stream = canvas.captureStream(2);
+    stream = canvas.captureStream(0);
     const options: MediaRecorderOptions = {
       // default is 2.5Mbps = 2500 * 1000
       videoBitsPerSecond: 50000 * 1000, // bps * 1000 = kbps
@@ -92,10 +91,10 @@ export const saveCanvasFrames = ({
 
     recorder.ondataavailable = (e: BlobEvent) => {
       chunks.push(e.data);
+      console.log(chunks);
     };
 
-    recorder.onstop = () => {
-      console.log("video recording complete");
+    recorder.onstop = (e) => {
       const blob = new Blob(chunks, { type: "video/webm" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -108,12 +107,6 @@ export const saveCanvasFrames = ({
       link.click();
     };
 
-    // TODO: recording should start from 0
-    states.startTime = 0;
-    props.time = 0;
-    props.playhead = 0;
-    props.frame = 0;
-
     states.captureReady = true;
     recorder.start();
 
@@ -122,10 +115,10 @@ export const saveCanvasFrames = ({
 
   // record frame
   (stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack).requestFrame();
-  console.log(props.frame, props.totalFrames);
 
   if (states.captureDone) {
     recorder.stop();
+    console.log("video recording complete");
     states.captureDone = false;
     states.savingFrames = false;
     states.captureReady = false;

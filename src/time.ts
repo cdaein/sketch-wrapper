@@ -11,9 +11,11 @@ import type {
 
 export const computePlayhead = ({
   settings,
+  states,
   props,
 }: {
   settings: SketchSettingsInternal;
+  states: SketchStates;
   props: BaseProps;
 }) => {
   const { duration } = settings;
@@ -22,24 +24,27 @@ export const computePlayhead = ({
 
 export const computeFrame = ({
   settings,
+  states,
   props,
 }: {
   settings: SketchSettingsInternal;
+  states: SketchStates;
   props: BaseProps;
 }) => {
-  const { duration, playFps, totalFrames } = settings;
+  const { duration, playFps, exportFps, totalFrames } = settings;
+  const fps = states.savingFrames ? exportFps : playFps;
 
   // 4 cases
-  // TODO: convert to 3 cases (playFps === null => +=1)
+  // TODO: convert to 3 cases (fps === null => +=1)
   if (duration !== Infinity) {
-    if (playFps !== null) {
+    if (fps !== null) {
       props.frame = Math.floor(props.playhead * totalFrames);
     } else {
       props.frame += 1;
     }
   } else {
-    if (playFps !== null) {
-      props.frame = Math.floor((props.time * playFps) / 1000);
+    if (fps !== null) {
+      props.frame = Math.floor((props.time * fps) / 1000);
     } else {
       props.frame += 1;
     }
@@ -65,55 +70,55 @@ export const computeLastTimestamp = ({
  *
  * @param param0
  */
-export const advanceTime = ({
-  props,
-  settings,
-  states,
-}: {
-  props: BaseProps;
-  settings: SketchSettingsInternal;
-  states: SketchStates;
-}) => {
-  const { duration } = settings;
-  // const fps = states.savingFrames ? exportFps : playFps;
+// export const advanceTime = ({
+//   props,
+//   settings,
+//   states,
+// }: {
+//   props: BaseProps;
+//   settings: SketchSettingsInternal;
+//   states: SketchStates;
+// }) => {
+//   const { duration } = settings;
+//   // const fps = states.savingFrames ? exportFps : playFps;
 
-  // REVIEW: set inital value to null, instead of 0?
-  // clean start again (this is to avoid calling performance.now again which adds slight discrepancy)
-  // if (states.startTime === 0) {
-  //   states.startTime = states.timestamp;
-  //   states.lastStartTime = states.startTime;
-  //   states.lastTimestamp = states.timestamp;
-  // }
+//   // REVIEW: set inital value to null, instead of 0?
+//   // clean start again (this is to avoid calling performance.now again which adds slight discrepancy)
+//   // if (states.startTime === 0) {
+//   //   states.startTime = states.timestamp;
+//   //   states.lastStartTime = states.startTime;
+//   //   states.lastTimestamp = states.timestamp;
+//   // }
 
-  // time
-  props.time = (states.timestamp - states.startTime) % duration;
+//   // time
+//   props.time = (states.timestamp - states.startTime) % duration;
 
-  // deltaTime
-  props.deltaTime = states.timestamp - states.lastTimestamp;
+//   // deltaTime
+//   props.deltaTime = states.timestamp - states.lastTimestamp;
 
-  // old
-  // props.playhead = props.playhead + props.deltaTime / duration
+//   // old
+//   // props.playhead = props.playhead + props.deltaTime / duration
 
-  // current
-  props.playhead = duration !== Infinity ? props.time / duration : 0;
+//   // current
+//   props.playhead = duration !== Infinity ? props.time / duration : 0;
 
-  // trying
-  // if (duration === Infinity) {
-  //   // FIX: fps throttle doesn't work when using "time", instead of "playhead"
-  //   //      also, snapping is not accurate representation of time at any moment
-  //   //      as it adds or subtracts from current time
-  //   //      maybe, useful for recording for precise time advance,
-  //   //      but users can do it on their end.
-  //   props.playhead = states.frameInterval !== null ? 0 : 0;
-  // } else {
-  //   props.playhead =
-  //     states.frameInterval !== null
-  //       ? snapFloorBy(props.time / duration, states.frameInterval / duration)
-  //       : props.time / duration;
-  // }
+//   // trying
+//   // if (duration === Infinity) {
+//   //   // FIX: fps throttle doesn't work when using "time", instead of "playhead"
+//   //   //      also, snapping is not accurate representation of time at any moment
+//   //   //      as it adds or subtracts from current time
+//   //   //      maybe, useful for recording for precise time advance,
+//   //   //      but users can do it on their end.
+//   //   props.playhead = states.frameInterval !== null ? 0 : 0;
+//   // } else {
+//   //   props.playhead =
+//   //     states.frameInterval !== null
+//   //       ? snapFloorBy(props.time / duration, states.frameInterval / duration)
+//   //       : props.time / duration;
+//   // }
 
-  computeFrame({ settings, props });
-};
+//   computeFrame({ settings, props });
+// };
 
 export const advanceFrame = (settings: SketchSettings) => {
   // when recording (ie. gif), we only want to record a new frame, not duplicte in case of high refresh rate (exportFps !== playFps)

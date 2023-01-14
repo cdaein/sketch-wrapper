@@ -1,11 +1,6 @@
 import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
-import {
-  advanceTime,
-  computeFrame,
-  computeLastTimestamp,
-  computePlayhead,
-} from "./time";
+import { computeFrame, computeLastTimestamp, computePlayhead } from "./time";
 import { combineSettings } from "./helpers";
 import type {
   Sketch,
@@ -239,8 +234,20 @@ export const sketchWrapper: SketchWrapper = (
     // time
     combinedProps.time =
       (states.timestamp - states.startTime) % combinedProps.duration;
+
+    // reset startTime for recording
+    if (states.savingFrames && !states.captureReady) {
+      states.startTime = states.timestamp;
+      // props.time = 0;
+      // props.playhead = 0;
+      // props.frame = 0;
+      console.log("reset to record");
+    }
+
     // deltaTime
-    combinedProps.deltaTime = states.timestamp - states.lastTimestamp;
+    combinedProps.deltaTime = states.savingFrames
+      ? 1000 / settings.exportFps
+      : states.timestamp - states.lastTimestamp;
 
     if (states.frameInterval !== null) {
       // throttle frame rate
@@ -250,13 +257,12 @@ export const sketchWrapper: SketchWrapper = (
       }
     }
 
-    console.log(combinedProps.time);
-
     computePlayhead({
       settings,
+      states,
       props: combinedProps,
     });
-    computeFrame({ settings, props: combinedProps });
+    computeFrame({ settings, states, props: combinedProps });
     // update lastTimestamp for deltaTime calculation
     computeLastTimestamp({ states, props: combinedProps });
 
@@ -267,10 +273,7 @@ export const sketchWrapper: SketchWrapper = (
 
     // save frames
     if (states.savingFrames) {
-      if (combinedProps.frame >= combinedProps.totalFrames - 1) {
-        states.captureDone = true;
-      }
-      saveCanvasFrames({ canvas, settings, states, props: combinedProps });
+      // saveCanvasFrames({ canvas, settings, states, props: combinedProps });
     }
   };
 
