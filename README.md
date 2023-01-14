@@ -31,7 +31,7 @@ The module supports both JavaScript and TypeScript.
 Check out a separate repository [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples) for more examples.
 
 ```js
-import { sketchWrapper } from "@daeinc/sketch-wrapper";
+import sketchWrapper from "@daeinc/sketch-wrapper";
 
 const sketch = ({ canvas, width, height }) => {
   // any setup code
@@ -67,7 +67,7 @@ sketchWrapper(sketch, settings);
 
 ## How to use
 
-> Note: Sketch Wrapper uses dynamic import of optional dependencies (ex. `ogl-typescript`) to reduce the package size. Your bundler may complain that it cannot find these dependencies. To get around this, you will need to exclude them at bundle time. [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper and you can use [`optimizeDeps.exclude`](https://vitejs.dev/guide/dep-pre-bundling.html) to configure like below:
+> ✋ Note: Sketch Wrapper uses dynamic import of optional dependencies (ex. `ogl-typescript`) to reduce the package size. Your bundler may complain that it cannot find these dependencies. To get around this, you will need to exclude them at bundle time. [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper and you can use [`optimizeDeps.exclude`](https://vitejs.dev/guide/dep-pre-bundling.html) to configure like below:
 
 ```js
 // vite.config.js
@@ -80,10 +80,11 @@ export default defineConfig({
 
 ### Keyboard Shortcuts
 
-|      Shortcut      | Description                                    |
-| :----------------: | ---------------------------------------------- |
-| `CMD(or Ctrl) + S` | Export a PNG image.                            |
-|     `Spacebar`     | not yet implemented. Pause or resume animation |
+|          Shortcut          | Description                                                        |
+| :------------------------: | ------------------------------------------------------------------ |
+|     `CMD(or Ctrl) + S`     | Export a PNG image.                                                |
+| `CMD(or Ctrl) + Shift + S` | Export a video (WebM by default). This feature is work-in-progress |
+|         `Spacebar`         | Pause or resume animation                                          |
 
 ### SketchProps
 
@@ -97,26 +98,15 @@ The same `frame` may be repeated if the display refresh rate is higher than the 
 
 #### Sketch Modes
 
-|  name  |            type            | description                                                     |
-| :----: | :------------------------: | --------------------------------------------------------------- |
-| `mode` | `"2d" \| "webgl" \| "ogl"` | Set sketch mode for different types of sketches. default:`"2d"` |
+|     name      |            type            | description                                                     |
+| :-----------: | :------------------------: | --------------------------------------------------------------- |
+|    `mode`     | `"2d" \| "webgl" \| "ogl"` | Set sketch mode for different types of sketches. default:`"2d"` |
+|   `context`   | `CanvasRenderingContext2D` | available in `2d` mode.                                         |
+|     `gl`      |  `WebGLRenderingContext`   | available in `webgl` mode.                                      |
+| `oglContext`  |   `OGLRenderingContext`    | available in `ogl` mode.                                        |
+| `oglRenderer` |         `Renderer`         | available in `ogl` mode.                                        |
 
-#### Mode-specific Props
-
-##### `2d`
-
-- `context` - returns `CanvasRenderingContext2D` object to.
-
-##### `webgl`
-
-- `gl` - returns `WebGLRenderingContext` object.
-
-##### `ogl`
-
-> Note: To use `ogl` mode, you will need to install it separately using `npm i ogl-typescript`.
-
-- `oglContext` - returns `OGLRenderingContext` object
-- `oglRenderer` - returns `Renderer` object
+> ✋ Note: To use `ogl` mode, you will need to install it separately using `npm i ogl-typescript`.
 
 #### DOM
 
@@ -186,14 +176,14 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 
 ### File Export
 
-|      name      |             type             | default | description                                                                   |
-| :------------: | :--------------------------: | :-----: | ----------------------------------------------------------------------------- |
-|   `filename`   |           `string`           |  `""`   | Set file name for exported file. if not set, will use current datetime string |
-|    `prefix`    |           `string`           |  `""`   | Set prefix to filename                                                        |
-|    `suffix`    |           `string`           |  `""`   | Set suffix to filename                                                        |
-| `frameFormat`  | `png \| jpeg \| jpg \| webp` |  `png`  | Set image export format yet                                                   |
-| `framesFormat` |           `string`           |  `mp4`  | not implemented yet                                                           |
-|   `hotkeys`    |          `boolean`           | `true`  | Set to `false` disable keyboard shortcuts such as `Cmd + S` to export image   |
+|      name      |                 type                 | default | description                                                                    |
+| :------------: | :----------------------------------: | :-----: | ------------------------------------------------------------------------------ |
+|   `filename`   |               `string`               |  `""`   | Set file name for exported file. if not set, will use current datetime string  |
+|    `prefix`    |               `string`               |  `""`   | Set prefix to filename                                                         |
+|    `suffix`    |               `string`               |  `""`   | Set suffix to filename                                                         |
+| `frameFormat`  | `"png" \| "jpeg" \| "jpg" \| "webp"` |  `png`  | Set image export format                                                        |
+| `framesFormat` |               `"webm"`               | `webm`  | not implemented yet                                                            |
+|   `hotkeys`    |              `boolean`               | `true`  | Set to `false` to disable keyboard shortcuts such as `Cmd + S` to export image |
 
 ## References
 
