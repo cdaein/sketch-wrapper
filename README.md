@@ -5,6 +5,8 @@
 
 Helpers for creative coding sketches with HTML5 Canvas. It is written from scratch, and heavily inspired by [`canvas-sketch`](https://github.com/mattdesl/canvas-sketch/). Many of the props and settings are compatible.
 
+Documentation is updated for `v0.9.5`
+
 > ⚠️ This module is in a very early stage of development, and there may be unexpected bugs.
 
 ## Install
@@ -64,8 +66,6 @@ sketchWrapper(sketch, settings);
 ```
 
 ## How to use
-
-Documentation is updated for `v0.9.5`
 
 > Note: Sketch Wrapper uses dynamic import of optional dependencies (ex. `ogl-typescript`) to reduce the package size. Your bundler may complain that it cannot find these dependencies. To get around this, you will need to exclude them at bundle time. [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper and you can use [`optimizeDeps.exclude`](https://vitejs.dev/guide/dep-pre-bundling.html) to configure like below:
 
