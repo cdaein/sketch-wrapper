@@ -62,5 +62,24 @@ export const createSettings = ({
   if (Object.values(combined).some((value) => value === undefined)) {
     throw new Error("settings object cannot have undefined values");
   }
+
+  // document
+  document.title = combined.title;
+  document.body.style.background = combined.background;
+
+  if (combined.playFps !== null) {
+    combined.playFps = Math.max(Math.floor(combined.playFps), 1);
+  }
+  combined.exportFps = Math.max(Math.floor(combined.exportFps), 1);
+  // userSettings doesn't have totalFrames, but internally, both will be computed.
+  // when both are Infinity, animation will continue to run,
+  // time/frame updates, playhead doesn't.
+  // REVIEW: use ceil()? will it affect advanceTime()?
+  if (combined.playFps !== null && combined.duration !== Infinity) {
+    combined.totalFrames = Math.floor(
+      (combined.duration * combined.playFps) / 1000
+    );
+  }
+
   return combined;
 };

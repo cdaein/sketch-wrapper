@@ -27,25 +27,6 @@ export const sketchWrapper: SketchWrapper = (
     main: userSettings,
   }) as SketchSettingsInternal;
 
-  // use and update some settings
-  // document
-  document.title = settings.title;
-  document.body.style.background = settings.background;
-
-  if (settings.playFps !== null) {
-    settings.playFps = Math.max(Math.floor(settings.playFps), 1);
-  }
-  settings.exportFps = Math.max(Math.floor(settings.exportFps), 1);
-  // userSettings doesn't have totalFrames, but internally, both will be computed.
-  // when both are Infinity, animation will continue to run,
-  // time/frame updates, playhead doesn't.
-  // REVIEW: use ceil()? will it affect advanceTime()?
-  if (settings.playFps !== null && settings.duration !== Infinity) {
-    settings.totalFrames = Math.floor(
-      (settings.duration * settings.playFps) / 1000
-    );
-  }
-
   const states = createStates({ settings });
 
   const props = createProps({
@@ -56,6 +37,7 @@ export const sketchWrapper: SketchWrapper = (
   const { canvas } = props;
 
   const returned = sketch(props);
+
   let render: SketchRender = () => {};
   let resize: SketchResize = () => {};
   if (typeof returned === "function") {
