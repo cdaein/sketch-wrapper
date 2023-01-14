@@ -1,57 +1,19 @@
 import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
 import { computeFrame, computeLastTimestamp, computePlayhead } from "./time";
-import { combineSettings } from "./helpers";
+import { combineSettings } from "./settings";
 import type {
   Sketch,
   SketchSettings,
   SketchSettingsInternal,
-  SketchProps,
   SketchStates,
   SketchLoop,
   SketchRender,
   SketchResize,
   SketchWrapper,
-  OGLProps,
-  BaseProps,
-  WebGLProps,
 } from "./types";
-import { prepareCanvas } from "./canvas";
-import { createFunctionProps } from "./function-props";
-import { OGLRenderingContext, Renderer } from "ogl-typescript";
+import { createAllProps, createFunctionProps } from "./props";
 import { saveCanvasFrames } from "./file-exports";
-
-// data flow: userSettings + defaultSettings => settings => states (mutable) => props => sketch()
-// default settings
-// TODO: create settings.ts
-const defaultSettings: SketchSettingsInternal = {
-  // document
-  title: "Sketch",
-  background: "#333",
-  // canvas
-  parent: "body",
-  canvas: null,
-  dimensions: [window.innerWidth, window.innerHeight],
-  pixelRatio: 1,
-  centered: true,
-  scaleContext: true,
-  pixelated: false,
-  // animation
-  animate: true,
-  playFps: null,
-  exportFps: 60,
-  duration: Infinity,
-  totalFrames: Infinity,
-  // file
-  filename: "",
-  prefix: "",
-  suffix: "",
-  frameFormat: "png",
-  framesFormat: "webm",
-  // sketch
-  hotkeys: true,
-  mode: "2d",
-};
 
 export const sketchWrapper: SketchWrapper = (
   sketch: Sketch,
@@ -62,7 +24,6 @@ export const sketchWrapper: SketchWrapper = (
 
   // combine settings; a few may have null or undefined values (ex. canvas)
   const settings = combineSettings({
-    base: defaultSettings,
     main: userSettings,
   }) as SketchSettingsInternal;
 
@@ -72,25 +33,6 @@ export const sketchWrapper: SketchWrapper = (
   //         or updateSettings({ ... })
   document.title = settings.title;
   document.body.style.background = settings.background;
-  // canvas, context
-  // REVIEW: problem may be createCanvas() returns context (2d or webgl), gl (webgl or undefined),
-  //         but props doesn't allow it
-
-  const {
-    canvas,
-    context,
-    width,
-    height,
-    pixelRatio,
-    gl,
-    oglContext,
-    oglRenderer,
-  } = prepareCanvas(settings);
-
-  // REVIEW: instead of directly assign to settings[..],
-  //         use states if it may update later during sketch lifetime
-  //         ex. user provided props.update({ ... })
-  settings.canvas = canvas;
 
   if (settings.playFps !== null) {
     settings.playFps = Math.max(Math.floor(settings.playFps), 1);
@@ -123,50 +65,12 @@ export const sketchWrapper: SketchWrapper = (
     timeResetted: false,
   };
 
-  // sketch props
-  const { exportFrame, update, togglePlay } = createFunctionProps({
-    canvas,
+  const props = createAllProps({
     settings,
     states,
   });
-
-  const baseProps: BaseProps = {
-    // canvas
-    canvas,
-    width,
-    height,
-    pixelRatio,
-    // animation
-    playhead: 0,
-    frame: 0,
-    time: 0,
-    deltaTime: 0,
-    duration: settings.duration,
-    totalFrames: settings.totalFrames,
-    exportFrame,
-    togglePlay,
-    update,
-  };
-
-  let props: SketchProps | WebGLProps | OGLProps;
-
-  if (settings.mode === "2d") {
-    props = {
-      ...baseProps,
-      context: context as CanvasRenderingContext2D,
-    } as SketchProps;
-  } else if (settings.mode === "ogl") {
-    props = {
-      ...baseProps,
-      oglContext: oglContext as OGLRenderingContext,
-      oglRenderer: oglRenderer as Renderer,
-    } as OGLProps;
-  } else {
-    props = {
-      ...baseProps,
-      gl: gl as WebGLRenderingContext,
-    } as WebGLProps;
-  }
+  // canvas is created for props
+  const { canvas } = props;
 
   const returned = sketch(props);
 
