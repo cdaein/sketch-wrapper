@@ -1,7 +1,7 @@
 import { resizeCanvas } from "@daeinc/canvas";
 import { OGLRenderingContext, Renderer } from "ogl-typescript";
 import { prepareCanvas } from "./canvas";
-import { saveCanvasFrame } from "./file-exports";
+import { saveCanvasFrame } from "./export-frame";
 import type {
   BaseProps,
   OGLProps,

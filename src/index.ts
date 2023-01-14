@@ -12,7 +12,7 @@ import { createSettings } from "./settings";
 import { createProps } from "./props";
 import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
-import { saveCanvasFrames } from "./file-exports";
+import { saveCanvasFrames } from "./export-frames-media-recorder";
 import { createStates } from "./states";
 
 export const sketchWrapper: SketchWrapper = (
