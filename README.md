@@ -67,6 +67,16 @@ sketchWrapper(sketch, settings);
 
 Documentation is updated for `v0.8.11`
 
+> Note: [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper. Your bundler may complain that it cannot find `ogl-typescript` at bundle time as it is not part of the dependency. You can configure your bundler so that it does not pre-bundle it and only load when you are using it with `ogl` mode. In Vitejs, use `optimizeDeps.exclude`. See below for example:
+
+```js
+export default defineConfig({
+  optimizeDeps: {
+    exclude: ["ogl-typescript"],
+  },
+});
+```
+
 ### Keyboard Shortcuts
 
 |      Shortcut      | Description                                    |
@@ -86,9 +96,9 @@ The same `frame` may be repeated if the display refresh rate is higher than the 
 
 #### Sketch Modes
 
-|  name  |         type         | description                                                   |
-| :----: | :------------------: | ------------------------------------------------------------- |
-| `mode` | `2d \| webgl \| ogl` | Set sketch mode for different types of sketches. default:`2d` |
+|  name  |            type            | description                                                     |
+| :----: | :------------------------: | --------------------------------------------------------------- |
+| `mode` | `"2d" \| "webgl" \| "ogl"` | Set sketch mode for different types of sketches. default:`"2d"` |
 
 #### Mode-specific Props
 
