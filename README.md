@@ -67,9 +67,10 @@ sketchWrapper(sketch, settings);
 
 Documentation is updated for `v0.8.11`
 
-> Note: [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper. Your bundler may complain that it cannot find `ogl-typescript` at bundle time as it is not part of the dependency. You can configure your bundler so that it does not pre-bundle it and only load when you are using it with `ogl` mode. In Vitejs, use `optimizeDeps.exclude`. See below for example:
+> Note: [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper. Your bundler may complain that it cannot find `ogl-typescript` at bundle time as it is not part of the dependency. You can configure your bundler so that it does not pre-bundle it and only loads when you are using it with `ogl` mode. In Vitejs, use [`optimizeDeps.exclude`](https://vitejs.dev/guide/dep-pre-bundling.html). See below for example:
 
 ```js
+// vite.config.js
 export default defineConfig({
   optimizeDeps: {
     exclude: ["ogl-typescript"],
