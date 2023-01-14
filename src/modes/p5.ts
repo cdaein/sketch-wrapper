@@ -1,5 +1,6 @@
 import type { SketchSettingsInternal } from "../types";
-import p5, { p5InstanceExtensions } from "p5";
+// import p5 from "p5";
+// import { p5InstanceExtensions } from "p5";
 import { setupCanvas } from "@daeinc/canvas";
 import { toDomElement } from "@daeinc/dom";
 

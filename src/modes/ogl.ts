@@ -1,13 +1,14 @@
 import type { SketchSettingsInternal } from "../types";
-import { Renderer } from "ogl-typescript";
+// import { Renderer } from "ogl-typescript";
 import { setupCanvas } from "@daeinc/canvas";
 
-export const createOglCanvas = (settings: SketchSettingsInternal) => {
+export const createOglCanvas = async (settings: SketchSettingsInternal) => {
   let [width, height] = settings.dimensions;
   let pixelRatio = Math.max(settings.pixelRatio, 1);
 
   const attributes = settings.attributes as WebGLContextAttributes;
 
+  const Renderer = (await import("ogl-typescript")).Renderer;
   const renderer = new Renderer({
     width,
     height,

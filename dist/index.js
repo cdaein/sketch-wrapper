@@ -1,4 +1,3 @@
-import { Renderer } from 'ogl-typescript';
 import { createCanvas, resizeCanvas, setupCanvas } from '@daeinc/canvas';
 import { toDomElement } from '@daeinc/dom';
 
@@ -20,10 +19,11 @@ __export(ogl_exports, {
 var createOglCanvas;
 var init_ogl = __esm({
   "src/modes/ogl.ts"() {
-    createOglCanvas = (settings) => {
+    createOglCanvas = async (settings) => {
       let [width, height] = settings.dimensions;
       let pixelRatio = Math.max(settings.pixelRatio, 1);
       const attributes = settings.attributes;
+      const Renderer = (await import('ogl-typescript')).Renderer;
       const renderer = new Renderer({
         width,
         height,
@@ -263,8 +263,7 @@ var prepareCanvas = async (settings) => {
   } else if (settings.mode === "webgl") {
     return createWebglCanvas(settings);
   } else if (settings.mode === "ogl") {
-    const renderer = await Promise.resolve().then(() => (init_ogl(), ogl_exports));
-    return renderer.createOglCanvas(settings);
+    return (await Promise.resolve().then(() => (init_ogl(), ogl_exports))).createOglCanvas(settings);
   }
   return create2dCanvas(settings);
 };
