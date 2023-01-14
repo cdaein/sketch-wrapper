@@ -92,7 +92,6 @@ export const sketchWrapper: SketchWrapper = (
   //         ex. user provided props.update({ ... })
   settings.canvas = canvas;
 
-  // fps at least 1 or keep at null: will be handled in advanceTime()
   if (settings.playFps !== null) {
     settings.playFps = Math.max(Math.floor(settings.playFps), 1);
   }
@@ -107,8 +106,6 @@ export const sketchWrapper: SketchWrapper = (
     );
   }
 
-  // data used internally and may change value during life of sketch
-  // REVIEW: i'm probably messing up with naming convention (props, states)
   const states: SketchStates = {
     paused: false,
     playMode: "play",
@@ -124,35 +121,15 @@ export const sketchWrapper: SketchWrapper = (
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1000 / settings.playFps : null,
     timeResetted: false,
-    temp: 0,
-    resized: false, // REVIEW
-  };
-
-  // REVIEW: can't move it inside createFunctionProps b/c it needs loop as argument
-  //         then, create a callback function that takes loop as argument
-  const togglePlay = () => {
-    states.paused = !states.paused;
-    if (!states.paused) {
-      // when resumed: call loop so animation will continue
-      // states.timestamp = performance.now() - states.pausedDuration;
-      // window.requestAnimationFrame(loop); // not needed?
-    } else {
-      // when paused
-      states.pausedStartTime = states.timestamp;
-    }
   };
 
   // sketch props
-  const { exportFrame, update } = createFunctionProps({
+  const { exportFrame, update, togglePlay } = createFunctionProps({
     canvas,
     settings,
     states,
   });
 
-  // REVIEW: for now, i settled on having different prop types for each mode.
-  //    would have been best to use same Type for everything, but had issues with
-  //    union types and users having to assert type on their end.
-  //    there is still room to improve with current method.
   const baseProps: BaseProps = {
     // canvas
     canvas,
@@ -171,32 +148,27 @@ export const sketchWrapper: SketchWrapper = (
     update,
   };
 
-  const props: SketchProps = {
-    ...baseProps,
-    context: context as CanvasRenderingContext2D,
-  };
-
-  // createCombinedProps(settings.mode)
-
-  let combinedProps: SketchProps | WebGLProps | OGLProps;
+  let props: SketchProps | WebGLProps | OGLProps;
 
   if (settings.mode === "2d") {
-    combinedProps = props;
+    props = {
+      ...baseProps,
+      context: context as CanvasRenderingContext2D,
+    } as SketchProps;
   } else if (settings.mode === "ogl") {
-    combinedProps = {
+    props = {
       ...baseProps,
       oglContext: oglContext as OGLRenderingContext,
       oglRenderer: oglRenderer as Renderer,
     } as OGLProps;
   } else {
-    combinedProps = {
+    props = {
       ...baseProps,
       gl: gl as WebGLRenderingContext,
     } as WebGLProps;
   }
 
-  // render 1st frame of 1st page refresh to start w/ playhead=0
-  const returned = sketch(combinedProps);
+  const returned = sketch(props);
 
   // REVIEW: had to assign something but don't like it
   let render: SketchRender = () => {};
@@ -211,7 +183,7 @@ export const sketchWrapper: SketchWrapper = (
   // window resize event
   const { add: addResize, handleResize } = resizeHandler(
     canvas,
-    combinedProps,
+    props,
     userSettings,
     settings,
     states,
@@ -232,8 +204,7 @@ export const sketchWrapper: SketchWrapper = (
     }
 
     // time
-    combinedProps.time =
-      (states.timestamp - states.startTime) % combinedProps.duration;
+    props.time = (states.timestamp - states.startTime) % props.duration;
 
     // reset startTime for recording
     if (states.savingFrames && !states.captureReady) {
@@ -245,13 +216,13 @@ export const sketchWrapper: SketchWrapper = (
     }
 
     // deltaTime
-    combinedProps.deltaTime = states.savingFrames
+    props.deltaTime = states.savingFrames
       ? 1000 / settings.exportFps
       : states.timestamp - states.lastTimestamp;
 
     if (states.frameInterval !== null) {
       // throttle frame rate
-      if (combinedProps.deltaTime < states.frameInterval) {
+      if (props.deltaTime < states.frameInterval) {
         window.requestAnimationFrame(loop);
         return;
       }
@@ -260,14 +231,14 @@ export const sketchWrapper: SketchWrapper = (
     computePlayhead({
       settings,
       states,
-      props: combinedProps,
+      props,
     });
-    computeFrame({ settings, states, props: combinedProps });
+    computeFrame({ settings, states, props });
     // update lastTimestamp for deltaTime calculation
-    computeLastTimestamp({ states, props: combinedProps });
+    computeLastTimestamp({ states, props });
 
     if (settings.animate && !states.paused) {
-      render(combinedProps);
+      render(props);
       window.requestAnimationFrame(loop);
     }
 
@@ -282,7 +253,7 @@ export const sketchWrapper: SketchWrapper = (
   // keyboard events
   const { add: addKeydown } = keydownHandler(
     canvas,
-    combinedProps,
+    props,
     settings,
     states,
     loop

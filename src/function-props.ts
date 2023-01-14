@@ -20,6 +20,7 @@ export const createFunctionProps = ({
     exportFrame: createExportFrameProp({ canvas, settings, states }),
     // REVIEW: is it ok to expose internal settings like this?
     update: createUpdateProp({ canvas, prevSettings: settings, resizeCanvas }),
+    togglePlay: createTogglePlay({ states }),
   };
 };
 
@@ -40,6 +41,16 @@ export const createExportFrameProp = ({
       settings,
       states,
     });
+  };
+};
+
+export const createTogglePlay = ({ states }: { states: SketchStates }) => {
+  return () => {
+    states.paused = !states.paused;
+    if (states.paused) {
+      // when paused
+      states.pausedStartTime = states.timestamp;
+    }
   };
 };
 
