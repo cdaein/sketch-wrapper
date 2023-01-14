@@ -44,7 +44,8 @@ export const saveCanvasFrames = ({
 
   // set up recording once at beginning of recording
   if (!states.captureReady) {
-    stream = canvas.captureStream(0);
+    // stream = canvas.captureStream(0);
+    stream = canvas.captureStream(settings.exportFps);
     const options: MediaRecorderOptions = {
       // default is 2.5Mbps = 2500 * 1000
       videoBitsPerSecond: 50000 * 1000, // bps * 1000 = kbps
@@ -52,9 +53,11 @@ export const saveCanvasFrames = ({
     };
     recorder = new MediaRecorder(stream, options);
 
+    // reset Blobk chunks
+    chunks.length = 0;
+
     recorder.ondataavailable = (e: BlobEvent) => {
       chunks.push(e.data);
-      console.log(chunks);
     };
 
     recorder.onstop = (e) => {
@@ -77,10 +80,13 @@ export const saveCanvasFrames = ({
   }
 
   // record frame
-  (stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack).requestFrame();
+  if (!states.captureDone) {
+    (
+      stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack
+    ).requestFrame();
+  }
 
   if (states.captureDone) {
-    // FIX: when recorder stops, last frame is not recorded
     recorder.stop();
     console.log("video recording complete");
     states.captureDone = false;

@@ -48,58 +48,112 @@ export const sketchWrapper: SketchWrapper = (
   }
 
   // animation render loop
+  let recordedFrames = 0;
+
   const loop: SketchLoop = (timestamp: number) => {
     states.timestamp = timestamp - states.pausedDuration;
 
-    // when paused, accumulate pausedDuration
-    if (states.paused) {
-      states.pausedDuration = timestamp - states.pausedStartTime;
-      window.requestAnimationFrame(loop);
-      return;
-    }
-
-    // time
-    props.time = (states.timestamp - states.startTime) % props.duration;
-
-    // reset startTime for recording
-    if (states.savingFrames && !states.captureReady) {
-      states.startTime = states.timestamp;
-      // props.time = 0;
-      // props.playhead = 0;
-      // props.frame = 0;
-      console.log("reset to record");
-    }
-
-    // deltaTime
-    props.deltaTime = states.savingFrames
-      ? 1000 / settings.exportFps
-      : states.timestamp - states.lastTimestamp;
-
-    if (states.frameInterval !== null) {
-      // throttle frame rate
-      if (props.deltaTime < states.frameInterval) {
+    // playing
+    if (!states.savingFrames) {
+      // when paused, accumulate pausedDuration
+      if (states.paused) {
+        states.pausedDuration = timestamp - states.pausedStartTime;
         window.requestAnimationFrame(loop);
         return;
       }
-    }
 
-    computePlayhead({
-      settings,
-      states,
-      props,
-    });
-    computeFrame({ settings, states, props });
-    // update lastTimestamp for deltaTime calculation
-    computeLastTimestamp({ states, props });
+      if (states.timeResetted) {
+        states.startTime = states.timestamp;
+        props.time = 0;
+        props.playhead = 0;
+        props.frame = 0;
+        states.lastTimestamp = 0;
+        states.timeResetted = false;
+        console.log("time resetted");
+      }
 
-    if (settings.animate && !states.paused) {
+      // time
+      props.time = (states.timestamp - states.startTime) % props.duration;
+      // deltaTime
+      props.deltaTime = states.timestamp - states.lastTimestamp;
+      // throttle frame rate
+      if (states.frameInterval !== null) {
+        if (props.deltaTime < states.frameInterval) {
+          window.requestAnimationFrame(loop);
+          return;
+        }
+      }
+
+      console.log(props.time / props.duration);
+
+      computePlayhead({
+        settings,
+        states,
+        props,
+      });
+      computeFrame({ settings, states, props });
+      // update lastTimestamp for deltaTime calculation
+      computeLastTimestamp({ states, props });
+
+      if (settings.animate && !states.paused) {
+        render(props);
+        window.requestAnimationFrame(loop);
+      }
+    } else {
+      // recording
+      // reset startTime for recording
+      if (!states.captureReady) {
+        states.startTime = states.timestamp;
+        props.time = 0;
+        props.playhead = 0;
+        props.frame = 0;
+        console.log("reset to record");
+      }
+
+      // time
+      // props.time = states.timestamp - states.startTime;
+
+      props.time = recordedFrames * (1000 / settings.exportFps);
+      // deltaTime
+      props.deltaTime = 1000 / settings.exportFps;
+      // throttle frame rate
+
+      // if (
+      //   states.captureReady &&
+      //   !states.captureDone &&
+      //   props.time < ((props.frame + 1) / props.totalFrames) * props.duration
+      // ) {
+      //   window.requestAnimationFrame(loop);
+      //   return;
+      // }
+
+      // console.log(props.time);
+
+      computePlayhead({
+        settings,
+        states,
+        props,
+      });
+      props.frame = recordedFrames;
+      computeLastTimestamp({ states, props });
+
       render(props);
       window.requestAnimationFrame(loop);
-    }
 
-    // save frames
-    if (states.savingFrames) {
-      // saveCanvasFrames({ canvas, settings, states, props: combinedProps });
+      recordedFrames += 1;
+      // re-calculate totalFrames for exportFps
+      if (
+        props.frame >=
+        Math.floor((settings.exportFps * settings.duration) / 1000)
+      ) {
+        states.captureDone = true;
+        recordedFrames = 0;
+
+        states.timeResetted = true;
+      }
+
+      // save frames
+      saveCanvasFrames({ canvas, settings, states, props });
     }
   };
 

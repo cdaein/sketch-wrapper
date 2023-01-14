@@ -31,8 +31,12 @@ export const computeFrame = ({
   states: SketchStates;
   props: BaseProps;
 }) => {
-  const { duration, playFps, exportFps, totalFrames } = settings;
+  let { duration, playFps, exportFps, totalFrames } = settings;
   const fps = states.savingFrames ? exportFps : playFps;
+
+  if (states.savingFrames) {
+    totalFrames = Math.floor((exportFps * duration) / 1000);
+  }
 
   // 4 cases
   // TODO: convert to 3 cases (fps === null => +=1)
