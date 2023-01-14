@@ -533,7 +533,6 @@ var sketchWrapper = async (sketch, userSettings) => {
           return;
         }
       }
-      console.log(props.time / props.duration);
       computePlayhead({
         settings,
         states,
@@ -595,5 +594,6 @@ var sketchWrapper = async (sketch, userSettings) => {
     addKeydown();
   }
 };
+var src_default = sketchWrapper;
 
-export { sketchWrapper };
+export { src_default as default };

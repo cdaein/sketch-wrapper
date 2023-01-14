@@ -116,4 +116,4 @@ interface OGLProps extends BaseProps {
 
 declare const sketchWrapper: SketchWrapper;
 
-export { FrameFormat, FramesFormat, OGLProps, Sketch, SketchProps, SketchRender, SketchResize, SketchSettings, WebGLProps, sketchWrapper };
+export { FrameFormat, FramesFormat, OGLProps, Sketch, SketchProps, SketchRender, SketchResize, SketchSettings, WebGLProps, sketchWrapper as default };
