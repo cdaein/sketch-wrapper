@@ -12,7 +12,7 @@ import type {
   WebGLProps,
 } from "./types";
 
-export const createProps = ({
+export const createProps = async ({
   settings,
   states,
 }: {
@@ -28,7 +28,7 @@ export const createProps = ({
     gl,
     oglContext,
     oglRenderer,
-  } = prepareCanvas(settings);
+  } = await prepareCanvas(settings);
 
   // function props
   const { exportFrame, update, togglePlay } = createFunctionProps({

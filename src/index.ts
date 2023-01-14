@@ -15,7 +15,7 @@ import keydownHandler from "./events/keydown";
 import { saveCanvasFrames } from "./export-frames-media-recorder";
 import { createStates } from "./states";
 
-export const sketchWrapper: SketchWrapper = (
+export const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
   userSettings: SketchSettings
 ) => {
@@ -29,7 +29,7 @@ export const sketchWrapper: SketchWrapper = (
 
   const states = createStates({ settings });
 
-  const props = createProps({
+  const props = await createProps({
     settings,
     states,
   });
