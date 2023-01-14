@@ -12,7 +12,7 @@ import type {
   WebGLProps,
 } from "./types";
 
-export const createAllProps = ({
+export const createProps = ({
   settings,
   states,
 }: {
@@ -78,7 +78,7 @@ export const createAllProps = ({
   return props;
 };
 
-export const createFunctionProps = ({
+const createFunctionProps = ({
   canvas,
   settings,
   states,

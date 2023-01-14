@@ -1,19 +1,19 @@
-import resizeHandler from "./events/resize";
-import keydownHandler from "./events/keydown";
-import { computeFrame, computeLastTimestamp, computePlayhead } from "./time";
-import { combineSettings } from "./settings";
 import type {
   Sketch,
   SketchSettings,
   SketchSettingsInternal,
-  SketchStates,
   SketchLoop,
   SketchRender,
   SketchResize,
   SketchWrapper,
 } from "./types";
-import { createAllProps, createFunctionProps } from "./props";
+import { computeFrame, computeLastTimestamp, computePlayhead } from "./time";
+import { createSettings } from "./settings";
+import { createProps } from "./props";
+import resizeHandler from "./events/resize";
+import keydownHandler from "./events/keydown";
 import { saveCanvasFrames } from "./file-exports";
+import { createStates } from "./states";
 
 export const sketchWrapper: SketchWrapper = (
   sketch: Sketch,
@@ -23,14 +23,12 @@ export const sketchWrapper: SketchWrapper = (
   // console.log(`is running on server? ${isServer ? "✅" : "❌"}`);
 
   // combine settings; a few may have null or undefined values (ex. canvas)
-  const settings = combineSettings({
+  const settings = createSettings({
     main: userSettings,
   }) as SketchSettingsInternal;
 
   // use and update some settings
   // document
-  // REVIEW: move inside combineSettings()?
-  //         or updateSettings({ ... })
   document.title = settings.title;
   document.body.style.background = settings.background;
 
@@ -48,24 +46,9 @@ export const sketchWrapper: SketchWrapper = (
     );
   }
 
-  const states: SketchStates = {
-    paused: false,
-    playMode: "play",
-    savingFrame: false,
-    savingFrames: false,
-    captureReady: false,
-    captureDone: false,
-    startTime: 0,
-    lastStartTime: 0,
-    pausedStartTime: 0,
-    pausedDuration: 0,
-    timestamp: 0,
-    lastTimestamp: 0,
-    frameInterval: settings.playFps !== null ? 1000 / settings.playFps : null,
-    timeResetted: false,
-  };
+  const states = createStates({ settings });
 
-  const props = createAllProps({
+  const props = createProps({
     settings,
     states,
   });
@@ -73,8 +56,6 @@ export const sketchWrapper: SketchWrapper = (
   const { canvas } = props;
 
   const returned = sketch(props);
-
-  // REVIEW: had to assign something but don't like it
   let render: SketchRender = () => {};
   let resize: SketchResize = () => {};
   if (typeof returned === "function") {
@@ -83,18 +64,6 @@ export const sketchWrapper: SketchWrapper = (
     render = returned.render || render;
     resize = returned.resize || resize;
   }
-
-  // window resize event
-  const { add: addResize, handleResize } = resizeHandler(
-    canvas,
-    props,
-    userSettings,
-    settings,
-    states,
-    render,
-    resize
-  );
-  handleResize();
 
   // animation render loop
   const loop: SketchLoop = (timestamp: number) => {
@@ -153,6 +122,19 @@ export const sketchWrapper: SketchWrapper = (
   };
 
   if (settings.animate) window.requestAnimationFrame(loop);
+
+  // window resize event
+  const { add: addResize, handleResize } = resizeHandler(
+    canvas,
+    props,
+    userSettings,
+    settings,
+    states,
+    render,
+    resize
+  );
+  // run it very first time
+  handleResize();
 
   // keyboard events
   const { add: addKeydown } = keydownHandler(

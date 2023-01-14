@@ -8,7 +8,7 @@ import { SketchSettings, SketchSettingsInternal } from "./types";
  * @param param0
  * @returns
  */
-export const combineSettings = ({
+export const createSettings = ({
   main,
 }: {
   // REVIEW: or NonNullable<SketchSettings>
