@@ -1,4 +1,5 @@
-import { Renderer, OGLRenderingContext } from "ogl-typescript";
+import type { Renderer, OGLRenderingContext } from "ogl-typescript";
+import type p5 from "p5";
 
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
 export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
@@ -169,14 +170,6 @@ export interface SketchProps extends BaseProps {
 }
 
 /**
- * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
- */
-export interface WebGLProps extends BaseProps {
-  /** webgl context */
-  gl: WebGLRenderingContext;
-}
-
-/**
  * props type specific to `mode: "ogl"`
  * */
 export interface OGLProps extends BaseProps {
@@ -184,4 +177,16 @@ export interface OGLProps extends BaseProps {
   oglContext: OGLRenderingContext;
   /** OGL renderer object */
   oglRenderer: Renderer;
+}
+
+export interface P5Props extends BaseProps {
+  p5: p5;
+}
+
+/**
+ * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
+ */
+export interface WebGLProps extends BaseProps {
+  /** webgl context */
+  gl: WebGLRenderingContext;
 }

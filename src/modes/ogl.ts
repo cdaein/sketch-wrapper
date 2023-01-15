@@ -1,5 +1,4 @@
 import type { SketchSettingsInternal } from "../types";
-// import { Renderer } from "ogl-typescript";
 import { setupCanvas } from "@daeinc/canvas";
 
 export const createOglCanvas = async (settings: SketchSettingsInternal) => {
@@ -62,6 +61,6 @@ export const createOglCanvas = async (settings: SketchSettingsInternal) => {
       pixelRatio,
     };
   } catch (e) {
-    //
+    console.log("cannot create OGL canvas", e);
   }
 };

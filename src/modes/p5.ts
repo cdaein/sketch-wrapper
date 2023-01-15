@@ -1,12 +1,14 @@
 import type { SketchSettingsInternal } from "../types";
-// import p5 from "p5";
-// import { p5InstanceExtensions } from "p5";
+import type { p5InstanceExtensions } from "p5";
 import { setupCanvas } from "@daeinc/canvas";
 import { toDomElement } from "@daeinc/dom";
 
-export const createP5Canvas = (settings: SketchSettingsInternal) => {
+export const createP5Canvas = async (settings: SketchSettingsInternal) => {
   let [width, height] = settings.dimensions;
   let pixelRatio = Math.max(settings.pixelRatio, 1);
+
+  // const p5 = await import("p5");
+  // p5.createCanvas();
 
   // TODO: set width, height, pixelRatio, attributes
 

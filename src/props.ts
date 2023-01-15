@@ -1,5 +1,4 @@
 import { resizeCanvas } from "@daeinc/canvas";
-import { OGLRenderingContext, Renderer } from "ogl-typescript";
 import { prepareCanvas } from "./canvas";
 import { saveCanvasFrame } from "./export-frame";
 import type {
@@ -11,6 +10,18 @@ import type {
   SketchStates,
   WebGLProps,
 } from "./types";
+import type { OGLRenderingContext, Renderer } from "ogl-typescript";
+
+type CanvasProps = {
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D;
+  width: number;
+  height: number;
+  pixelRatio: number;
+  gl: WebGLRenderingContext;
+  oglContext: OGLRenderingContext;
+  oglRenderer: Renderer;
+};
 
 export const createProps = async ({
   settings,
@@ -28,7 +39,7 @@ export const createProps = async ({
     gl,
     oglContext,
     oglRenderer,
-  } = await prepareCanvas(settings);
+  } = (await prepareCanvas(settings)) as CanvasProps;
 
   // function props
   const { exportFrame, update, togglePlay } = createFunctionProps({
