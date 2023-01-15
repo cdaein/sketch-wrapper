@@ -30,6 +30,8 @@ export default (
       } else {
         states.captureDone = true;
       }
+    } else if (ev.key === "t") {
+      states.timeResetted = true;
     }
   };
 

@@ -7,7 +7,12 @@ import type {
   SketchResize,
   SketchWrapper,
 } from "./types";
-import { computeFrame, computeLastTimestamp, computePlayhead } from "./time";
+import {
+  computeFrame,
+  computeLastTimestamp,
+  computePlayhead,
+  resetTime,
+} from "./time";
 import { createSettings } from "./settings";
 import { createProps } from "./props";
 import resizeHandler from "./events/resize";
@@ -63,19 +68,14 @@ const sketchWrapper: SketchWrapper = async (
       }
 
       if (states.timeResetted) {
-        states.startTime = states.timestamp;
-        props.time = 0;
-        props.playhead = 0;
-        props.frame = 0;
-        states.lastTimestamp = 0;
-        states.timeResetted = false;
-        console.log("time resetted");
+        resetTime({ settings, states, props });
       }
 
       // time
       props.time = (states.timestamp - states.startTime) % props.duration;
       // deltaTime
       props.deltaTime = states.timestamp - states.lastTimestamp;
+
       // throttle frame rate
       if (states.frameInterval !== null) {
         if (props.deltaTime < states.frameInterval) {
@@ -83,8 +83,6 @@ const sketchWrapper: SketchWrapper = async (
           return;
         }
       }
-
-      // console.log(props.time / props.duration);
 
       computePlayhead({
         settings,
@@ -116,18 +114,6 @@ const sketchWrapper: SketchWrapper = async (
       props.time = recordedFrames * (1000 / settings.exportFps);
       // deltaTime
       props.deltaTime = 1000 / settings.exportFps;
-      // throttle frame rate
-
-      // if (
-      //   states.captureReady &&
-      //   !states.captureDone &&
-      //   props.time < ((props.frame + 1) / props.totalFrames) * props.duration
-      // ) {
-      //   window.requestAnimationFrame(loop);
-      //   return;
-      // }
-
-      // console.log(props.time);
 
       computePlayhead({
         settings,

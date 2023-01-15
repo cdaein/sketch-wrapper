@@ -67,6 +67,28 @@ export const computeLastTimestamp = ({
     : states.timestamp;
 };
 
+export const resetTime = ({
+  settings,
+  states,
+  props,
+}: {
+  settings: SketchSettingsInternal;
+  states: SketchStates;
+  props: BaseProps;
+}) => {
+  states.startTime = states.timestamp;
+  props.time = 0;
+  props.playhead = 0;
+  props.frame = 0;
+  // states.lastTimestamp = 0;
+  // REVIEW: after video exporting, deltaTime gets messed up, so this is a way to get back regular deltaTime
+  states.lastTimestamp =
+    states.startTime - (settings.playFps ? 1000 / settings.playFps : 0);
+
+  states.timeResetted = false;
+  console.log("time resetted");
+};
+
 //---------- unused below
 
 /**

@@ -98,13 +98,6 @@ interface SketchProps extends BaseProps {
     context: CanvasRenderingContext2D;
 }
 /**
- * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
- */
-interface WebGLProps extends BaseProps {
-    /** webgl context */
-    gl: WebGLRenderingContext;
-}
-/**
  * props type specific to `mode: "ogl"`
  * */
 interface OGLProps extends BaseProps {
@@ -112,6 +105,13 @@ interface OGLProps extends BaseProps {
     oglContext: OGLRenderingContext;
     /** OGL renderer object */
     oglRenderer: Renderer;
+}
+/**
+ * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
+ */
+interface WebGLProps extends BaseProps {
+    /** webgl context */
+    gl: WebGLRenderingContext;
 }
 
 declare const sketchWrapper: SketchWrapper;
