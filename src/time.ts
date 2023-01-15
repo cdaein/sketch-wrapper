@@ -39,7 +39,6 @@ export const computeFrame = ({
   }
 
   // 4 cases
-  // TODO: convert to 3 cases (fps === null => +=1)
   if (duration !== Infinity) {
     if (fps !== null) {
       props.frame = Math.floor(props.playhead * totalFrames);
@@ -67,6 +66,7 @@ export const computeLastTimestamp = ({
     : states.timestamp;
 };
 
+// REVIEW: when reset delta time is always 1 frame duration more (ex. 8ms on 120fps)
 export const resetTime = ({
   settings,
   states,
@@ -76,17 +76,20 @@ export const resetTime = ({
   states: SketchStates;
   props: BaseProps;
 }) => {
+  const { playFps, exportFps } = settings;
+  const fps = states.savingFrames ? exportFps : playFps;
+
   states.startTime = states.timestamp;
   props.time = 0;
   props.playhead = 0;
-  props.frame = 0;
+  props.frame = playFps ? 0 : -1;
+
   // states.lastTimestamp = 0;
-  // REVIEW: after video exporting, deltaTime gets messed up, so this is a way to get back regular deltaTime
-  states.lastTimestamp =
-    states.startTime - (settings.playFps ? 1000 / settings.playFps : 0);
+  states.lastTimestamp = states.startTime - (fps ? 1000 / fps : 0);
+
+  // console.log(states.timestamp, states.lastTimestamp);
 
   states.timeResetted = false;
-  console.log("time resetted");
 };
 
 //---------- unused below

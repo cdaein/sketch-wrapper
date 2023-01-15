@@ -52,8 +52,25 @@ const sketchWrapper: SketchWrapper = async (
     resize = returned.resize || resize;
   }
 
+  // window resize event
+  const { add: addResize, handleResize } = resizeHandler(
+    canvas,
+    props,
+    userSettings,
+    settings,
+    render,
+    resize
+  );
+  // keyboard events
+  const { add: addKeydown } = keydownHandler(props, states);
+
   // animation render loop
-  let recordedFrames = 0;
+
+  // run it very first time
+  handleResize();
+
+  // for manual counting scenarios
+  let frameCount = 0;
 
   const loop: SketchLoop = (timestamp: number) => {
     states.timestamp = timestamp - states.pausedDuration;
@@ -72,9 +89,18 @@ const sketchWrapper: SketchWrapper = async (
       }
 
       // time
-      props.time = (states.timestamp - states.startTime) % props.duration;
+      // 1. better dt handling
+      // props.time = (states.timestamp - states.startTime) % props.duration;
+      // 2. full reset each loop. but, dt is one-frame (8 or 16ms) off
+      props.time = states.timestamp - states.startTime;
+      if (props.time >= props.duration) {
+        resetTime({ settings, states, props });
+      }
+
+      console.log(settings.totalFrames);
       // deltaTime
       props.deltaTime = states.timestamp - states.lastTimestamp;
+      // console.log(props.deltaTime); // TEST
 
       // throttle frame rate
       if (states.frameInterval !== null) {
@@ -90,28 +116,26 @@ const sketchWrapper: SketchWrapper = async (
         props,
       });
       computeFrame({ settings, states, props });
+      // console.log(props.frame);
       // update lastTimestamp for deltaTime calculation
       computeLastTimestamp({ states, props });
 
-      if (settings.animate && !states.paused) {
-        render(props);
-        window.requestAnimationFrame(loop);
-      }
+      // console.log(states.timestamp); // TEST
+
+      render(props);
+      window.requestAnimationFrame(loop);
+
+      // console.log(props.deltaTime); // TEST
     } else {
       // recording
-      // reset startTime for recording
+
       if (!states.captureReady) {
-        states.startTime = states.timestamp;
-        props.time = 0;
-        props.playhead = 0;
-        props.frame = 0;
-        console.log("reset to record");
+        resetTime({ settings, states, props });
       }
 
       // time
       // props.time = states.timestamp - states.startTime;
-
-      props.time = recordedFrames * (1000 / settings.exportFps);
+      props.time = frameCount * (1000 / settings.exportFps);
       // deltaTime
       props.deltaTime = 1000 / settings.exportFps;
 
@@ -120,52 +144,32 @@ const sketchWrapper: SketchWrapper = async (
         states,
         props,
       });
-      props.frame = recordedFrames;
+      props.frame = frameCount;
       computeLastTimestamp({ states, props });
 
       render(props);
       window.requestAnimationFrame(loop);
 
-      recordedFrames += 1;
+      frameCount += 1;
+
       // re-calculate totalFrames for exportFps
       if (
         props.frame >=
         Math.floor((settings.exportFps * settings.duration) / 1000)
       ) {
         states.captureDone = true;
-        recordedFrames = 0;
+        frameCount = 0;
 
         states.timeResetted = true;
       }
 
       // save frames
+      // REVIEW: trying to change where to call this. it seems requestFrame() doesn't necessarily record the current frame
       saveCanvasFrames({ canvas, settings, states, props });
     }
   };
 
   if (settings.animate) window.requestAnimationFrame(loop);
-
-  // window resize event
-  const { add: addResize, handleResize } = resizeHandler(
-    canvas,
-    props,
-    userSettings,
-    settings,
-    states,
-    render,
-    resize
-  );
-  // run it very first time
-  handleResize();
-
-  // keyboard events
-  const { add: addKeydown } = keydownHandler(
-    canvas,
-    props,
-    settings,
-    states,
-    loop
-  );
 
   if (settings.hotkeys) {
     addResize();
