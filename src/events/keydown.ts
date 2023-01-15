@@ -8,11 +8,8 @@ import type {
 } from "../types";
 
 export default (
-  canvas: HTMLCanvasElement,
   props: SketchProps | OGLProps | WebGLProps,
-  settings: SketchSettingsInternal,
-  states: SketchStates,
-  loop: SketchLoop
+  states: SketchStates
 ) => {
   const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key === " ") {

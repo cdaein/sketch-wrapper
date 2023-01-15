@@ -19,7 +19,6 @@ export default (
   props: SketchProps | OGLProps | WebGLProps,
   userSettings: SketchSettings,
   settings: SketchSettingsInternal,
-  states: SketchStates,
   render: SketchRender,
   resize: SketchResize
 ) => {
@@ -48,6 +47,7 @@ export default (
       // call only when canvas size has changed (ie. fullscreen)
       resize(props);
     }
+
     render(props);
 
     // resizing canvas style (when !fullscreen & centered)

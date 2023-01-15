@@ -44,8 +44,8 @@ export const saveCanvasFrames = ({
 
   // set up recording once at beginning of recording
   if (!states.captureReady) {
-    // stream = canvas.captureStream(0);
-    stream = canvas.captureStream(settings.exportFps);
+    stream = canvas.captureStream(0);
+    // stream = canvas.captureStream(settings.exportFps);
     const options: MediaRecorderOptions = {
       // default is 2.5Mbps = 2500 * 1000
       videoBitsPerSecond: 50000 * 1000, // bps * 1000 = kbps
@@ -76,19 +76,21 @@ export const saveCanvasFrames = ({
     states.captureReady = true;
     recorder.start();
 
-    console.log("video recording started");
+    console.log("recording started");
   }
 
   // record frame
+  // FIX: frame 0 is not recorded
   if (!states.captureDone) {
     (
       stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack
     ).requestFrame();
+    console.log(`recording frame ${props.frame}`);
   }
 
   if (states.captureDone) {
     recorder.stop();
-    console.log("video recording complete");
+    console.log("recording complete");
     states.captureDone = false;
     states.savingFrames = false;
     states.captureReady = false;
