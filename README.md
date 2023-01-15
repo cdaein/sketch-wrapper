@@ -108,31 +108,25 @@ The same `frame` may be repeated if the display refresh rate is higher than the 
 
 > ✋ Note: To use `ogl` mode, you will need to install it separately using `npm i ogl-typescript`.
 
-#### DOM
-
-|   name   |        type         | description                 |
-| :------: | :-----------------: | --------------------------- |
-| `canvas` | `HTMLCanvasElement` | get canvas object reference |
-
 #### Canvas
 
-|     name     |   type   | description                                                                                       |
-| :----------: | :------: | ------------------------------------------------------------------------------------------------- |
-|   `width`    | `number` | get width in `px`. When `scaleContext` is `true`, `canvas.width` is multiplied by `pixelRatio`.   |
-|   `height`   | `number` | get height in `px`. When `scaleContext` is `true`, `canvas.height` is multiplied by `pixelRatio`. |
-| `pixelRatio` | `number` | get current pixel ratio. Displays like Apple Retina can use `2`. default: `1`                     |
+|     name     |        type         | description                                                                                       |
+| :----------: | :-----------------: | ------------------------------------------------------------------------------------------------- |
+|   `canvas`   | `HTMLCanvasElement` | get canvas object reference                                                                       |
+|   `width`    |      `number`       | get width in `px`. When `scaleContext` is `true`, `canvas.width` is multiplied by `pixelRatio`.   |
+|   `height`   |      `number`       | get height in `px`. When `scaleContext` is `true`, `canvas.height` is multiplied by `pixelRatio`. |
+| `pixelRatio` |      `number`       | get current pixel ratio. Displays like Apple Retina can use `2`. default: `1`                     |
 
 #### Animation
 
-|     name      |   type    | description                                                                                                       |
-| :-----------: | :-------: | ----------------------------------------------------------------------------------------------------------------- |
-|  `duration`   | `number`  | get loop duration in `ms` (ex. `4000` = 4 sec). If `settings.duration` is not set, it will be `Infinity`.         |
-| `totalFrames` | `number`  | get the number of total frames. If `settings.duration` is not set, it will be `Infinity`.                         |
-|    `frame`    | `number`  | get current frame count. starts at `0`                                                                            |
-|    `time`     | `number`  | get current time in `ms`. starts at `0`                                                                           |
-|  `deltaTime`  | `number`  | get delta time between frame renderes in `ms`                                                                     |
-|  `playhead`   | `number`  | goes from `0` to `1` over animation duration. If `duration` is not set, it does not update, and will stay at `0`. |
-|   `animate`   | `boolean` | not yet implemented.                                                                                              |
+|     name      |   type   | description                                                                                                       |
+| :-----------: | :------: | ----------------------------------------------------------------------------------------------------------------- |
+|  `duration`   | `number` | get loop duration in `ms` (ex. `4000` = 4 sec). If `settings.duration` is not set, it will be `Infinity`.         |
+| `totalFrames` | `number` | get the number of total frames. If `settings.duration` is not set, it will be `Infinity`.                         |
+|    `frame`    | `number` | get current frame count. starts at `0`                                                                            |
+|    `time`     | `number` | get current time in `ms`. starts at `0`                                                                           |
+|  `deltaTime`  | `number` | get delta time between frame renderes in `ms`                                                                     |
+|  `playhead`   | `number` | goes from `0` to `1` over animation duration. If `duration` is not set, it does not update, and will stay at `0`. |
 
 #### Function props
 
@@ -148,10 +142,10 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 
 #### Document
 
-|     name     |   type   | default  | description                                                       |
-| :----------: | :------: | :------: | ----------------------------------------------------------------- |
-|   `title`    | `string` | `Sketch` | Set HTML document title. It is displayed at top of tab or window. |
-| `background` | `string` |  `#333`  | Set HTML background color as CSS color string. ex.`#333`, `gray`  |
+|     name     |   type   |  default   | description                                                       |
+| :----------: | :------: | :--------: | ----------------------------------------------------------------- |
+|   `title`    | `string` | `"Sketch"` | Set HTML document title. It is displayed at top of tab or window. |
+| `background` | `string` |  `"#333"`  | Set HTML background color as CSS color string. ex.`#333`, `gray`  |
 
 #### Canvas
 
@@ -176,14 +170,14 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 
 ### File Export
 
-|      name      |                 type                 | default | description                                                                    |
-| :------------: | :----------------------------------: | :-----: | ------------------------------------------------------------------------------ |
-|   `filename`   |               `string`               |  `""`   | Set file name for exported file. if not set, will use current datetime string  |
-|    `prefix`    |               `string`               |  `""`   | Set prefix to filename                                                         |
-|    `suffix`    |               `string`               |  `""`   | Set suffix to filename                                                         |
-| `frameFormat`  | `"png" \| "jpeg" \| "jpg" \| "webp"` |  `png`  | Set image export format                                                        |
-| `framesFormat` |               `"webm"`               | `webm`  | not implemented yet                                                            |
-|   `hotkeys`    |              `boolean`               | `true`  | Set to `false` to disable keyboard shortcuts such as `Cmd + S` to export image |
+|      name      |                 type                 | default  | description                                                                    |
+| :------------: | :----------------------------------: | :------: | ------------------------------------------------------------------------------ |
+|   `filename`   |               `string`               |   `""`   | Set file name for exported file. if not set, will use current datetime string  |
+|    `prefix`    |               `string`               |   `""`   | Set prefix to filename                                                         |
+|    `suffix`    |               `string`               |   `""`   | Set suffix to filename                                                         |
+| `frameFormat`  | `"png" \| "jpeg" \| "jpg" \| "webp"` | `"png"`  | Set image export format                                                        |
+| `framesFormat` |               `"webm"`               | `"webm"` | not implemented yet                                                            |
+|   `hotkeys`    |              `boolean`               |  `true`  | Set to `false` to disable keyboard shortcuts such as `Cmd + S` to export image |
 
 ## References
 
