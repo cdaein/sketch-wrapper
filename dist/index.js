@@ -1,17 +1,24 @@
-import { createCanvas, resizeCanvas, setupCanvas } from "@daeinc/canvas";
-import { toDomElement } from "@daeinc/dom";
-import WebMMuxer from "webm-muxer";
+import { createCanvas, resizeCanvas, setupCanvas } from '@daeinc/canvas';
+import { toDomElement } from '@daeinc/dom';
+import WebMMuxer from 'webm-muxer';
 
 // src/time.ts
-var computePlayhead = ({ settings, states, props }) => {
+var computePlayhead = ({
+  settings,
+  props
+}) => {
   const { duration } = settings;
   props.playhead = duration !== Infinity ? props.time / duration : 0;
 };
-var computeFrame = ({ settings, states, props }) => {
+var computeFrame = ({
+  settings,
+  states,
+  props
+}) => {
   let { duration, playFps, exportFps, totalFrames } = settings;
   const fps = states.savingFrames ? exportFps : playFps;
   if (states.savingFrames) {
-    totalFrames = Math.floor((exportFps * duration) / 1e3);
+    totalFrames = Math.floor(exportFps * duration / 1e3);
   }
   if (duration !== Infinity) {
     if (fps !== null) {
@@ -21,18 +28,23 @@ var computeFrame = ({ settings, states, props }) => {
     }
   } else {
     if (fps !== null) {
-      props.frame = Math.floor((props.time * fps) / 1e3);
+      props.frame = Math.floor(props.time * fps / 1e3);
     } else {
       props.frame += 1;
     }
   }
 };
-var computeLastTimestamp = ({ states, props }) => {
-  states.lastTimestamp = states.frameInterval
-    ? states.timestamp - (props.deltaTime % states.frameInterval)
-    : states.timestamp;
+var computeLastTimestamp = ({
+  states,
+  props
+}) => {
+  states.lastTimestamp = states.frameInterval ? states.timestamp - props.deltaTime % states.frameInterval : states.timestamp;
 };
-var resetTime = ({ settings, states, props }) => {
+var resetTime = ({
+  settings,
+  states,
+  props
+}) => {
   const { playFps, exportFps } = settings;
   const fps = states.savingFrames ? exportFps : playFps;
   states.startTime = states.timestamp;
@@ -44,7 +56,9 @@ var resetTime = ({ settings, states, props }) => {
 };
 
 // src/settings.ts
-var createSettings = ({ main }) => {
+var createSettings = ({
+  main
+}) => {
   const defaultSettings = {
     title: "Sketch",
     background: "#333",
@@ -60,13 +74,14 @@ var createSettings = ({ main }) => {
     exportFps: 60,
     duration: Infinity,
     totalFrames: Infinity,
+    exportTotalFrames: Infinity,
     filename: "",
     prefix: "",
     suffix: "",
     frameFormat: "png",
     framesFormat: "webm",
     hotkeys: true,
-    mode: "2d",
+    mode: "2d"
   };
   const combined = Object.assign({}, defaultSettings, main);
   for (const [key, value] of Object.entries(combined)) {
@@ -85,7 +100,12 @@ var createSettings = ({ main }) => {
   combined.exportFps = Math.max(Math.floor(combined.exportFps), 1);
   if (combined.playFps !== null && combined.duration !== Infinity) {
     combined.totalFrames = Math.floor(
-      (combined.duration * combined.playFps) / 1e3
+      combined.duration * combined.playFps / 1e3
+    );
+  }
+  if (combined.exportFps !== null && combined.duration !== Infinity) {
+    combined.exportTotalFrames = Math.floor(
+      combined.exportFps * combined.duration / 1e3
     );
   }
   return combined;
@@ -104,7 +124,7 @@ var create2dCanvas = (settings) => {
       height,
       pixelRatio,
       scaleContext: settings.scaleContext,
-      attributes: settings.attributes,
+      attributes: settings.attributes
     }));
   } else {
     if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
@@ -121,7 +141,7 @@ var create2dCanvas = (settings) => {
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
       scaleContext: settings.scaleContext,
-      attributes: settings.attributes,
+      attributes: settings.attributes
     }));
   }
   if (settings.centered === true) {
@@ -131,7 +151,7 @@ var create2dCanvas = (settings) => {
     canvasContainer.style.display = "flex";
     canvasContainer.style.justifyContent = "center";
     canvasContainer.style.alignItems = "center";
-    if (settings.scaleContext === false);
+    if (settings.scaleContext === false) ;
   } else {
     canvas.style.width = 100 + "%";
     canvas.style.height = 100 + "%";
@@ -145,12 +165,12 @@ var createOglCanvas = async (settings) => {
   let pixelRatio = Math.max(settings.pixelRatio, 1);
   const attributes = settings.attributes;
   try {
-    const Renderer = (await import("ogl-typescript")).Renderer;
+    const Renderer = (await import('ogl-typescript')).Renderer;
     const renderer = new Renderer({
       width,
       height,
       dpr: settings.pixelRatio,
-      ...attributes,
+      ...attributes
     });
     const gl = renderer.gl;
     let canvas = gl.canvas;
@@ -159,7 +179,7 @@ var createOglCanvas = async (settings) => {
       canvas,
       width,
       height,
-      pixelRatio,
+      pixelRatio
     }));
     if (settings.centered === true) {
       const canvasContainer = canvas.parentElement;
@@ -182,7 +202,7 @@ var createOglCanvas = async (settings) => {
       oglRenderer: renderer,
       width,
       height,
-      pixelRatio,
+      pixelRatio
     };
   } catch (e) {
     console.log("cannot create OGL canvas", e);
@@ -203,7 +223,7 @@ var createWebglCanvas = (settings) => {
       height,
       pixelRatio,
       scaleContext: settings.scaleContext,
-      attributes: settings.attributes,
+      attributes: settings.attributes
     }));
   } else {
     if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
@@ -220,7 +240,7 @@ var createWebglCanvas = (settings) => {
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
       scaleContext: settings.scaleContext,
-      attributes: settings.attributes,
+      attributes: settings.attributes
     }));
   }
   if (settings.centered === true) {
@@ -230,7 +250,7 @@ var createWebglCanvas = (settings) => {
     canvasContainer.style.display = "flex";
     canvasContainer.style.justifyContent = "center";
     canvasContainer.style.alignItems = "center";
-    if (settings.scaleContext === false);
+    if (settings.scaleContext === false) ;
   } else {
     canvas.style.width = 100 + "%";
     canvas.style.height = 100 + "%";
@@ -240,7 +260,7 @@ var createWebglCanvas = (settings) => {
   return { canvas, context, gl, width, height, pixelRatio };
 };
 
-// src/canvas.ts
+// src/modes/canvas.ts
 var prepareCanvas = async (settings) => {
   if (settings.mode === "2d") {
     return create2dCanvas(settings);
@@ -253,10 +273,12 @@ var prepareCanvas = async (settings) => {
 };
 
 // src/helpers.ts
-var formatFilename = ({ filename, prefix = "", suffix = "" }) => {
-  return filename === void 0 || filename === ""
-    ? `${prefix}${formatDatetime(new Date())}${suffix}`
-    : filename;
+var formatFilename = ({
+  filename,
+  prefix = "",
+  suffix = ""
+}) => {
+  return filename === void 0 || filename === "" ? `${prefix}${formatDatetime(new Date())}${suffix}` : filename;
 };
 var formatDatetime = (date) => {
   const offset = date.getTimezoneOffset();
@@ -269,16 +291,21 @@ var formatDatetime = (date) => {
   return formatted;
 };
 
-// src/export-frame.ts
-var saveCanvasFrame = ({ canvas, states, settings }) => {
+// src/recorders/export-frame.ts
+var saveCanvasFrame = ({
+  canvas,
+  states,
+  settings
+}) => {
   let { filename, prefix, suffix, frameFormat: format } = settings;
-  if (format === "jpg") format = "jpeg";
+  if (format === "jpg")
+    format = "jpeg";
   const dataURL = canvas.toDataURL(`image/${format}`);
   const link = document.createElement("a");
   link.download = `${formatFilename({
     filename,
     prefix,
-    suffix,
+    suffix
   })}.${format}`;
   link.href = dataURL;
   link.click();
@@ -287,7 +314,10 @@ var saveCanvasFrame = ({ canvas, states, settings }) => {
 };
 
 // src/props.ts
-var createProps = async ({ settings, states }) => {
+var createProps = async ({
+  settings,
+  states
+}) => {
   const {
     canvas,
     context,
@@ -296,12 +326,12 @@ var createProps = async ({ settings, states }) => {
     pixelRatio,
     gl,
     oglContext,
-    oglRenderer,
+    oglRenderer
   } = await prepareCanvas(settings);
   const { exportFrame, update, togglePlay } = createFunctionProps({
     canvas,
     settings,
-    states,
+    states
   });
   const baseProps = {
     canvas,
@@ -316,47 +346,51 @@ var createProps = async ({ settings, states }) => {
     totalFrames: settings.totalFrames,
     exportFrame,
     togglePlay,
-    update,
+    update
   };
   let props;
   if (settings.mode === "2d") {
     props = {
       ...baseProps,
-      context,
+      context
     };
   } else if (settings.mode === "ogl") {
     props = {
       ...baseProps,
       oglContext,
-      oglRenderer,
+      oglRenderer
     };
   } else {
     props = {
       ...baseProps,
-      gl,
+      gl
     };
   }
   return props;
 };
-var createFunctionProps = ({ canvas, settings, states }) => {
+var createFunctionProps = ({
+  canvas,
+  settings,
+  states
+}) => {
   return {
     exportFrame: createExportFrameProp({ canvas, settings, states }),
-    update: createUpdateProp({
-      canvas,
-      prevSettings: settings,
-      resizeCanvas: resizeCanvas,
-    }),
-    togglePlay: createTogglePlay({ states }),
+    update: createUpdateProp({ canvas, prevSettings: settings, resizeCanvas: resizeCanvas }),
+    togglePlay: createTogglePlay({ states })
   };
 };
-var createExportFrameProp = ({ canvas, settings, states }) => {
+var createExportFrameProp = ({
+  canvas,
+  settings,
+  states
+}) => {
   return () => {
     states.savingFrame = true;
     states.playMode = "record";
     saveCanvasFrame({
       canvas,
       settings,
-      states,
+      states
     });
   };
 };
@@ -371,20 +405,13 @@ var createTogglePlay = ({ states }) => {
 var createUpdateProp = ({
   canvas,
   prevSettings,
-  resizeCanvas: resizeCanvas5,
+  resizeCanvas: resizeCanvas5
 }) => {
   return (settings) => {
     console.log("update() prop is not yet implemented.");
   };
 };
-var resize_default = (
-  canvas,
-  props,
-  userSettings,
-  settings,
-  render,
-  resize
-) => {
+var resize_default = (canvas, props, userSettings, settings, render, resize) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       if (settings.mode === "2d" || settings.mode === "webgl") {
@@ -394,7 +421,7 @@ var resize_default = (
           width: window.innerWidth,
           height: window.innerHeight,
           pixelRatio: Math.max(settings.pixelRatio, 1),
-          scaleContext: settings.scaleContext,
+          scaleContext: settings.scaleContext
         }));
       }
       resize(props);
@@ -453,56 +480,10 @@ var keydown_default = (props, states) => {
   return { add, remove };
 };
 
-// src/export-frames-media-recorder.ts
-var stream;
-var recorder;
-var chunks = [];
-var saveCanvasFrames = ({ canvas, settings, states, props }) => {
-  const { filename, prefix, suffix, framesFormat: format } = settings;
-  if (format !== "webm") {
-    throw new Error("currently, only webm video format is supported");
-  }
-  if (!states.captureReady) {
-    stream = canvas.captureStream(settings.exportFps);
-    const options = {
-      videoBitsPerSecond: 5e4 * 1e3,
-      mimeType: "video/webm; codecs=vp9",
-    };
-    recorder = new MediaRecorder(stream, options);
-    chunks.length = 0;
-    recorder.ondataavailable = (e) => {
-      chunks.push(e.data);
-    };
-    recorder.onstop = (e) => {
-      const blob = new Blob(chunks, { type: "video/webm" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.download = `${formatFilename({
-        filename,
-        prefix,
-        suffix,
-      })}.${format}`;
-      link.href = url;
-      link.click();
-    };
-    states.captureReady = true;
-    recorder.start();
-    console.log("video recording started");
-  }
-  if (!states.captureDone) {
-    stream.getVideoTracks()[0].requestFrame();
-  }
-  if (states.captureDone) {
-    recorder.stop();
-    console.log("video recording complete");
-    states.captureDone = false;
-    states.savingFrames = false;
-    states.captureReady = false;
-  }
-};
-
 // src/states.ts
-var createStates = ({ settings }) => {
+var createStates = ({
+  settings
+}) => {
   return {
     paused: false,
     playMode: "play",
@@ -517,68 +498,90 @@ var createStates = ({ settings }) => {
     timestamp: 0,
     lastTimestamp: 0,
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
-    timeResetted: false,
+    timeResetted: false
   };
 };
 var muxer = null;
 var videoEncoder = null;
 var lastKeyframe = null;
-var exportWebM = async ({ canvas, settings, states, props }) => {
-  const { filename, prefix, suffix, framesFormat: format } = settings;
+var exportWebM = async ({
+  canvas,
+  settings,
+  states,
+  props
+}) => {
+  const { framesFormat: format } = settings;
   if (format !== "webm") {
     throw new Error("currently, only webm video format is supported");
   }
-  if (!states.captureReady) {
-    muxer = new WebMMuxer({
-      target: "buffer",
-      video: {
-        codec: "V_VP9",
-        width: canvas.width,
-        height: canvas.height,
-        frameRate: settings.exportFps,
-      },
-    });
-    videoEncoder = new VideoEncoder({
-      output: (chunk, meta) => muxer?.addVideoChunk(chunk, meta),
-      error: (e) => console.error(`WebMMuxer error: ${e}`),
-    });
-    videoEncoder.configure({
-      codec: "vp09.00.10.08",
-      width: canvas.width,
-      height: canvas.height,
-      bitrate: 1e7,
-    });
-    lastKeyframe = -Infinity;
-    states.captureReady = true;
-    console.log("recording started");
-  }
   if (!states.captureDone) {
-    encodeVideoFrame({ canvas, states, props });
-    console.log(
-      `recording frame... ${props.frame} of ${Math.floor(
-        (settings.exportFps * settings.duration) / 1e3
-      )}`
-    );
+    encodeVideoFrame({ canvas, settings, states, props });
   }
-  if (states.captureDone && muxer) {
-    await videoEncoder?.flush();
-    const buffer = muxer?.finalize();
-    downloadBlob(new Blob([buffer]), settings);
-    muxer = null;
-    videoEncoder = null;
-    states.captureDone = false;
-    states.savingFrames = false;
-    states.captureReady = false;
-    console.log("recording complete");
-    console.log(states.captureDone);
+  if (states.captureDone) {
+    endWebMRecord({ settings });
   }
 };
-var encodeVideoFrame = ({ canvas, states, props }) => {
+var setupWebMRecord = ({
+  canvas,
+  settings
+}) => {
+  const { framesFormat: format } = settings;
+  if (format !== "webm") {
+    throw new Error("currently, only webm video format is supported");
+  }
+  muxer = new WebMMuxer({
+    target: "buffer",
+    video: {
+      codec: "V_VP9",
+      width: canvas.width,
+      height: canvas.height,
+      frameRate: settings.exportFps
+    }
+  });
+  videoEncoder = new VideoEncoder({
+    output: (chunk, meta) => muxer?.addVideoChunk(chunk, meta),
+    error: (e) => console.error(`WebMMuxer error: ${e}`)
+  });
+  videoEncoder.configure({
+    codec: "vp09.00.10.08",
+    width: canvas.width,
+    height: canvas.height,
+    bitrate: 1e7
+  });
+  lastKeyframe = -Infinity;
+  console.log(`recording (${format}) started`);
+};
+var endWebMRecord = async ({
+  settings
+}) => {
+  const { framesFormat: format } = settings;
+  await videoEncoder?.flush();
+  const buffer = muxer?.finalize();
+  downloadBlob(new Blob([buffer]), settings);
+  muxer = null;
+  videoEncoder = null;
+  console.log(`recording (${format}) complete`);
+};
+var encodeVideoFrame = ({
+  canvas,
+  settings,
+  states,
+  props
+}) => {
   const frame = new VideoFrame(canvas, { timestamp: props.time * 1e3 });
   const needsKeyframe = props.time - lastKeyframe >= 1e4;
-  if (needsKeyframe) lastKeyframe = props.time;
+  if (needsKeyframe)
+    lastKeyframe = props.time;
   videoEncoder?.encode(frame, { keyFrame: needsKeyframe });
   frame.close();
+  const totalFrames = Math.floor(
+    settings.exportFps * settings.duration / 1e3
+  );
+  console.log(
+    `%crecording frame... %c${props.frame + 1} of ${totalFrames}`,
+    `color:black`,
+    `color:#9aa`
+  );
 };
 var downloadBlob = (blob, settings) => {
   const { filename, prefix, suffix, framesFormat: format } = settings;
@@ -588,7 +591,7 @@ var downloadBlob = (blob, settings) => {
   a.download = `${formatFilename({
     filename,
     prefix,
-    suffix,
+    suffix
   })}.${format}`;
   a.click();
   window.URL.revokeObjectURL(url);
@@ -597,17 +600,19 @@ var downloadBlob = (blob, settings) => {
 // src/index.ts
 var sketchWrapper = async (sketch, userSettings) => {
   const settings = createSettings({
-    main: userSettings,
+    main: userSettings
   });
   const states = createStates({ settings });
   const props = await createProps({
     settings,
-    states,
+    states
   });
   const { canvas } = props;
   const returned = sketch(props);
-  let render = () => {};
-  let resize = () => {};
+  let render = () => {
+  };
+  let resize = () => {
+  };
   if (typeof returned === "function") {
     render = returned;
   } else {
@@ -624,67 +629,88 @@ var sketchWrapper = async (sketch, userSettings) => {
   );
   const { add: addKeydown } = keydown_default(props, states);
   handleResize();
-  let frameCount = 0;
   const loop = (timestamp) => {
     states.timestamp = timestamp - states.pausedDuration;
-    if (!states.savingFrames) {
-      if (states.paused) {
-        states.pausedDuration = timestamp - states.pausedStartTime;
-        window.requestAnimationFrame(loop);
-        return;
-      }
-      if (states.timeResetted) {
-        resetTime({ settings, states, props });
-      }
-      props.time = (states.timestamp - states.startTime) % props.duration;
-      props.deltaTime = states.timestamp - states.lastTimestamp;
-      if (states.frameInterval !== null) {
-        if (props.deltaTime < states.frameInterval) {
-          window.requestAnimationFrame(loop);
-          return;
-        }
-      }
-      computePlayhead({
-        settings,
-        states,
-        props,
-      });
-      computeFrame({ settings, states, props });
-      computeLastTimestamp({ states, props });
-      render(props);
-      window.requestAnimationFrame(loop);
-    } else {
-      if (!states.captureReady) {
-        resetTime({ settings, states, props });
-      }
-      props.time = frameCount * (1e3 / settings.exportFps);
-      props.deltaTime = 1e3 / settings.exportFps;
-      computePlayhead({
-        settings,
-        states,
-        props,
-      });
-      props.frame = frameCount;
-      computeLastTimestamp({ states, props });
-      render(props);
-      window.requestAnimationFrame(loop);
-      frameCount += 1;
-      if (
-        props.frame >=
-        Math.floor((settings.exportFps * settings.duration) / 1e3)
-      ) {
-        states.captureDone = true;
-        frameCount = 0;
-        states.timeResetted = true;
-      }
-      exportWebM({ canvas, settings, states, props });
-    }
+    if (!states.savingFrames)
+      playLoop({ timestamp, settings, states, props });
+    else
+      recordLoop({ canvas, settings, states, props });
   };
-  if (settings.animate) window.requestAnimationFrame(loop);
+  if (settings.animate)
+    window.requestAnimationFrame(loop);
   if (settings.hotkeys) {
     addResize();
     addKeydown();
   }
+  const playLoop = ({
+    timestamp,
+    settings: settings2,
+    states: states2,
+    props: props2
+  }) => {
+    if (states2.paused) {
+      states2.pausedDuration = timestamp - states2.pausedStartTime;
+      window.requestAnimationFrame(loop);
+      return;
+    }
+    if (states2.timeResetted) {
+      resetTime({ settings: settings2, states: states2, props: props2 });
+    }
+    props2.time = states2.timestamp - states2.startTime;
+    if (props2.time >= props2.duration) {
+      resetTime({ settings: settings2, states: states2, props: props2 });
+    }
+    props2.deltaTime = states2.timestamp - states2.lastTimestamp;
+    if (states2.frameInterval !== null) {
+      if (props2.deltaTime < states2.frameInterval) {
+        window.requestAnimationFrame(loop);
+        return;
+      }
+    }
+    computePlayhead({
+      settings: settings2,
+      props: props2
+    });
+    computeFrame({ settings: settings2, states: states2, props: props2 });
+    computeLastTimestamp({ states: states2, props: props2 });
+    render(props2);
+    window.requestAnimationFrame(loop);
+  };
+  let frameCount = 0;
+  const recordLoop = ({
+    canvas: canvas2,
+    settings: settings2,
+    states: states2,
+    props: props2
+  }) => {
+    if (!states2.captureReady) {
+      resetTime({ settings: settings2, states: states2, props: props2 });
+      setupWebMRecord({ canvas: canvas2, settings: settings2 });
+      states2.captureReady = true;
+    }
+    props2.deltaTime = 1e3 / settings2.exportFps;
+    props2.time = frameCount * props2.deltaTime;
+    computePlayhead({
+      settings: settings2,
+      props: props2
+    });
+    props2.frame = frameCount;
+    computeLastTimestamp({ states: states2, props: props2 });
+    render(props2);
+    window.requestAnimationFrame(loop);
+    frameCount += 1;
+    if (props2.frame >= settings2.exportTotalFrames) {
+      states2.captureDone = true;
+    }
+    exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
+    if (states2.captureDone) {
+      states2.captureReady = false;
+      states2.captureDone = false;
+      states2.savingFrames = false;
+      states2.timeResetted = true;
+      frameCount = 0;
+    }
+  };
 };
 var src_default = sketchWrapper;
 
