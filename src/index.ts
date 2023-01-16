@@ -19,7 +19,7 @@ import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
 import { saveCanvasFrames } from "./export-frames-media-recorder";
 import { createStates } from "./states";
-import { exportWebM } from "./export-frames-webm-muxer";
+import { exportWebM, setupWebMRecord } from "./export-frames-webm-muxer";
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
@@ -128,11 +128,11 @@ const sketchWrapper: SketchWrapper = async (
       // console.log(props.deltaTime); // TEST
     } else {
       // recording
-
       // TODO: what if duration is not set?
-
       if (!states.captureReady) {
         resetTime({ settings, states, props });
+        setupWebMRecord({ canvas, settings });
+        states.captureReady = true;
       }
 
       // time
@@ -161,13 +161,19 @@ const sketchWrapper: SketchWrapper = async (
         Math.floor((settings.exportFps * settings.duration) / 1000)
       ) {
         states.captureDone = true;
-        frameCount = 0;
-
-        states.timeResetted = true;
       }
 
       // save frames
       exportWebM({ canvas, settings, states, props });
+
+      if (states.captureDone) {
+        states.captureReady = false;
+        states.captureDone = false;
+        states.savingFrames = false;
+
+        states.timeResetted = true;
+        frameCount = 0;
+      }
     }
   };
 
