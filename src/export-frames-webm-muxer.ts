@@ -27,7 +27,7 @@ export const exportWebM = async ({
   canvas: HTMLCanvasElement;
   states: SketchStates;
   settings: SketchSettingsInternal;
-  props: SketchProps | WebGLProps | OGLProps;
+  props: BaseProps;
 }) => {
   const { framesFormat: format } = settings;
 

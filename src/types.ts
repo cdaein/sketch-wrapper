@@ -100,6 +100,7 @@ export interface SketchSettingsInternal {
   exportFps: number;
   duration: number;
   totalFrames: number;
+  exportTotalFrames: number;
   // out file
   filename: string;
   prefix: string;
