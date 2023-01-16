@@ -35,6 +35,7 @@ export const createSettings = ({
     exportFps: 60,
     duration: Infinity,
     totalFrames: Infinity,
+    exportTotalFrames: Infinity,
     // file
     filename: "",
     prefix: "",
@@ -74,10 +75,15 @@ export const createSettings = ({
   // userSettings doesn't have totalFrames, but internally, both will be computed.
   // when both are Infinity, animation will continue to run,
   // time/frame updates, playhead doesn't.
-  // REVIEW: use ceil()? will it affect advanceTime()?
+  // REVIEW: use ceil()?
   if (combined.playFps !== null && combined.duration !== Infinity) {
     combined.totalFrames = Math.floor(
       (combined.duration * combined.playFps) / 1000
+    );
+  }
+  if (combined.exportFps !== null && combined.duration !== Infinity) {
+    combined.exportTotalFrames = Math.floor(
+      (combined.exportFps * combined.duration) / 1000
     );
   }
 
