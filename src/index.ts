@@ -76,13 +76,9 @@ const sketchWrapper: SketchWrapper = async (
   // run it very first time
   handleResize();
 
-  // for manual counting scenarios
-  let frameCount = 0;
-
   const loop: SketchLoop = (timestamp: number) => {
     states.timestamp = timestamp - states.pausedDuration;
-    if (!states.savingFrames)
-      playLoop({ timestamp, canvas, settings, states, props });
+    if (!states.savingFrames) playLoop({ timestamp, settings, states, props });
     else recordLoop({ canvas, settings, states, props });
   };
   if (settings.animate) window.requestAnimationFrame(loop);
@@ -93,13 +89,11 @@ const sketchWrapper: SketchWrapper = async (
 
   const playLoop = ({
     timestamp,
-    canvas,
     settings,
     states,
     props,
   }: {
     timestamp: number;
-    canvas: HTMLCanvasElement;
     settings: SketchSettingsInternal;
     states: SketchStates;
     props: SketchProps | WebGLProps | OGLProps;
@@ -123,7 +117,6 @@ const sketchWrapper: SketchWrapper = async (
     if (props.time >= props.duration) {
       resetTime({ settings, states, props });
     }
-
     // deltaTime
     props.deltaTime = states.timestamp - states.lastTimestamp;
 
@@ -137,17 +130,18 @@ const sketchWrapper: SketchWrapper = async (
 
     computePlayhead({
       settings,
-      states,
       props,
     });
     computeFrame({ settings, states, props });
-    // console.log(props.frame);
     // update lastTimestamp for deltaTime calculation
     computeLastTimestamp({ states, props });
 
     render(props);
     window.requestAnimationFrame(loop);
   };
+
+  // for manual counting when recording
+  let frameCount = 0;
 
   const recordLoop = ({
     canvas,
@@ -170,12 +164,10 @@ const sketchWrapper: SketchWrapper = async (
     // deltaTime
     props.deltaTime = 1000 / settings.exportFps;
     // time
-    // props.time = states.timestamp - states.startTime;
     props.time = frameCount * props.deltaTime;
 
     computePlayhead({
       settings,
-      states,
       props,
     });
     props.frame = frameCount;
@@ -197,9 +189,8 @@ const sketchWrapper: SketchWrapper = async (
       states.captureReady = false;
       states.captureDone = false;
       states.savingFrames = false;
-
-      states.timeResetted = true;
-      frameCount = 0;
+      states.timeResetted = true; // playLoop should start fresh
+      frameCount = 0; // for next recording
     }
   };
 };
