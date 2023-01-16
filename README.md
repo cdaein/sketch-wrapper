@@ -5,7 +5,7 @@
 
 Helpers for creative coding sketches with HTML5 Canvas. It is written from scratch, and heavily inspired by [`canvas-sketch`](https://github.com/mattdesl/canvas-sketch/). Many of the props and settings are compatible.
 
-Documentation is updated for `v0.10.1`
+Documentation is updated for `v0.10.3`
 
 > ⚠️ This module is in a very early stage of development, and there may be unexpected bugs.
 
@@ -22,7 +22,7 @@ npm i @daeinc/sketch-wrapper
 - Animation loop: It has `playhead` prop that repeats `0..1` and makes it easy to create a seamless animation loop. Other props such as `time`, `deltaTime` are provided as well.
 - Settings: Use `settings` object to reduce boilerplate code in your sketch - set up animation duration, playback frame rate, filename, etc.
 - Sketch props: Use props for each mode to help your coding.
-- Keyboard shortcuts: Play/pause your sketch and export canvas as image.
+- Keyboard shortcuts: Play/pause your sketch and export canvas as image or WebM video at various frame rates (using [`webm-muxer`](https://github.com/Vanilagy/webm-muxer/) package).
 
 ## Example Usage
 
@@ -80,11 +80,11 @@ export default defineConfig({
 
 ### Keyboard Shortcuts
 
-|          Shortcut          | Description                                                        |
-| :------------------------: | ------------------------------------------------------------------ |
-|     `CMD(or Ctrl) + S`     | Export a PNG image.                                                |
-| `CMD(or Ctrl) + Shift + S` | Export a video (WebM by default). This feature is work-in-progress |
-|         `Spacebar`         | Pause or resume animation                                          |
+|          Shortcut          | Description                       |
+| :------------------------: | --------------------------------- |
+|     `CMD(or Ctrl) + S`     | Export a PNG image.               |
+| `CMD(or Ctrl) + Shift + S` | Export a video (WebM by default). |
+|         `Spacebar`         | Pause or resume animation         |
 
 ### SketchProps
 
@@ -93,8 +93,6 @@ You can use any of these props that are passed to your `sketch(props)` function 
 The `playhead` prop repeats the range of `0..1` over animation duration. This is useful for creating a seamless loop. For example, `Math.sin(playhead * Math.PI * 2)` will go over one full cycle.
 
 Use `width` and `height` to create a composition proportional to canvas size instead of hard-coding numbers.
-
-The same `frame` may be repeated if the display refresh rate is higher than the frame rate set.
 
 #### Sketch Modes
 
@@ -164,8 +162,8 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 |    name     |   type    |  default   | description                                                                         |
 | :---------: | :-------: | :--------: | ----------------------------------------------------------------------------------- |
 |  `animate`  | `boolean` |   `true`   | Set to `true` for animating. Set to `false` for static sketches.                    |
-|  `playFps`  | `number`  |   `null`   | Set frame rate for playback. If not set, will use the maximum display refresh rate. |
-| `exportFps` | `number`  |    `60`    | not implemented yet.                                                                |
+|  `playFps`  | `number`  |   `null`   | Set frame rate for playback. If not set, will use the current display refresh rate. |
+| `exportFps` | `number`  |    `60`    | Set frame rate for WebM video export. Supports up to 60fps.                         |
 | `duration`  | `number`  | `Infinity` | Set loop duration in `ms` (ex. `4000` = 4 sec)                                      |
 
 ### File Export
@@ -176,7 +174,7 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 |    `prefix`    |               `string`               |   `""`   | Set prefix to filename                                                         |
 |    `suffix`    |               `string`               |   `""`   | Set suffix to filename                                                         |
 | `frameFormat`  | `"png" \| "jpeg" \| "jpg" \| "webp"` | `"png"`  | Set image export format                                                        |
-| `framesFormat` |               `"webm"`               | `"webm"` | not implemented yet                                                            |
+| `framesFormat` |               `"webm"`               | `"webm"` | Currently, it only supports `webm` format.                                     |
 |   `hotkeys`    |              `boolean`               |  `true`  | Set to `false` to disable keyboard shortcuts such as `Cmd + S` to export image |
 
 ## References
