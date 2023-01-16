@@ -1,7 +1,7 @@
-import { create2dCanvas } from "./modes/2d";
-import { createOglCanvas } from "./modes/ogl";
-import { createWebglCanvas } from "./modes/webgl";
-import type { SketchSettingsInternal } from "./types";
+import { create2dCanvas } from "./2d";
+import { createOglCanvas } from "./ogl";
+import { createWebglCanvas } from "./webgl";
+import type { SketchSettingsInternal } from "../types";
 import type { Renderer, OGLRenderingContext } from "ogl-typescript";
 
 export const prepareCanvas = async (
