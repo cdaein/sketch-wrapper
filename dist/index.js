@@ -1,5 +1,6 @@
 import { createCanvas, resizeCanvas, setupCanvas } from '@daeinc/canvas';
 import { toDomElement } from '@daeinc/dom';
+import WebMMuxer from 'webm-muxer';
 
 // src/time.ts
 var computePlayhead = ({
@@ -45,13 +46,14 @@ var resetTime = ({
   states,
   props
 }) => {
+  const { playFps, exportFps } = settings;
+  const fps = states.savingFrames ? exportFps : playFps;
   states.startTime = states.timestamp;
   props.time = 0;
   props.playhead = 0;
-  props.frame = 0;
-  states.lastTimestamp = states.startTime - (settings.playFps ? 1e3 / settings.playFps : 0);
+  props.frame = playFps ? 0 : -1;
+  states.lastTimestamp = states.startTime - (fps ? 1e3 / fps : 0);
   states.timeResetted = false;
-  console.log("time resetted");
 };
 
 // src/settings.ts
@@ -404,7 +406,7 @@ var createUpdateProp = ({
     console.log("update() prop is not yet implemented.");
   };
 };
-var resize_default = (canvas, props, userSettings, settings, states, render, resize) => {
+var resize_default = (canvas, props, userSettings, settings, render, resize) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       if (settings.mode === "2d" || settings.mode === "webgl") {
@@ -445,7 +447,7 @@ var resize_default = (canvas, props, userSettings, settings, states, render, res
 };
 
 // src/events/keydown.ts
-var keydown_default = (canvas, props, settings, states, loop) => {
+var keydown_default = (props, states) => {
   const handleKeydown = (ev) => {
     if (ev.key === " ") {
       ev.preventDefault();
@@ -473,59 +475,6 @@ var keydown_default = (canvas, props, settings, states, loop) => {
   return { add, remove };
 };
 
-// src/export-frames-media-recorder.ts
-var stream;
-var recorder;
-var chunks = [];
-var saveCanvasFrames = ({
-  canvas,
-  settings,
-  states,
-  props
-}) => {
-  const { filename, prefix, suffix, framesFormat: format } = settings;
-  if (format !== "webm") {
-    throw new Error("currently, only webm video format is supported");
-  }
-  if (!states.captureReady) {
-    stream = canvas.captureStream(settings.exportFps);
-    const options = {
-      videoBitsPerSecond: 5e4 * 1e3,
-      mimeType: "video/webm; codecs=vp9"
-    };
-    recorder = new MediaRecorder(stream, options);
-    chunks.length = 0;
-    recorder.ondataavailable = (e) => {
-      chunks.push(e.data);
-    };
-    recorder.onstop = (e) => {
-      const blob = new Blob(chunks, { type: "video/webm" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.download = `${formatFilename({
-        filename,
-        prefix,
-        suffix
-      })}.${format}`;
-      link.href = url;
-      link.click();
-    };
-    states.captureReady = true;
-    recorder.start();
-    console.log("video recording started");
-  }
-  if (!states.captureDone) {
-    stream.getVideoTracks()[0].requestFrame();
-  }
-  if (states.captureDone) {
-    recorder.stop();
-    console.log("video recording complete");
-    states.captureDone = false;
-    states.savingFrames = false;
-    states.captureReady = false;
-  }
-};
-
 // src/states.ts
 var createStates = ({
   settings
@@ -546,6 +495,89 @@ var createStates = ({
     frameInterval: settings.playFps !== null ? 1e3 / settings.playFps : null,
     timeResetted: false
   };
+};
+var muxer = null;
+var videoEncoder = null;
+var lastKeyframe = null;
+var exportWebM = async ({
+  canvas,
+  settings,
+  states,
+  props
+}) => {
+  const { filename, prefix, suffix, framesFormat: format } = settings;
+  if (format !== "webm") {
+    throw new Error("currently, only webm video format is supported");
+  }
+  if (!states.captureReady) {
+    muxer = new WebMMuxer({
+      target: "buffer",
+      video: {
+        codec: "V_VP9",
+        width: canvas.width,
+        height: canvas.height,
+        frameRate: settings.exportFps
+      }
+    });
+    videoEncoder = new VideoEncoder({
+      output: (chunk, meta) => muxer?.addVideoChunk(chunk, meta),
+      error: (e) => console.error(`WebMMuxer error: ${e}`)
+    });
+    videoEncoder.configure({
+      codec: "vp09.00.10.08",
+      width: canvas.width,
+      height: canvas.height,
+      bitrate: 1e7
+    });
+    lastKeyframe = -Infinity;
+    states.captureReady = true;
+    console.log("recording started");
+  }
+  if (!states.captureDone) {
+    encodeVideoFrame({ canvas, states, props });
+    console.log(
+      `recording frame... ${props.frame} of ${Math.floor(
+        settings.exportFps * settings.duration / 1e3
+      )}`
+    );
+  }
+  if (states.captureDone && muxer) {
+    await videoEncoder?.flush();
+    const buffer = muxer?.finalize();
+    downloadBlob(new Blob([buffer]), settings);
+    muxer = null;
+    videoEncoder = null;
+    states.captureDone = false;
+    states.savingFrames = false;
+    states.captureReady = false;
+    console.log("recording complete");
+    console.log(states.captureDone);
+  }
+};
+var encodeVideoFrame = ({
+  canvas,
+  states,
+  props
+}) => {
+  const frame = new VideoFrame(canvas, { timestamp: props.time * 1e3 });
+  const needsKeyframe = props.time - lastKeyframe >= 1e4;
+  if (needsKeyframe)
+    lastKeyframe = props.time;
+  videoEncoder?.encode(frame, { keyFrame: needsKeyframe });
+  frame.close();
+};
+var downloadBlob = (blob, settings) => {
+  const { filename, prefix, suffix, framesFormat: format } = settings;
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${formatFilename({
+    filename,
+    prefix,
+    suffix
+  })}.${format}`;
+  a.click();
+  window.URL.revokeObjectURL(url);
 };
 
 // src/index.ts
@@ -570,7 +602,17 @@ var sketchWrapper = async (sketch, userSettings) => {
     render = returned.render || render;
     resize = returned.resize || resize;
   }
-  let recordedFrames = 0;
+  const { add: addResize, handleResize } = resize_default(
+    canvas,
+    props,
+    userSettings,
+    settings,
+    render,
+    resize
+  );
+  const { add: addKeydown } = keydown_default(props, states);
+  handleResize();
+  let frameCount = 0;
   const loop = (timestamp) => {
     states.timestamp = timestamp - states.pausedDuration;
     if (!states.savingFrames) {
@@ -582,7 +624,10 @@ var sketchWrapper = async (sketch, userSettings) => {
       if (states.timeResetted) {
         resetTime({ settings, states, props });
       }
-      props.time = (states.timestamp - states.startTime) % props.duration;
+      props.time = states.timestamp - states.startTime;
+      if (props.time >= props.duration) {
+        resetTime({ settings, states, props });
+      }
       props.deltaTime = states.timestamp - states.lastTimestamp;
       if (states.frameInterval !== null) {
         if (props.deltaTime < states.frameInterval) {
@@ -597,55 +642,34 @@ var sketchWrapper = async (sketch, userSettings) => {
       });
       computeFrame({ settings, states, props });
       computeLastTimestamp({ states, props });
-      if (settings.animate && !states.paused) {
-        render(props);
-        window.requestAnimationFrame(loop);
-      }
+      render(props);
+      window.requestAnimationFrame(loop);
     } else {
       if (!states.captureReady) {
-        states.startTime = states.timestamp;
-        props.time = 0;
-        props.playhead = 0;
-        props.frame = 0;
-        console.log("reset to record");
+        resetTime({ settings, states, props });
       }
-      props.time = recordedFrames * (1e3 / settings.exportFps);
+      props.time = frameCount * (1e3 / settings.exportFps);
       props.deltaTime = 1e3 / settings.exportFps;
       computePlayhead({
         settings,
         states,
         props
       });
-      props.frame = recordedFrames;
+      props.frame = frameCount;
       computeLastTimestamp({ states, props });
       render(props);
       window.requestAnimationFrame(loop);
-      recordedFrames += 1;
+      frameCount += 1;
       if (props.frame >= Math.floor(settings.exportFps * settings.duration / 1e3)) {
         states.captureDone = true;
-        recordedFrames = 0;
+        frameCount = 0;
         states.timeResetted = true;
       }
-      saveCanvasFrames({ canvas, settings, states, props });
+      exportWebM({ canvas, settings, states, props });
     }
   };
   if (settings.animate)
     window.requestAnimationFrame(loop);
-  const { add: addResize, handleResize } = resize_default(
-    canvas,
-    props,
-    userSettings,
-    settings,
-    states,
-    render,
-    resize
-  );
-  handleResize();
-  const { add: addKeydown } = keydown_default(
-    canvas,
-    props,
-    settings,
-    states);
   if (settings.hotkeys) {
     addResize();
     addKeydown();

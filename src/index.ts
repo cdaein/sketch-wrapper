@@ -19,6 +19,7 @@ import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
 import { saveCanvasFrames } from "./export-frames-media-recorder";
 import { createStates } from "./states";
+import { exportWebM } from "./export-frames-webm-muxer";
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
@@ -97,7 +98,6 @@ const sketchWrapper: SketchWrapper = async (
         resetTime({ settings, states, props });
       }
 
-      console.log(settings.totalFrames);
       // deltaTime
       props.deltaTime = states.timestamp - states.lastTimestamp;
       // console.log(props.deltaTime); // TEST
@@ -129,6 +129,8 @@ const sketchWrapper: SketchWrapper = async (
     } else {
       // recording
 
+      // TODO: what if duration is not set?
+
       if (!states.captureReady) {
         resetTime({ settings, states, props });
       }
@@ -153,6 +155,7 @@ const sketchWrapper: SketchWrapper = async (
       frameCount += 1;
 
       // re-calculate totalFrames for exportFps
+      // TODO: should be a prop?
       if (
         props.frame >=
         Math.floor((settings.exportFps * settings.duration) / 1000)
@@ -164,8 +167,7 @@ const sketchWrapper: SketchWrapper = async (
       }
 
       // save frames
-      // REVIEW: trying to change where to call this. it seems requestFrame() doesn't necessarily record the current frame
-      saveCanvasFrames({ canvas, settings, states, props });
+      exportWebM({ canvas, settings, states, props });
     }
   };
 

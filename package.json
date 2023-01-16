@@ -19,6 +19,11 @@
   },
   "author": "Daeinc",
   "license": "MIT",
+  "dependencies": {
+    "@daeinc/canvas": "^0.12.1",
+    "@daeinc/dom": "^0.3.1",
+    "webm-muxer": "^1.1.0"
+  },
   "devDependencies": {
     "@daeinc/color": "^0.2.4",
     "@daeinc/draw": "^0.2.1",
@@ -44,10 +49,6 @@
     "vite-dts": "^1.0.4",
     "vite-plugin-dts": "^1.7.1",
     "vite-plugin-typescript": "^1.0.4"
-  },
-  "dependencies": {
-    "@daeinc/canvas": "^0.12.1",
-    "@daeinc/dom": "^0.3.1"
   },
   "publishConfig": {
     "access": "public",
