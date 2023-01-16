@@ -1,5 +1,5 @@
-import type { SketchStates, SketchSettingsInternal } from "./types";
-import { formatFilename } from "./helpers";
+import type { SketchStates, SketchSettingsInternal } from "../types";
+import { formatFilename } from "../helpers";
 
 /**
  * save a single frame of canvas

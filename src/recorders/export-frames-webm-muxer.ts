@@ -3,16 +3,9 @@
  * WebM Muxer: https://github.com/Vanilagy/webm-muxer/blob/main/demo/script.js
  */
 
-import type {
-  SketchStates,
-  SketchSettingsInternal,
-  SketchProps,
-  WebGLProps,
-  OGLProps,
-  BaseProps,
-} from "./types";
+import type { SketchStates, SketchSettingsInternal, BaseProps } from "../types";
 import WebMMuxer from "webm-muxer";
-import { formatFilename } from "./helpers";
+import { formatFilename } from "../helpers";
 
 let muxer: WebMMuxer | null = null;
 let videoEncoder: VideoEncoder | null = null;

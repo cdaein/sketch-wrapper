@@ -8,7 +8,6 @@ import type {
   SketchWrapper,
   SketchStates,
   SketchProps,
-  BaseProps,
   WebGLProps,
   OGLProps,
 } from "./types";
@@ -22,9 +21,11 @@ import { createSettings } from "./settings";
 import { createProps } from "./props";
 import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
-import { saveCanvasFrames } from "./export-frames-media-recorder";
 import { createStates } from "./states";
-import { exportWebM, setupWebMRecord } from "./export-frames-webm-muxer";
+import {
+  exportWebM,
+  setupWebMRecord,
+} from "./recorders/export-frames-webm-muxer";
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
