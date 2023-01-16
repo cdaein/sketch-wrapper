@@ -1,6 +1,6 @@
 import { resizeCanvas } from "@daeinc/canvas";
-import { prepareCanvas } from "./canvas";
-import { saveCanvasFrame } from "./export-frame";
+import { prepareCanvas } from "./modes/canvas";
+import { saveCanvasFrame } from "./recorders/export-frame";
 import type {
   BaseProps,
   OGLProps,

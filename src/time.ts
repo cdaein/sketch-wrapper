@@ -11,11 +11,9 @@ import type {
 
 export const computePlayhead = ({
   settings,
-  states,
   props,
 }: {
   settings: SketchSettingsInternal;
-  states: SketchStates;
   props: BaseProps;
 }) => {
   const { duration } = settings;
