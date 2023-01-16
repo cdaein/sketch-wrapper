@@ -45,13 +45,14 @@ var resetTime = ({
   states,
   props
 }) => {
+  const { playFps, exportFps } = settings;
+  const fps = states.savingFrames ? exportFps : playFps;
   states.startTime = states.timestamp;
   props.time = 0;
   props.playhead = 0;
-  props.frame = 0;
-  states.lastTimestamp = states.startTime - (settings.playFps ? 1e3 / settings.playFps : 0);
+  props.frame = playFps ? 0 : -1;
+  states.lastTimestamp = states.startTime - (fps ? 1e3 / fps : 0);
   states.timeResetted = false;
-  console.log("time resetted");
 };
 
 // src/settings.ts
@@ -404,7 +405,7 @@ var createUpdateProp = ({
     console.log("update() prop is not yet implemented.");
   };
 };
-var resize_default = (canvas, props, userSettings, settings, states, render, resize) => {
+var resize_default = (canvas, props, userSettings, settings, render, resize) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
       if (settings.mode === "2d" || settings.mode === "webgl") {
@@ -445,7 +446,7 @@ var resize_default = (canvas, props, userSettings, settings, states, render, res
 };
 
 // src/events/keydown.ts
-var keydown_default = (canvas, props, settings, states, loop) => {
+var keydown_default = (props, states) => {
   const handleKeydown = (ev) => {
     if (ev.key === " ") {
       ev.preventDefault();
@@ -488,7 +489,7 @@ var saveCanvasFrames = ({
     throw new Error("currently, only webm video format is supported");
   }
   if (!states.captureReady) {
-    stream = canvas.captureStream(settings.exportFps);
+    stream = canvas.captureStream(0);
     const options = {
       videoBitsPerSecond: 5e4 * 1e3,
       mimeType: "video/webm; codecs=vp9"
@@ -512,14 +513,15 @@ var saveCanvasFrames = ({
     };
     states.captureReady = true;
     recorder.start();
-    console.log("video recording started");
+    console.log("recording started");
   }
   if (!states.captureDone) {
     stream.getVideoTracks()[0].requestFrame();
+    console.log(`recording frame ${props.frame}`);
   }
   if (states.captureDone) {
     recorder.stop();
-    console.log("video recording complete");
+    console.log("recording complete");
     states.captureDone = false;
     states.savingFrames = false;
     states.captureReady = false;
@@ -570,7 +572,17 @@ var sketchWrapper = async (sketch, userSettings) => {
     render = returned.render || render;
     resize = returned.resize || resize;
   }
-  let recordedFrames = 0;
+  const { add: addResize, handleResize } = resize_default(
+    canvas,
+    props,
+    userSettings,
+    settings,
+    render,
+    resize
+  );
+  const { add: addKeydown } = keydown_default(props, states);
+  handleResize();
+  let frameCount = 0;
   const loop = (timestamp) => {
     states.timestamp = timestamp - states.pausedDuration;
     if (!states.savingFrames) {
@@ -582,7 +594,11 @@ var sketchWrapper = async (sketch, userSettings) => {
       if (states.timeResetted) {
         resetTime({ settings, states, props });
       }
-      props.time = (states.timestamp - states.startTime) % props.duration;
+      props.time = states.timestamp - states.startTime;
+      if (props.time >= props.duration) {
+        resetTime({ settings, states, props });
+      }
+      console.log(settings.totalFrames);
       props.deltaTime = states.timestamp - states.lastTimestamp;
       if (states.frameInterval !== null) {
         if (props.deltaTime < states.frameInterval) {
@@ -597,33 +613,27 @@ var sketchWrapper = async (sketch, userSettings) => {
       });
       computeFrame({ settings, states, props });
       computeLastTimestamp({ states, props });
-      if (settings.animate && !states.paused) {
-        render(props);
-        window.requestAnimationFrame(loop);
-      }
+      render(props);
+      window.requestAnimationFrame(loop);
     } else {
       if (!states.captureReady) {
-        states.startTime = states.timestamp;
-        props.time = 0;
-        props.playhead = 0;
-        props.frame = 0;
-        console.log("reset to record");
+        resetTime({ settings, states, props });
       }
-      props.time = recordedFrames * (1e3 / settings.exportFps);
+      props.time = frameCount * (1e3 / settings.exportFps);
       props.deltaTime = 1e3 / settings.exportFps;
       computePlayhead({
         settings,
         states,
         props
       });
-      props.frame = recordedFrames;
+      props.frame = frameCount;
       computeLastTimestamp({ states, props });
       render(props);
       window.requestAnimationFrame(loop);
-      recordedFrames += 1;
+      frameCount += 1;
       if (props.frame >= Math.floor(settings.exportFps * settings.duration / 1e3)) {
         states.captureDone = true;
-        recordedFrames = 0;
+        frameCount = 0;
         states.timeResetted = true;
       }
       saveCanvasFrames({ canvas, settings, states, props });
@@ -631,21 +641,6 @@ var sketchWrapper = async (sketch, userSettings) => {
   };
   if (settings.animate)
     window.requestAnimationFrame(loop);
-  const { add: addResize, handleResize } = resize_default(
-    canvas,
-    props,
-    userSettings,
-    settings,
-    states,
-    render,
-    resize
-  );
-  handleResize();
-  const { add: addKeydown } = keydown_default(
-    canvas,
-    props,
-    settings,
-    states);
   if (settings.hotkeys) {
     addResize();
     addKeydown();
