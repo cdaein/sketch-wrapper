@@ -1,4 +1,4 @@
-# SketchProps
+# Props
 
 You can use any of these props that are passed to your `sketch(props)` function to help with your coding.
 
