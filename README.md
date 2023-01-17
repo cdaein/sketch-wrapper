@@ -69,6 +69,7 @@ sketchWrapper(sketch, settings);
 
 See [the documentation](./docs/index.md)
 
+- [Basic](./basic.md)
 - [Sketch Settings](./docs/settings.md)
 - [Sketch Props](./docs/props.md)
 
