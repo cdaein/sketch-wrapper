@@ -72,5 +72,28 @@ Then, pass them to `sketchWrapper` function at the end:
 sketchWrapper(sketch, settings)
 ```
 
-Now, you will see the white circle animated at the center of the canvas and it will be a seamless animation loop. There are many more props and settings to help your creative coding, so check out the rest of the documentation.
+Now, you will see the white circle animated at the center of the canvas and it will be a seamless animation loop. There are many more props and settings to help your creative coding, so check out the rest of the documentation. Also, see [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples) repository for more examples.
+
+### For TypeScript users
+
+You may have to also import a few types and use type assertions. 
+
+```ts
+import sketchWrapper from '@daeinc/sketch-wrapper'
+import type { Sketch, SketchProps } from '@daeinc/sketch-wrapper'
+
+const sketch = () => {
+  // use SketchProps type for 2d canvas sketch
+  return ({ context, width, height, playhead }: SketchProps) => {
+    // ...
+  }
+}
+
+const settings = {
+  // ...
+}
+
+// use type assertion
+sketchWrapper(sketch as Sketch, settings)
+```
 
