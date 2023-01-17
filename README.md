@@ -24,6 +24,10 @@ npm i @daeinc/sketch-wrapper
 - Sketch props: Use props for each mode to help your coding.
 - Keyboard shortcuts: Play/pause your sketch and export canvas as image or WebM video at various frame rates (using [`webm-muxer`](https://github.com/Vanilagy/webm-muxer/) package).
 
+## Motivation
+
+In 2022, I started using [`canvas-sketch`](https://github.com/mattdesl/canvas-sketch) for all my creative coding sketches, and it was wonderful and met most of my needs. However, there were a few features that I wish it had. First was external ESM support. Due to the bundler it was using, I could not import latest packages that I liked such as [`pts`](https://github.com/williamngan/pts) or [`thi.ng/umbrella`](https://github.com/thi-ng/umbrella). Another was TypeScript. I've only used TS for a few months, but it quickly became a very essential tool in my workflow. So, I thought maybe I'd make my own tool. Sketch-wraper is incomplete and work-in-progress but it's been a great learning experience personally. If it can find some use in your sketches, that would be great, too.
+
 ## Example Usage
 
 The module supports both JavaScript and TypeScript.
