@@ -80,7 +80,7 @@ You may have to also import a few types and use type assertions.
 
 ```ts
 import sketchWrapper from '@daeinc/sketch-wrapper'
-import type { Sketch, SketchProps } from '@daeinc/sketch-wrapper'
+import type { Sketch, SketchProps, SketchSettings } from '@daeinc/sketch-wrapper'
 
 const sketch = () => {
   // use SketchProps type for 2d canvas sketch
@@ -89,7 +89,7 @@ const sketch = () => {
   }
 }
 
-const settings = {
+const settings: SketchSettings = {
   // ...
 }
 
