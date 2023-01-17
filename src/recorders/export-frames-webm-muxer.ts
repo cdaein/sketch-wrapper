@@ -34,7 +34,7 @@ export const exportWebM = async ({
   }
 
   if (states.captureDone) {
-    endWebMRecord({ settings });
+    endWebMRecord({ canvas, settings });
   }
 };
 
@@ -75,12 +75,17 @@ export const setupWebMRecord = ({
 
   lastKeyframe = -Infinity;
 
+  canvas.style.outline = `2px solid red`;
+  canvas.style.outlineOffset = `-2px`;
+
   console.log(`recording (${format}) started`);
 };
 
 export const endWebMRecord = async ({
+  canvas,
   settings,
 }: {
+  canvas: HTMLCanvasElement;
   settings: SketchSettingsInternal;
 }) => {
   // end record
@@ -93,6 +98,9 @@ export const endWebMRecord = async ({
 
   muxer = null;
   videoEncoder = null;
+
+  canvas.style.outline = "none";
+  canvas.style.outlineOffset = `0 `;
 
   console.log(`recording (${format}) complete`);
 };
