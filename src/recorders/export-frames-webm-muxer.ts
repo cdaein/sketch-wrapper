@@ -75,8 +75,8 @@ export const setupWebMRecord = ({
 
   lastKeyframe = -Infinity;
 
-  canvas.style.outline = `2px solid red`;
-  canvas.style.outlineOffset = `-2px`;
+  canvas.style.outline = `3px solid red`;
+  canvas.style.outlineOffset = `-3px`;
 
   console.log(`recording (${format}) started`);
 };
