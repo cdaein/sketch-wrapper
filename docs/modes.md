@@ -4,9 +4,9 @@ Sketch Wrapper supports multiple sketch modes. You can set the mode as part of t
 
 ```js
 const settings = {
-  mode: 'webgl',
+  mode: "webgl",
   // rest of the settings
-}
+};
 ```
 
 Currently, it supports thre different modes - `2d`, `webgl` and `ogl`
@@ -18,10 +18,10 @@ This is the default mode, meaning you don't have to explicitly set it if you are
 ```js
 const sketch = ({ context }) => {
   return ({ width, height }) => {
-    context.clearRect(0, 0, width, height)
+    context.clearRect(0, 0, width, height);
     // ...
-  }
-}
+  };
+};
 ```
 
 In TypeScript:
@@ -29,10 +29,21 @@ In TypeScript:
 ```ts
 const sketch = ({ context }: SketchProps) => {
   return ({ width, height }: SketchProps) => {
-    context.clearRect(0, 0, width, height)
+    context.clearRect(0, 0, width, height);
     // ...
-  }
-}
+  };
+};
+```
+
+You can abbreviate the props like this:
+
+```js
+const sketch = ({ context: ctx }) => {
+  return ({ width, height }) => {
+    ctx.clearRect(0, 0, width, height);
+    // ...
+  };
+};
 ```
 
 ## `webgl`
@@ -43,8 +54,8 @@ const sketch = ({ context }: SketchProps) => {
 const sketch = ({ gl }) => {
   return ({ width, height }) => {
     // ...
-  }
-}
+  };
+};
 ```
 
 In TypeScript:
@@ -53,10 +64,9 @@ In TypeScript:
 const sketch = ({ gl }: WebGLProps) => {
   return ({ width, height }: WebGLProps) => {
     // ...
-  }
-}
+  };
+};
 ```
-
 
 ## `ogl`
 
@@ -66,8 +76,8 @@ const sketch = ({ gl }: WebGLProps) => {
 const sketch = ({ oglContext, oglRenderer }) => {
   return ({ width, height }) => {
     // ...
-  }
-}
+  };
+};
 ```
 
 In TypeScript:
@@ -76,8 +86,8 @@ In TypeScript:
 const sketch = ({ oglContext, oglRenderer }: OGLProps) => {
   return ({ width, height }: OGLProps) => {
     // ...
-  }
-}
+  };
+};
 ```
 
 You can abbreviate the props like this:
@@ -86,7 +96,6 @@ You can abbreviate the props like this:
 const sketch = ({ oglContext: gl, oglRenderer: renderer }) => {
   return ({ width, height }) => {
     // ...
-  }
-}
+  };
+};
 ```
-
