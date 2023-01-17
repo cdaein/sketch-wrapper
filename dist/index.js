@@ -518,7 +518,7 @@ var exportWebM = async ({
     encodeVideoFrame({ canvas, settings, states, props });
   }
   if (states.captureDone) {
-    endWebMRecord({ settings });
+    endWebMRecord({ canvas, settings });
   }
 };
 var setupWebMRecord = ({
@@ -549,9 +549,12 @@ var setupWebMRecord = ({
     bitrate: 1e7
   });
   lastKeyframe = -Infinity;
+  canvas.style.outline = `3px solid red`;
+  canvas.style.outlineOffset = `-3px`;
   console.log(`recording (${format}) started`);
 };
 var endWebMRecord = async ({
+  canvas,
   settings
 }) => {
   const { framesFormat: format } = settings;
@@ -560,6 +563,8 @@ var endWebMRecord = async ({
   downloadBlob(new Blob([buffer]), settings);
   muxer = null;
   videoEncoder = null;
+  canvas.style.outline = "none";
+  canvas.style.outlineOffset = `0 `;
   console.log(`recording (${format}) complete`);
 };
 var encodeVideoFrame = ({
