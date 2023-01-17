@@ -5,4 +5,5 @@
 - [Sketch Props](./props.md)
 - [Sketch (Rendering) Modes](./modes.md)
 - [File Exports (image and video)](./file-exports.md)
+- [Keyboard Shortcuts](./keyboard.md)
 - [Local Development Environment](./dev-environment.md)

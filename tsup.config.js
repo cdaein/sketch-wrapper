@@ -5,7 +5,7 @@ export default defineConfig({
   format: "esm",
   target: "esnext",
   dts: true,
-  splitting: true,
+  splitting: true, // REVIEW
   sourcemap: false,
   clean: true,
   treeshake: true,
