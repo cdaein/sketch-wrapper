@@ -71,12 +71,11 @@ sketchWrapper(sketch, settings);
 
 ## How to use
 
-See [the documentation](./docs/index.md)
-
 - [Basic](./docs/basic.md)
 - [Sketch Settings](./docs/settings.md)
 - [Sketch Props](./docs/props.md)
 - [Sketch (Rendering) Modes](./docs/modes.md)
+- and more in the [the documentation](./docs/index.md)
 
 > ✋ Note: Sketch Wrapper uses dynamic import of optional dependencies (ex. `ogl-typescript`) to reduce the package size. Your bundler may complain that it cannot find these dependencies. To get around this, you will need to exclude them at bundle time. [Vitejs](https://vitejs.dev/) is recommended to use with Sketch Wrapper and you can use [`optimizeDeps.exclude`](https://vitejs.dev/guide/dep-pre-bundling.html) to configure like below:
 
