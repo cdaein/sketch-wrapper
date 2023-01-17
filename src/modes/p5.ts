@@ -1,7 +1,7 @@
 import type { SketchSettingsInternal } from "../types";
 import type { p5InstanceExtensions } from "p5";
 import { setupCanvas } from "@daeinc/canvas";
-import { toDomElement } from "@daeinc/dom";
+import { toHTMLElement } from "@daeinc/dom";
 
 export const createP5Canvas = async (settings: SketchSettingsInternal) => {
   let [width, height] = settings.dimensions;
@@ -32,8 +32,8 @@ export const createP5Canvas = async (settings: SketchSettingsInternal) => {
 
   // new p5(
   //   p5Sketch,
-  //   // TODO: toDomElement: create toHTMLElement() / toElement()
-  //   settings.parent ? toDomElement(settings.parent as HTMLElement) : undefined
+  //   // TODO: toHTMLElement: create toHTMLElement() / toElement()
+  //   settings.parent ? toHTMLElement(settings.parent as HTMLElement) : undefined
   // );
 
   // ({ canvas, width, height, pixelRatio } = setupCanvas({

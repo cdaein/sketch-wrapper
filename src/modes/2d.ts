@@ -1,5 +1,5 @@
 import { createCanvas, resizeCanvas } from "@daeinc/canvas";
-import { toDomElement } from "@daeinc/dom";
+import { toHTMLElement } from "@daeinc/dom";
 import type { SketchSettingsInternal } from "../types";
 
 export const create2dCanvas = (settings: SketchSettingsInternal) => {
@@ -33,7 +33,7 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
     // existing canvas
     canvas = settings.canvas;
     if (settings.parent) {
-      toDomElement(settings.parent).appendChild(canvas);
+      toHTMLElement(settings.parent).appendChild(canvas);
     }
 
     ({ context, width, height } = resizeCanvas({
