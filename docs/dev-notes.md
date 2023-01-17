@@ -1,0 +1,5 @@
+## Dynamic Import
+
+I've had issues with dyanmically importing `ogl-typescript` package with Vitejs build. My goal is to support and integrate with other Canvas libraries, while not increasing the bundle size by optionally and dynamically importing these third-party packages only when they are used.
+
+When using `sketch-wrapper`, first, the bundler tries to pre-bundle the dependencies for development environment. Because `ogl-typescript` is not part of the production dependency, it throws an error. My solution is to exclude it in `vite.config.js` using `optimizeDeps.exclude`, deferring the dependency check. I also updated the code to use `await import()` so it will only load the `createOglCanvas()` code when the mode is set to `ogl`. But this was not enough. When I look at the built file, it replaces some of the import code. My workaround is to use the code split in `tsup`. Same problem persists when building for production. `vite.config.js` needs additional rollupOptions to exclude the package. I don't think this is ideal and will need to monitor build setups in the future.
