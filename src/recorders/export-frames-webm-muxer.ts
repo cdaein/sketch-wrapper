@@ -119,8 +119,8 @@ export const encodeVideoFrame = ({
   // timestamp unit is micro-seconds!!
   const frame = new VideoFrame(canvas, { timestamp: props.time * 1000 });
 
-  // add video keyframe at least every 10 seconds (10000ms)
-  const needsKeyframe = props.time - lastKeyframe! >= 10000;
+  // add video keyframe every 2 seconds (2000ms)
+  const needsKeyframe = props.time - lastKeyframe! >= 2000;
   if (needsKeyframe) lastKeyframe = props.time;
 
   videoEncoder?.encode(frame, { keyFrame: needsKeyframe });
