@@ -32,7 +32,7 @@ In 2022, I started using [`canvas-sketch`](https://github.com/mattdesl/canvas-sk
 
 The module supports both JavaScript and TypeScript.
 
-Check out a separate repository [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples) for more examples.
+If you want to quickly try out sketch-wrapper, check out [`sketch-wrapper-starter-js`](https://github.com/cdaein/sketch-wrapper-starter-js). Also, check out a separate repository [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples) for more examples both in TS and JS.
 
 ```js
 import sketchWrapper from "@daeinc/sketch-wrapper";
