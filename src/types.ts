@@ -5,19 +5,23 @@ import type p5 from "p5";
 export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
 /** sketch function to be used as argument for sketchWrapper() */
 export type Sketch = (
-  props: SketchProps | OGLProps | WebGLProps
+  props: SketchProps | OGLProps | WebGLProps | P5Props
 ) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-export type SketchRender = (props: SketchProps | OGLProps | WebGLProps) => void;
+export type SketchRender = (
+  props: SketchProps | OGLProps | WebGLProps | P5Props
+) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-export type SketchResize = (props: SketchProps | OGLProps | WebGLProps) => void;
+export type SketchResize = (
+  props: SketchProps | OGLProps | WebGLProps | P5Props
+) => void;
 export type SketchLoop = (timestamp: number) => void;
 
-export type SketchMode = "2d" | "webgl" | "ogl";
+export type SketchMode = "2d" | "webgl" | "ogl" | "p5";
 
 // gif is not supported by default
 export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
@@ -181,6 +185,9 @@ export interface OGLProps extends BaseProps {
 }
 
 export interface P5Props extends BaseProps {
+  /** p5 drawingContext */
+  context: CanvasRenderingContext2D;
+  /** p5 object */
   p5: p5;
 }
 

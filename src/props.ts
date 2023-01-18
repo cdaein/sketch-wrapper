@@ -4,6 +4,7 @@ import { saveCanvasFrame } from "./recorders/export-frame";
 import type {
   BaseProps,
   OGLProps,
+  P5Props,
   SketchProps,
   SketchSettings,
   SketchSettingsInternal,
@@ -11,6 +12,7 @@ import type {
   WebGLProps,
 } from "./types";
 import type { OGLRenderingContext, Renderer } from "ogl-typescript";
+import type p5 from "p5";
 
 type CanvasProps = {
   canvas: HTMLCanvasElement;
@@ -21,6 +23,7 @@ type CanvasProps = {
   gl: WebGLRenderingContext;
   oglContext: OGLRenderingContext;
   oglRenderer: Renderer;
+  p5: p5;
 };
 
 export const createProps = async ({
@@ -39,6 +42,7 @@ export const createProps = async ({
     gl,
     oglContext,
     oglRenderer,
+    p5,
   } = (await prepareCanvas(settings)) as CanvasProps;
 
   // function props
@@ -66,24 +70,36 @@ export const createProps = async ({
     update,
   };
 
-  let props: SketchProps | WebGLProps | OGLProps;
+  let props: SketchProps | WebGLProps | OGLProps | P5Props;
 
   if (settings.mode === "2d") {
     props = {
       ...baseProps,
       context: context as CanvasRenderingContext2D,
     } as SketchProps;
+  } else if (settings.mode === "webgl") {
+    props = {
+      ...baseProps,
+      gl: gl as WebGLRenderingContext,
+    } as WebGLProps;
   } else if (settings.mode === "ogl") {
     props = {
       ...baseProps,
       oglContext: oglContext as OGLRenderingContext,
       oglRenderer: oglRenderer as Renderer,
     } as OGLProps;
-  } else {
+  } else if (settings.mode === "p5") {
     props = {
       ...baseProps,
-      gl: gl as WebGLRenderingContext,
-    } as WebGLProps;
+      context: context as CanvasRenderingContext2D,
+      p5,
+    };
+  } else {
+    // fallback
+    props = {
+      ...baseProps,
+      context: context as CanvasRenderingContext2D,
+    } as SketchProps;
   }
 
   return props;

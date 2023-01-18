@@ -10,6 +10,7 @@ import type {
   SketchProps,
   WebGLProps,
   OGLProps,
+  P5Props,
 } from "./types";
 import {
   computeFrame,
@@ -103,7 +104,7 @@ const sketchWrapper: SketchWrapper = async (
     timestamp: number;
     settings: SketchSettingsInternal;
     states: SketchStates;
-    props: SketchProps | WebGLProps | OGLProps;
+    props: SketchProps | WebGLProps | OGLProps | P5Props;
   }) => {
     // when paused, accumulate pausedDuration
     if (states.paused) {
@@ -159,7 +160,7 @@ const sketchWrapper: SketchWrapper = async (
     canvas: HTMLCanvasElement;
     settings: SketchSettingsInternal;
     states: SketchStates;
-    props: SketchProps | WebGLProps | OGLProps;
+    props: SketchProps | WebGLProps | OGLProps | P5Props;
   }) => {
     // TODO: what if duration is not set?
     if (!states.captureReady) {

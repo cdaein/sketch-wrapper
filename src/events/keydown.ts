@@ -1,5 +1,6 @@
 import type {
   OGLProps,
+  P5Props,
   SketchLoop,
   SketchProps,
   SketchSettingsInternal,
@@ -8,7 +9,7 @@ import type {
 } from "../types";
 
 export default (
-  props: SketchProps | OGLProps | WebGLProps,
+  props: SketchProps | OGLProps | WebGLProps | P5Props,
   states: SketchStates
 ) => {
   const handleKeydown = (ev: KeyboardEvent) => {
