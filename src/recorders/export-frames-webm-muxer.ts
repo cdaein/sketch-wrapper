@@ -70,7 +70,7 @@ export const setupWebMRecord = ({
     codec: "vp09.00.10.08", // TODO: look at other codecs
     width: canvas.width,
     height: canvas.height,
-    bitrate: 1e7, // 1e7 = 10 Mbps
+    bitrate: 4_000_000, // REVIEW: 1e7 = 10 Mbps
   });
 
   lastKeyframe = -Infinity;

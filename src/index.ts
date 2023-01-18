@@ -81,7 +81,14 @@ const sketchWrapper: SketchWrapper = async (
     if (!states.savingFrames) playLoop({ timestamp, settings, states, props });
     else recordLoop({ canvas, settings, states, props });
   };
-  if (settings.animate) window.requestAnimationFrame(loop);
+  if (settings.animate) {
+    // REVIEW: on page load, animation timing is already a few frames off
+    document.addEventListener("DOMContentLoaded", () => {
+      window.onload = () => {
+        window.requestAnimationFrame(loop);
+      };
+    });
+  }
   if (settings.hotkeys) {
     addResize();
     addKeydown();
