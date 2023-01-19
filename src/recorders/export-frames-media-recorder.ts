@@ -18,8 +18,8 @@ import type {
   SketchProps,
   WebGLProps,
   OGLProps,
-} from "./types";
-import { formatFilename } from "./helpers";
+} from "../types";
+import { formatFilename } from "../helpers";
 
 let stream: MediaStream;
 let recorder: MediaRecorder;

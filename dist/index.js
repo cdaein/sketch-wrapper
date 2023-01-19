@@ -296,6 +296,7 @@ var createProps = async ({
     deltaTime: 0,
     duration: settings.duration,
     totalFrames: settings.totalFrames,
+    recording: false,
     exportFrame,
     togglePlay,
     update
@@ -468,9 +469,11 @@ var exportWebM = async ({
   }
   if (!states.captureDone) {
     encodeVideoFrame({ canvas, settings, states, props });
+    props.recording = true;
   }
   if (states.captureDone) {
     endWebMRecord({ canvas, settings });
+    props.recording = false;
   }
 };
 var setupWebMRecord = ({
@@ -498,7 +501,7 @@ var setupWebMRecord = ({
     codec: "vp09.00.10.08",
     width: canvas.width,
     height: canvas.height,
-    bitrate: 1e7
+    bitrate: 4e6
   });
   lastKeyframe = -Infinity;
   canvas.style.outline = `3px solid red`;
@@ -526,7 +529,7 @@ var encodeVideoFrame = ({
   props
 }) => {
   const frame = new VideoFrame(canvas, { timestamp: props.time * 1e3 });
-  const needsKeyframe = props.time - lastKeyframe >= 1e4;
+  const needsKeyframe = props.time - lastKeyframe >= 2e3;
   if (needsKeyframe)
     lastKeyframe = props.time;
   videoEncoder?.encode(frame, { keyFrame: needsKeyframe });
@@ -593,8 +596,13 @@ var sketchWrapper = async (sketch, userSettings) => {
     else
       recordLoop({ canvas, settings, states, props });
   };
-  if (settings.animate)
-    window.requestAnimationFrame(loop);
+  if (settings.animate) {
+    document.addEventListener("DOMContentLoaded", () => {
+      window.onload = () => {
+        window.requestAnimationFrame(loop);
+      };
+    });
+  }
   if (settings.hotkeys) {
     addResize();
     addKeydown();

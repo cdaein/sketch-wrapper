@@ -31,10 +31,12 @@ export const exportWebM = async ({
   if (!states.captureDone) {
     // record frame
     encodeVideoFrame({ canvas, settings, states, props });
+    props.recording = true;
   }
 
   if (states.captureDone) {
     endWebMRecord({ canvas, settings });
+    props.recording = false;
   }
 };
 
