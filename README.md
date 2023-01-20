@@ -17,22 +17,32 @@ npm i @daeinc/sketch-wrapper
 
 ## Features
 
-- TypeScript: It can work both in JavaScript or TypeScript projects.
-- Multiple sketch modes: It supports vanilla Canvas 2D API, Webgl context and OGL(through [`ogl-typescript`](https://github.com/nshen/ogl-typescript)) library, or use any other Canvas libraries as long as they support an existing canvas.
-- Animation loop: It has `playhead` prop that repeats `0..1` and makes it easy to create a seamless animation loop. Other props such as `time`, `deltaTime` are provided as well.
-- Settings: Use `settings` object to reduce boilerplate code in your sketch - set up animation duration, playback frame rate, filename, etc.
-- Sketch props: Use props for each mode to help your coding.
-- Keyboard shortcuts: Play/pause your sketch and export canvas as image or WebM video at various frame rates (using [`webm-muxer`](https://github.com/Vanilagy/webm-muxer/) package).
+- **TypeScript**: It can work both in JavaScript or TypeScript projects.
+- **Multiple sketch modes**: It supports vanilla Canvas 2D API, WebGL context and OGL(through [`ogl-typescript`](https://github.com/nshen/ogl-typescript)) library, or use with other Canvas libraries as long as they support an existing canvas.
+- **Animation loop**: It has `playhead` prop that repeats `0..1` and makes it easy to create a seamless animation loop. Other props such as `time`, `deltaTime` are provided as well. You can also adjust frame rate for both playing and recording.
+- **Sketch settings**: Use `settings` object to reduce boilerplate code in your sketch - set up animation duration, playback frame rate, filename, etc.
+- **Sketch props**: Use props for each mode to help your coding.
+- **Keyboard shortcuts**: Play/pause your sketch and export canvas as image or WebM video at various frame rates (using [`webm-muxer`](https://github.com/Vanilagy/webm-muxer/) package).
 
 ## Motivation
 
-In 2022, I started using [`canvas-sketch`](https://github.com/mattdesl/canvas-sketch) for all my creative coding sketches, and it was wonderful and met most of my needs. However, there were a few features that I wish it had. First was external ESM support. Due to the bundler it was using, I could not import latest packages that I liked such as [`pts`](https://github.com/williamngan/pts) or [`thi.ng/umbrella`](https://github.com/thi-ng/umbrella). Another was TypeScript. I've only used TS for a few months, but it quickly became a very essential tool in my workflow. So, I thought maybe I'd make my own tool. Sketch-wraper is incomplete and a work-in-progress but it's been a great learning experience personally. If it can find some use in your sketches, that would be great, too.
+In 2022, I started using [`canvas-sketch`](https://github.com/mattdesl/canvas-sketch) for all my creative coding sketches, and it was wonderful and met most of my needs. However, there were a few features that I wish it had. First was external ESM support. Due to the bundler it was using, I could not import the latest packages that I liked such as [`pts`](https://github.com/williamngan/pts) or [`thi.ng/umbrella`](https://github.com/thi-ng/umbrella). Another was TypeScript. I've only used TS for a few months, but it quickly became a very essential tool in my workflow. So, I thought maybe I'd make my own tool. Sketch-wraper is incomplete and a work-in-progress but it's been a great learning experience personally. If it can find some use in your sketches, that would be great, too.
+
+## How to use
+
+- [Basic](./docs/basic.md)
+- [Sketch Settings](./docs/settings.md)
+- [Sketch Props](./docs/props.md)
+- [Sketch (Rendering) Modes](./docs/modes.md)
+- and more in the [the documentation](./docs/index.md)
 
 ## Example Usage
 
 The module supports both JavaScript and TypeScript.
 
-If you are not familiar with NPM, ESM or bundler setup, Check out a quick starter repository, [`sketch-wrapper-starter-js`](https://github.com/cdaein/sketch-wrapper-starter-js). If you want to see more examples on how to use each mode and feature, check out [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples).
+- 👉 If you are not familiar with NPM, ESM or bundler setup, Check out a quick starter repository, [`sketch-wrapper-starter-js`](https://github.com/cdaein/sketch-wrapper-starter-js).
+- 👉 There is also [a starter for TypeScript projects](https://github.com/cdaein/sketch-wrapper-starter-ts). 
+- 👉 If you want to see more examples on how to use each mode and feature, check out [`sketch-wrapper-examples`](https://github.com/cdaein/sketch-wrapper-examples).
 
 ```js
 import sketchWrapper from "@daeinc/sketch-wrapper";
@@ -68,14 +78,6 @@ const settings = {
 
 sketchWrapper(sketch, settings);
 ```
-
-## How to use
-
-- [Basic](./docs/basic.md)
-- [Sketch Settings](./docs/settings.md)
-- [Sketch Props](./docs/props.md)
-- [Sketch (Rendering) Modes](./docs/modes.md)
-- and more in the [the documentation](./docs/index.md)
 
 ## References
 
