@@ -469,11 +469,6 @@ var exportWebM = async ({
   }
   if (!states.captureDone) {
     encodeVideoFrame({ canvas, settings, states, props });
-    props.recording = true;
-  }
-  if (states.captureDone) {
-    endWebMRecord({ canvas, settings });
-    props.recording = false;
   }
 };
 var setupWebMRecord = ({
@@ -501,7 +496,7 @@ var setupWebMRecord = ({
     codec: "vp09.00.10.08",
     width: canvas.width,
     height: canvas.height,
-    bitrate: 4e6
+    bitrate: 1e7
   });
   lastKeyframe = -Infinity;
   canvas.style.outline = `3px solid red`;
@@ -649,9 +644,11 @@ var sketchWrapper = async (sketch, userSettings) => {
     props: props2
   }) => {
     if (!states2.captureReady) {
-      resetTime({ settings: settings2, states: states2, props: props2 });
+      if (props2.duration)
+        resetTime({ settings: settings2, states: states2, props: props2 });
       setupWebMRecord({ canvas: canvas2, settings: settings2 });
       states2.captureReady = true;
+      props2.recording = true;
     }
     props2.deltaTime = 1e3 / settings2.exportFps;
     props2.time = frameCount * props2.deltaTime;
@@ -661,18 +658,20 @@ var sketchWrapper = async (sketch, userSettings) => {
     });
     props2.frame = frameCount;
     computeLastTimestamp({ states: states2, props: props2 });
+    frameCount += 1;
     render(props2);
     window.requestAnimationFrame(loop);
-    frameCount += 1;
-    if (props2.frame >= settings2.exportTotalFrames) {
+    exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
+    if (props2.frame >= settings2.exportTotalFrames - 1) {
       states2.captureDone = true;
     }
-    exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
     if (states2.captureDone) {
+      endWebMRecord({ canvas: canvas2, settings: settings2 });
       states2.captureReady = false;
       states2.captureDone = false;
       states2.savingFrames = false;
       states2.timeResetted = true;
+      props2.recording = false;
       frameCount = 0;
     }
   };
