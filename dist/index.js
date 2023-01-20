@@ -584,12 +584,21 @@ var sketchWrapper = async (sketch, userSettings) => {
   );
   const { add: addKeydown } = keydown_default(props, states);
   handleResize();
+  let firstLoopRender = true;
+  let firstLoopRenderTime = 0;
   const loop = (timestamp) => {
-    states.timestamp = timestamp - states.pausedDuration;
-    if (!states.savingFrames)
+    if (firstLoopRender) {
+      firstLoopRenderTime = timestamp;
+      firstLoopRender = false;
+      window.requestAnimationFrame(loop);
+      return;
+    }
+    states.timestamp = timestamp - firstLoopRenderTime - states.pausedDuration;
+    if (!states.savingFrames) {
       playLoop({ timestamp, settings, states, props });
-    else
+    } else {
       recordLoop({ canvas, settings, states, props });
+    }
   };
   if (settings.animate) {
     document.addEventListener("DOMContentLoaded", () => {

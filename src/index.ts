@@ -74,16 +74,31 @@ const sketchWrapper: SketchWrapper = async (
 
   // animation render loop
 
-  // run it very first time
+  // run it very first time (render, too)
   handleResize();
 
+  // there's time delay between first render in handleResize() and first loop render, resulting in animatiom jump. this compesates for that delay
+  let firstLoopRender = true;
+  let firstLoopRenderTime = 0;
+
   const loop: SketchLoop = (timestamp: number) => {
-    states.timestamp = timestamp - states.pausedDuration;
-    if (!states.savingFrames) playLoop({ timestamp, settings, states, props });
-    else recordLoop({ canvas, settings, states, props });
+    if (firstLoopRender) {
+      firstLoopRenderTime = timestamp;
+      firstLoopRender = false;
+      window.requestAnimationFrame(loop);
+      return;
+    }
+
+    states.timestamp = timestamp - firstLoopRenderTime - states.pausedDuration;
+
+    if (!states.savingFrames) {
+      playLoop({ timestamp, settings, states, props });
+    } else {
+      recordLoop({ canvas, settings, states, props });
+    }
   };
+
   if (settings.animate) {
-    // REVIEW: on page load, animation timing is already a few frames off
     document.addEventListener("DOMContentLoaded", () => {
       window.onload = () => {
         window.requestAnimationFrame(loop);
@@ -122,6 +137,7 @@ const sketchWrapper: SketchWrapper = async (
     // props.time = (states.timestamp - states.startTime) % props.duration;
     // 2. full reset each loop. but, dt is one-frame (8 or 16ms) off
     props.time = states.timestamp - states.startTime;
+
     if (props.time >= props.duration) {
       resetTime({ settings, states, props });
     }
