@@ -1,6 +1,6 @@
 {
   "name": "@daeinc/sketch-wrapper",
-  "version": "0.10.7",
+  "version": "0.10.8",
   "description": "Helpers for creative coding sketches with HTML Canvas",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
