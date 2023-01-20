@@ -24,6 +24,7 @@ import resizeHandler from "./events/resize";
 import keydownHandler from "./events/keydown";
 import { createStates } from "./states";
 import {
+  endWebMRecord,
   exportWebM,
   setupWebMRecord,
 } from "./recorders/export-frames-webm-muxer";
@@ -74,16 +75,31 @@ const sketchWrapper: SketchWrapper = async (
 
   // animation render loop
 
-  // run it very first time
+  // run it very first time (render, too)
   handleResize();
 
+  // there's time delay between first render in handleResize() and first loop render, resulting in animatiom jump. this compesates for that delay
+  let firstLoopRender = true;
+  let firstLoopRenderTime = 0;
+
   const loop: SketchLoop = (timestamp: number) => {
-    states.timestamp = timestamp - states.pausedDuration;
-    if (!states.savingFrames) playLoop({ timestamp, settings, states, props });
-    else recordLoop({ canvas, settings, states, props });
+    if (firstLoopRender) {
+      firstLoopRenderTime = timestamp;
+      firstLoopRender = false;
+      window.requestAnimationFrame(loop);
+      return;
+    }
+
+    states.timestamp = timestamp - firstLoopRenderTime - states.pausedDuration;
+
+    if (!states.savingFrames) {
+      playLoop({ timestamp, settings, states, props });
+    } else {
+      recordLoop({ canvas, settings, states, props });
+    }
   };
+
   if (settings.animate) {
-    // REVIEW: on page load, animation timing is already a few frames off
     document.addEventListener("DOMContentLoaded", () => {
       window.onload = () => {
         window.requestAnimationFrame(loop);
@@ -122,6 +138,7 @@ const sketchWrapper: SketchWrapper = async (
     // props.time = (states.timestamp - states.startTime) % props.duration;
     // 2. full reset each loop. but, dt is one-frame (8 or 16ms) off
     props.time = states.timestamp - states.startTime;
+
     if (props.time >= props.duration) {
       resetTime({ settings, states, props });
     }
@@ -148,7 +165,7 @@ const sketchWrapper: SketchWrapper = async (
     window.requestAnimationFrame(loop);
   };
 
-  // for manual counting when recording
+  // for manual counting when recording (use only for recording)
   let frameCount = 0;
 
   const recordLoop = ({
@@ -164,9 +181,12 @@ const sketchWrapper: SketchWrapper = async (
   }) => {
     // TODO: what if duration is not set?
     if (!states.captureReady) {
-      resetTime({ settings, states, props });
+      // reset time only if looping (duration set)
+      // REVIEW: whether to resetTime() needs more testing
+      if (props.duration) resetTime({ settings, states, props });
       setupWebMRecord({ canvas, settings });
       states.captureReady = true;
+      props.recording = true;
     }
 
     // deltaTime
@@ -181,24 +201,29 @@ const sketchWrapper: SketchWrapper = async (
     props.frame = frameCount;
     computeLastTimestamp({ states, props });
 
-    render(props);
-    window.requestAnimationFrame(loop);
-
     frameCount += 1;
 
-    if (props.frame >= settings.exportTotalFrames) {
-      states.captureDone = true;
-    }
+    render(props);
+    window.requestAnimationFrame(loop);
 
     // save frames
     exportWebM({ canvas, settings, states, props });
 
+    if (props.frame >= settings.exportTotalFrames - 1) {
+      states.captureDone = true;
+    }
+
     if (states.captureDone) {
+      endWebMRecord({ canvas, settings });
+
       states.captureReady = false;
       states.captureDone = false;
       states.savingFrames = false;
       states.timeResetted = true; // playLoop should start fresh
-      frameCount = 0; // for next recording
+
+      props.recording = false;
+
+      frameCount = 0; // reset local frameCount for next recording
     }
   };
 };

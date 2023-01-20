@@ -65,6 +65,7 @@ export const createProps = async ({
     deltaTime: 0,
     duration: settings.duration,
     totalFrames: settings.totalFrames,
+    recording: false,
     exportFrame,
     togglePlay,
     update,

@@ -296,6 +296,7 @@ var createProps = async ({
     deltaTime: 0,
     duration: settings.duration,
     totalFrames: settings.totalFrames,
+    recording: false,
     exportFrame,
     togglePlay,
     update
@@ -469,9 +470,6 @@ var exportWebM = async ({
   if (!states.captureDone) {
     encodeVideoFrame({ canvas, settings, states, props });
   }
-  if (states.captureDone) {
-    endWebMRecord({ canvas, settings });
-  }
 };
 var setupWebMRecord = ({
   canvas,
@@ -526,7 +524,7 @@ var encodeVideoFrame = ({
   props
 }) => {
   const frame = new VideoFrame(canvas, { timestamp: props.time * 1e3 });
-  const needsKeyframe = props.time - lastKeyframe >= 1e4;
+  const needsKeyframe = props.time - lastKeyframe >= 2e3;
   if (needsKeyframe)
     lastKeyframe = props.time;
   videoEncoder?.encode(frame, { keyFrame: needsKeyframe });
@@ -586,15 +584,29 @@ var sketchWrapper = async (sketch, userSettings) => {
   );
   const { add: addKeydown } = keydown_default(props, states);
   handleResize();
+  let firstLoopRender = true;
+  let firstLoopRenderTime = 0;
   const loop = (timestamp) => {
-    states.timestamp = timestamp - states.pausedDuration;
-    if (!states.savingFrames)
+    if (firstLoopRender) {
+      firstLoopRenderTime = timestamp;
+      firstLoopRender = false;
+      window.requestAnimationFrame(loop);
+      return;
+    }
+    states.timestamp = timestamp - firstLoopRenderTime - states.pausedDuration;
+    if (!states.savingFrames) {
       playLoop({ timestamp, settings, states, props });
-    else
+    } else {
       recordLoop({ canvas, settings, states, props });
+    }
   };
-  if (settings.animate)
-    window.requestAnimationFrame(loop);
+  if (settings.animate) {
+    document.addEventListener("DOMContentLoaded", () => {
+      window.onload = () => {
+        window.requestAnimationFrame(loop);
+      };
+    });
+  }
   if (settings.hotkeys) {
     addResize();
     addKeydown();
@@ -641,9 +653,11 @@ var sketchWrapper = async (sketch, userSettings) => {
     props: props2
   }) => {
     if (!states2.captureReady) {
-      resetTime({ settings: settings2, states: states2, props: props2 });
+      if (props2.duration)
+        resetTime({ settings: settings2, states: states2, props: props2 });
       setupWebMRecord({ canvas: canvas2, settings: settings2 });
       states2.captureReady = true;
+      props2.recording = true;
     }
     props2.deltaTime = 1e3 / settings2.exportFps;
     props2.time = frameCount * props2.deltaTime;
@@ -653,18 +667,20 @@ var sketchWrapper = async (sketch, userSettings) => {
     });
     props2.frame = frameCount;
     computeLastTimestamp({ states: states2, props: props2 });
+    frameCount += 1;
     render(props2);
     window.requestAnimationFrame(loop);
-    frameCount += 1;
-    if (props2.frame >= settings2.exportTotalFrames) {
+    exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
+    if (props2.frame >= settings2.exportTotalFrames - 1) {
       states2.captureDone = true;
     }
-    exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
     if (states2.captureDone) {
+      endWebMRecord({ canvas: canvas2, settings: settings2 });
       states2.captureReady = false;
       states2.captureDone = false;
       states2.savingFrames = false;
       states2.timeResetted = true;
+      props2.recording = false;
       frameCount = 0;
     }
   };

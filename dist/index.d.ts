@@ -84,6 +84,8 @@ interface BaseProps {
     duration: number;
     /** number of total frames over duration */
     totalFrames: number;
+    /** true if recording in progress */
+    recording: boolean;
     /** call to export canvas as image */
     exportFrame: () => void;
     /** call to play or pause sketch */

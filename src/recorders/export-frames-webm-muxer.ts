@@ -32,10 +32,6 @@ export const exportWebM = async ({
     // record frame
     encodeVideoFrame({ canvas, settings, states, props });
   }
-
-  if (states.captureDone) {
-    endWebMRecord({ canvas, settings });
-  }
 };
 
 export const setupWebMRecord = ({
@@ -70,7 +66,7 @@ export const setupWebMRecord = ({
     codec: "vp09.00.10.08", // TODO: look at other codecs
     width: canvas.width,
     height: canvas.height,
-    bitrate: 4_000_000, // REVIEW: 1e7 = 10 Mbps
+    bitrate: 10_000_000, // REVIEW: 1e7 = 10 Mbps (keep high. needs mp4 convert again)
   });
 
   lastKeyframe = -Infinity;
@@ -119,8 +115,8 @@ export const encodeVideoFrame = ({
   // timestamp unit is micro-seconds!!
   const frame = new VideoFrame(canvas, { timestamp: props.time * 1000 });
 
-  // add video keyframe at least every 10 seconds (10000ms)
-  const needsKeyframe = props.time - lastKeyframe! >= 10000;
+  // add video keyframe every 2 seconds (2000ms)
+  const needsKeyframe = props.time - lastKeyframe! >= 2000;
   if (needsKeyframe) lastKeyframe = props.time;
 
   videoEncoder?.encode(frame, { keyFrame: needsKeyframe });

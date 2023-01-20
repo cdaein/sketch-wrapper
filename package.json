@@ -1,6 +1,6 @@
 {
   "name": "@daeinc/sketch-wrapper",
-  "version": "0.10.6",
+  "version": "0.10.8",
   "description": "Helpers for creative coding sketches with HTML Canvas",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
@@ -26,8 +26,8 @@
   },
   "devDependencies": {
     "@daeinc/color": "^0.2.4",
-    "@daeinc/draw": "^0.2.1",
-    "@daeinc/math": "^0.4.0",
+    "@daeinc/draw": "^0.3.0",
+    "@daeinc/math": "^0.5.0",
     "@types/node": "^18.11.18",
     "@types/p5": "^1.4.3",
     "@types/three": "^0.148.0",
@@ -37,7 +37,7 @@
     "license-checker": "^25.0.1",
     "ogl-typescript": "^0.1.40",
     "p5": "^1.5.0",
-    "parcel": "^2.8.2",
+    "parcel": "^2.8.3",
     "pts": "^0.11.3",
     "rollup-plugin-dts": "^5.1.1",
     "three": "^0.148.0",
