@@ -102,11 +102,12 @@ const sketchWrapper: SketchWrapper = async (
       recordLoop({ canvas, settings, states, props });
     }
   };
+  if (settings.animate) window.requestAnimationFrame(loop);
 
   if (settings.animate) {
     document.addEventListener("DOMContentLoaded", () => {
       window.onload = () => {
-        window.requestAnimationFrame(loop);
+        // REVIEW: rAF here doesn't work in OGL mode
       };
     });
   }
@@ -114,6 +115,8 @@ const sketchWrapper: SketchWrapper = async (
     addResize();
     addKeydown();
   }
+
+  console.log(settings.animate);
 
   const playLoop = ({
     timestamp,
@@ -126,6 +129,8 @@ const sketchWrapper: SketchWrapper = async (
     states: SketchStates;
     props: SketchProps | WebGLProps | OGLProps;
   }) => {
+    console.log("play loop"); // TEST
+
     // when paused, accumulate pausedDuration
     if (states.paused) {
       states.pausedDuration = timestamp - states.pausedStartTime;
@@ -227,6 +232,8 @@ const sketchWrapper: SketchWrapper = async (
         context = (props as SketchProps).context;
       } else if (settings.mode === "webgl") {
         context = (props as WebGLProps).gl;
+      } else if (settings.mode === "ogl") {
+        context = (props as OGLProps).oglContext;
       }
       exportGifAnim({ canvas, context, settings, states, props });
     }

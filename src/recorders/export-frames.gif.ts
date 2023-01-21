@@ -47,19 +47,10 @@ export const exportGifAnim = ({
       const palette = quantize(data, 256);
       const index = applyPalette(data, palette);
 
-      // TODO: where to put this warning?
-      //       should i automatically clamp fps AND duration?
-      if (settings.exportFps > 50) {
-        console.warn(
-          "clamping fps to 50, which is the maximum for GIF. animation duration will be inaccurate."
-        );
-      }
-
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1000;
-
       gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
-    } else if (settings.mode === "webgl") {
+    } else if (settings.mode === "webgl" || settings.mode === "ogl") {
       // REVIEW: https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels
       const gl = context as WebGLRenderingContext;
       const pixels = new Uint8Array(
@@ -68,9 +59,22 @@ export const exportGifAnim = ({
       //prettier-ignore
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, 
                     gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-
       // console.log(pixels); // Uint8Array
+      const palette = quantize(pixels, 256);
+      const index = applyPalette(pixels, palette);
+
+      const fpsInterval = 1 / settings.exportFps;
+      const delay = fpsInterval * 1000;
+      gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
     }
+  }
+
+  // TODO: where to put this warning?
+  //       should i automatically clamp fps AND duration?
+  if (settings.exportFps > 50) {
+    console.warn(
+      "clamping fps to 50, which is the maximum for GIF. animation duration will be inaccurate."
+    );
   }
 
   // TODO: this should be in settings, states or props
