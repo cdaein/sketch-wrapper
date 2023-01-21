@@ -29,9 +29,6 @@ export const createWebglCanvas = (settings: SketchSettingsInternal) => {
       height: number;
     };
   } else {
-    if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
-      throw new Error("provided canvas must be an HTMLCanvasElement");
-    }
     // existing canvas
     canvas = settings.canvas;
     if (settings.parent) {

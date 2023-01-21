@@ -26,7 +26,7 @@ export const createProps = async ({
   settings: SketchSettingsInternal;
   states: SketchStates;
 }) => {
-  const { canvas, context, width, height, pixelRatio, gl } =
+  const { canvas, context, gl, width, height, pixelRatio } =
     (await prepareCanvas(settings)) as CanvasProps;
 
   // function props

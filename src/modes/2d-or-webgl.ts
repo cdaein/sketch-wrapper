@@ -2,18 +2,19 @@ import { createCanvas, resizeCanvas } from "@daeinc/canvas";
 import { toHTMLElement } from "@daeinc/dom";
 import type { SketchSettingsInternal } from "../types";
 
-export const create2dCanvas = (settings: SketchSettingsInternal) => {
+export const create2dOrWebGLCanvas = (settings: SketchSettingsInternal) => {
   let canvas: HTMLCanvasElement;
   let context:
     | CanvasRenderingContext2D
     | WebGLRenderingContext
     | WebGLRenderingContext;
+  let gl;
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
 
   if (settings.canvas === undefined || settings.canvas === null) {
-    // new 2d canvas
-    ({ canvas, context, width, height } = createCanvas({
+    // new canvas
+    ({ canvas, context, gl, width, height } = createCanvas({
       parent: settings.parent,
       context: settings.mode,
       width,
@@ -24,6 +25,7 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
     })) as {
       canvas: HTMLCanvasElement;
       context: CanvasRenderingContext2D;
+      gl: WebGLRenderingContext | WebGL2RenderingContext;
       width: number;
       height: number;
     };
@@ -34,7 +36,7 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
       toHTMLElement(settings.parent).appendChild(canvas);
     }
 
-    ({ context, width, height } = resizeCanvas({
+    ({ context, gl, width, height } = resizeCanvas({
       canvas,
       context: settings.mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
@@ -68,5 +70,5 @@ export const create2dCanvas = (settings: SketchSettingsInternal) => {
     canvas.style.maxHeight = `${settings.dimensions[1]}px`;
   }
 
-  return { canvas, context, width, height, pixelRatio };
+  return { canvas, context, gl, width, height, pixelRatio };
 };
