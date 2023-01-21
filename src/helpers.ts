@@ -1,3 +1,19 @@
+import { SketchSettingsInternal } from "./types";
+
+export const downloadBlob = (blob: Blob, settings: SketchSettingsInternal) => {
+  const { filename, prefix, suffix, framesFormat: format } = settings;
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${formatFilename({
+    filename,
+    prefix,
+    suffix,
+  })}.${format}`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
+
 /**
  * format complete filename (excl. extension)
  *
