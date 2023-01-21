@@ -220,7 +220,7 @@ var prepareCanvas = async (settings) => {
   } else if (settings.mode === "webgl") {
     return createWebglCanvas(settings);
   } else if (settings.mode === "ogl") {
-    return (await import('./ogl-SXYU76IS.js')).createOglCanvas(settings);
+    throw new Error("ogl mode is no longer supported");
   }
   return create2dCanvas(settings);
 };
@@ -284,16 +284,7 @@ var createProps = async ({
   settings,
   states
 }) => {
-  const {
-    canvas,
-    context,
-    width,
-    height,
-    pixelRatio,
-    gl,
-    oglContext,
-    oglRenderer
-  } = await prepareCanvas(settings);
+  const { canvas, context, width, height, pixelRatio, gl } = await prepareCanvas(settings);
   const { exportFrame, update, togglePlay } = createFunctionProps({
     canvas,
     settings,
@@ -320,12 +311,6 @@ var createProps = async ({
     props = {
       ...baseProps,
       context
-    };
-  } else if (settings.mode === "ogl") {
-    props = {
-      ...baseProps,
-      oglContext,
-      oglRenderer
     };
   } else {
     props = {
@@ -577,7 +562,7 @@ var exportGifAnim = ({
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1e3;
       gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
-    } else if (settings.mode === "webgl" || settings.mode === "ogl") {
+    } else if (settings.mode === "webgl") {
       const gl = context;
       const pixels = new Uint8Array(
         gl.drawingBufferWidth * gl.drawingBufferHeight * 4
@@ -685,14 +670,12 @@ var sketchWrapper = async (sketch, userSettings) => {
     addResize();
     addKeydown();
   }
-  console.log(settings.animate);
   const playLoop = ({
     timestamp,
     settings: settings2,
     states: states2,
     props: props2
   }) => {
-    console.log("play loop");
     if (states2.paused) {
       states2.pausedDuration = timestamp - states2.pausedStartTime;
       window.requestAnimationFrame(loop);
@@ -760,8 +743,6 @@ var sketchWrapper = async (sketch, userSettings) => {
         context = props2.context;
       } else if (settings2.mode === "webgl") {
         context = props2.gl;
-      } else if (settings2.mode === "ogl") {
-        context = props2.oglContext;
       }
       exportGifAnim({ canvas: canvas2, context, settings: settings2, states: states2, props: props2 });
     }

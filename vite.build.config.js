@@ -18,7 +18,7 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["@daeinc/dom", "@daeinc/canvas", "ogl-typescript", "p5"],
+      external: ["@daeinc/dom", "@daeinc/canvas", "p5"],
       // plugins: [dts()],
     },
   },

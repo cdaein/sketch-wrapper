@@ -36,7 +36,6 @@
     "jest-canvas-mock": "^2.4.0",
     "jest-environment-jsdom": "^29.3.1",
     "license-checker": "^25.0.1",
-    "ogl-typescript": "^0.1.40",
     "p5": "^1.5.0",
     "parcel": "^2.8.3",
     "pts": "^0.11.3",
