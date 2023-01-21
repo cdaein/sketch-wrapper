@@ -48,7 +48,29 @@ const sketch = ({ context: ctx }) => {
 
 ## `webgl`
 
-`webgl` mode will give you `gl` prop, which is `WebGLRenderingContext` object. This mode may not be much useful unless you write vanilla WebGL code.
+`webgl` mode will give you `gl` prop, which is `WebGLRenderingContext` object. If you are using external WebGL libraries, you can plug in an existing canvas or context in most cases (ex. Three.js, OGL). Refer to the libraries' documentations.
+
+```js
+const sketch = ({ canvas, gl }) => {
+  return ({ width, height }) => {
+    // ...
+  };
+};
+```
+
+In TypeScript:
+
+```ts
+const sketch = ({ canvas, gl }: WebGLProps) => {
+  return ({ width, height }: WebGLProps) => {
+    // ...
+  };
+};
+```
+
+## `webgl2`
+
+`webgl2` mode will give you `gl` prop, which is `WebGL2RenderingContext` object. If you are using external WebGL libraries, you can plug in an existing canvas or context in most cases (ex. Three.js, OGL). Refer to the libraries' documentations.
 
 ```js
 const sketch = ({ gl }) => {
@@ -67,7 +89,3 @@ const sketch = ({ gl }: WebGLProps) => {
   };
 };
 ```
-
-## `ogl`
-
-`ogl` mode is no longer supported from `v0.12.0`. Use `webgl` mode and set up the OGLRenderer and OGLContext.
