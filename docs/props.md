@@ -8,15 +8,11 @@ Use `width` and `height` to create a composition proportional to canvas size ins
 
 ### Sketch Modes
 
-|     name      |            type            | description                                                     |
-| :-----------: | :------------------------: | --------------------------------------------------------------- |
-|    `mode`     | `"2d" \| "webgl" \| "ogl"` | Set sketch mode for different types of sketches. default:`"2d"` |
-|   `context`   | `CanvasRenderingContext2D` | available in `2d` mode.                                         |
-|     `gl`      |  `WebGLRenderingContext`   | available in `webgl` mode.                                      |
-| `oglContext`  |   `OGLRenderingContext`    | available in `ogl` mode.                                        |
-| `oglRenderer` |         `Renderer`         | available in `ogl` mode.                                        |
-
-> ✋ Note: To use `ogl` mode, you will need to install it separately using `npm i ogl-typescript`.
+|   name    |            type            | description                                                     |
+| :-------: | :------------------------: | --------------------------------------------------------------- |
+|  `mode`   | `"2d" \| "webgl" \| "ogl"` | Set sketch mode for different types of sketches. default:`"2d"` |
+| `context` | `CanvasRenderingContext2D` | available in `2d` mode.                                         |
+|   `gl`    |  `WebGLRenderingContext`   | available in `webgl` mode.                                      |
 
 #### Canvas
 

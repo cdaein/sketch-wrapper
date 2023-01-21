@@ -9,7 +9,7 @@ const settings = {
 };
 ```
 
-Currently, it supports thre different modes - `2d`, `webgl` and `ogl`
+Currently, it supports thre different modes - `2d` and `webgl`
 
 ## `2d`
 
@@ -70,32 +70,4 @@ const sketch = ({ gl }: WebGLProps) => {
 
 ## `ogl`
 
-`ogl` mode is to create a WebGL sketch with `ogl-typescript` library. It gives you two props `oglContext` and `oglRenderer`:
-
-```js
-const sketch = ({ oglContext, oglRenderer }) => {
-  return ({ width, height }) => {
-    // ...
-  };
-};
-```
-
-In TypeScript:
-
-```ts
-const sketch = ({ oglContext, oglRenderer }: OGLProps) => {
-  return ({ width, height }: OGLProps) => {
-    // ...
-  };
-};
-```
-
-You can abbreviate the props like this:
-
-```js
-const sketch = ({ oglContext: gl, oglRenderer: renderer }) => {
-  return ({ width, height }) => {
-    // ...
-  };
-};
-```
+`ogl` mode is no longer supported from `v0.12.0`. Use `webgl` mode and set up the OGLRenderer and OGLContext.

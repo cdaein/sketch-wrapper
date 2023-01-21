@@ -13,6 +13,7 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 
 |      name      |          type           |                  default                  | description                                                                                                                                              |
 | :------------: | :---------------------: | :---------------------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     `mode`     |    `"2d" \| "webgl"`    |                  `"2d"`                   | See [modes](./modes.md) for details.                                                                                                                     |
 |    `parent`    | `HTMLElement \| string` |                  `body`                   | Set an existing HTML element as canvas parent. It can be either an `HTMLElement` or a selector. ex. `document.querySelector('div#app')`, `div#container` |
 |    `canvas`    |   `HTMLCanvasElement`   |                  `null`                   | Use an existing canvas instead of creating a new one. ex. `document.querySelector('canvas#my-canvas')`                                                   |
 |  `dimensions`  |   `[number, number]`    | `[window.innerWidth, window.innerHeight]` | Set Canvas width and height in `px`. If not set, use full window size                                                                                    |
@@ -38,5 +39,5 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 |    `prefix`    |               `string`               |   `""`   | Set prefix to filename                                                         |
 |    `suffix`    |               `string`               |   `""`   | Set suffix to filename                                                         |
 | `frameFormat`  | `"png" \| "jpeg" \| "jpg" \| "webp"` | `"png"`  | Set image export format                                                        |
-| `framesFormat` |               `"webm" \| "gif"`               | `"webm"` | Set moving image export format.                                     |
+| `framesFormat` |          `"webm" \| "gif"`           | `"webm"` | Set moving image export format.                                                |
 |   `hotkeys`    |              `boolean`               |  `true`  | Set to `false` to disable keyboard shortcuts such as `Cmd + S` to export image |
