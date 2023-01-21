@@ -5,6 +5,7 @@ import type {
   BaseProps,
   OGLProps,
   P5Props,
+  Sketch,
   SketchProps,
   SketchSettings,
   SketchSettingsInternal,
@@ -27,9 +28,11 @@ type CanvasProps = {
 };
 
 export const createProps = async ({
+  sketch,
   settings,
   states,
 }: {
+  sketch: Sketch;
   settings: SketchSettingsInternal;
   states: SketchStates;
 }) => {
@@ -43,7 +46,7 @@ export const createProps = async ({
     oglContext,
     oglRenderer,
     p5,
-  } = (await prepareCanvas(settings)) as CanvasProps;
+  } = (await prepareCanvas(sketch, settings)) as CanvasProps;
 
   // function props
   const { exportFrame, update, togglePlay } = createFunctionProps({

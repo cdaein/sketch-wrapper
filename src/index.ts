@@ -43,13 +43,13 @@ const sketchWrapper: SketchWrapper = async (
 
   const states = createStates({ settings });
 
-  const props = await createProps({
+  let props = await createProps({
+    sketch,
     settings,
     states,
   });
   // canvas is created for props
-  const { canvas } = props;
-
+  let { canvas } = props;
   const returned = sketch(props);
 
   let render: SketchRender = () => {};
@@ -59,6 +59,17 @@ const sketchWrapper: SketchWrapper = async (
   } else {
     render = returned.render || render;
     resize = returned.resize || resize;
+  }
+
+  // TODO: createP5Canvas() cannot be handled by createProps/prepareCanvas
+  //       b/c it needs to use props (including p5 instance itself)
+  //       or, have it return p5Constructor, not p5 intance?
+  if (settings.mode === "p5") {
+    console.log(props);
+    (props as P5Props).p5.draw = () => {
+      console.log("drawwwww");
+      render(props);
+    };
   }
 
   // window resize event
@@ -161,7 +172,13 @@ const sketchWrapper: SketchWrapper = async (
     // update lastTimestamp for deltaTime calculation
     computeLastTimestamp({ states, props });
 
-    render(props);
+    // REVIEW
+    if (settings.mode === "p5") {
+      (props as P5Props).p5.redraw();
+      console.log("redraw");
+    } else {
+      render(props);
+    }
     window.requestAnimationFrame(loop);
   };
 

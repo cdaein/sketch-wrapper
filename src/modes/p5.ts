@@ -1,78 +1,86 @@
-import type { SketchSettingsInternal } from "../types";
-import type { p5InstanceExtensions } from "p5";
-import { setupCanvas } from "@daeinc/canvas";
+import type { Sketch, SketchSettingsInternal } from "../types";
+// import { setupCanvas } from "@daeinc/canvas";
 import { toHTMLElement } from "@daeinc/dom";
+import type p5 from "p5";
+import { numberToRGB } from "ogl-typescript/lib/math/functions/ColorFunc";
 
-export const createP5Canvas = async (settings: SketchSettingsInternal) => {
+export const createP5Canvas = async (
+  sketch: Sketch,
+  settings: SketchSettingsInternal
+) => {
+  let p5: p5 | undefined;
   let [width, height] = settings.dimensions;
   let pixelRatio = Math.max(settings.pixelRatio, 1);
 
-  // const p5 = await import("p5");
-  // p5.createCanvas();
+  // TODO; check for settings.canvas === null | undefined
 
-  // TODO: set width, height, pixelRatio, attributes
+  const p5Constructor = (await import("p5")).default;
 
-  // const setup = (p: p5InstanceExtensions) => {
-  //   return () => {
-  //     const renderer = p.createCanvas(200, 200);
-  //   };
-  // };
+  const p5Sketch = (p: p5) => {
+    let renderFn;
 
-  // const draw = (p: p5InstanceExtensions) => {
-  //   return () => {
-  //     p.background(200, 0, 0);
-  //   };
-  // };
+    p.setup = () => {
+      // TODO: "2d" or "webgl" ( 2 different sketch mode "p5" and "p5-webgl")
+      const p5Renderer = p.createCanvas(width, height, p.P2D); // 2d mode
+      p.pixelDensity(pixelRatio);
+      // TODO: set context attributes "2d"?
+      // p.setAttributes()
+      p.noLoop(); // will use our own draw loop
 
-  // const p5Sketch = (p: p5) => {
-  //   p.setup = setup(p);
+      p5 = p;
 
-  //   p.draw = draw(p);
-  // };
+      console.log("wrapper setup");
+      // need to run sketch function once to set everything up
+      // renderFn = sketch(props)
+    };
 
-  // new p5(
-  //   p5Sketch,
-  //   // TODO: toHTMLElement: create toHTMLElement() / toElement()
-  //   settings.parent ? toHTMLElement(settings.parent as HTMLElement) : undefined
-  // );
+    // draw will be stored
+    // REVIEW: can i assign p.draw later after p5Object is created?
+    // p.draw = () => renderFn(props);
+  };
 
-  // ({ canvas, width, height, pixelRatio } = setupCanvas({
-  //   parent: settings.parent,
-  //   canvas,
-  //   width,
-  //   height,
-  //   pixelRatio,
-  // }));
+  const p5Object = new p5Constructor(
+    p5Sketch,
+    settings.parent ? toHTMLElement(settings.parent) : undefined
+  );
 
-  // // canvas centering
-  // // TODO: needs extra scaling of style.width & height to fit window/container
-  // // REVIEW: this is probably be better done in index.html <style>
-  // //         but, for now, this module doesn't provide html file, so...
-  // if (settings.centered === true) {
-  //   const canvasContainer = canvas.parentElement!;
-  //   canvasContainer.style.width = "100vw";
-  //   canvasContainer.style.height = "100vh";
-  //   canvasContainer.style.display = "flex";
-  //   canvasContainer.style.justifyContent = "center";
-  //   canvasContainer.style.alignItems = "center";
+  // REVIEW: there's no type definition although p5Object.canvas exists
+  // @ts-ignore
+  const canvas: HTMLCanvasElement = p5Object.canvas;
+  // const context: CanvasRenderingContext2D = p5Object.drawingContext;
 
-  //   if (settings.scaleContext === false) {
-  //     // TODO: centering does not work at pixelRatio=2
-  //   }
-  // } else {
-  //   // scale canvas even when not centered.
-  //   canvas.style.width = 100 + "%";
-  //   canvas.style.height = 100 + "%";
-  //   canvas.style.maxWidth = `${settings.dimensions[0]}px`;
-  //   canvas.style.maxHeight = `${settings.dimensions[1]}px`;
-  // }
+  // canvas centering
+  // TODO: needs extra scaling of style.width & height to fit window/container
+  // REVIEW: this is probably be better done in index.html <style>
+  //         but, for now, this module doesn't provide html file, so...
+  if (settings.centered === true) {
+    const canvasContainer = canvas.parentElement!;
+    canvasContainer.style.width = "100vw";
+    canvasContainer.style.height = "100vh";
+    canvasContainer.style.display = "flex";
+    canvasContainer.style.justifyContent = "center";
+    canvasContainer.style.alignItems = "center";
 
-  // return {
-  //   canvas,
-  //   oglContext: gl,
-  //   oglRenderer: renderer,
-  //   width,
-  //   height,
-  //   pixelRatio,
-  // };
+    if (settings.scaleContext === false) {
+      // TODO: centering does not work at pixelRatio=2
+    }
+  } else {
+    // scale canvas even when not centered.
+    canvas.style.width = 100 + "%";
+    canvas.style.height = 100 + "%";
+    canvas.style.maxWidth = `${settings.dimensions[0]}px`;
+    canvas.style.maxHeight = `${settings.dimensions[1]}px`;
+  }
+
+  if (p5) {
+    return {
+      p5,
+      canvas,
+      width,
+      height,
+      pixelRatio,
+    };
+  } else {
+    throw new Error("could not create p5 canvas");
+  }
 };

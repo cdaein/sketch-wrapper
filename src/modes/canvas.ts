@@ -1,12 +1,13 @@
 import { create2dCanvas } from "./2d";
 // import { createOglCanvas } from "./ogl";
 import { createWebglCanvas } from "./webgl";
-import type { SketchSettingsInternal } from "../types";
+import type { Sketch, SketchSettingsInternal } from "../types";
 import type { Renderer, OGLRenderingContext } from "ogl-typescript";
-import type p5 from "p5";
 import { createP5Canvas } from "./p5";
+import type p5 from "p5";
 
 export const prepareCanvas = async (
+  sketch: Sketch,
   settings: SketchSettingsInternal
 ): Promise<
   | {
@@ -31,7 +32,7 @@ export const prepareCanvas = async (
     return (await import("./ogl")).createOglCanvas(settings);
   } else if (settings.mode === "p5") {
     // TODO: to return p5 canvas, we need to have created p5 object
-    // return createP5Canvas(settings);
+    return createP5Canvas(sketch, settings);
   }
 
   // fallback
