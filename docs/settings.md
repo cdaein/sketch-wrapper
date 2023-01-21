@@ -38,5 +38,5 @@ You can pass any of these settings to `sketchWrapper(sketch, settings)` function
 |    `prefix`    |               `string`               |   `""`   | Set prefix to filename                                                         |
 |    `suffix`    |               `string`               |   `""`   | Set suffix to filename                                                         |
 | `frameFormat`  | `"png" \| "jpeg" \| "jpg" \| "webp"` | `"png"`  | Set image export format                                                        |
-| `framesFormat` |               `"webm"`               | `"webm"` | Currently, it only supports `webm` format.                                     |
+| `framesFormat` |               `"webm" \| "gif"`               | `"webm"` | Set moving image export format.                                     |
 |   `hotkeys`    |              `boolean`               |  `true`  | Set to `false` to disable keyboard shortcuts such as `Cmd + S` to export image |
