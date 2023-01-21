@@ -16,7 +16,7 @@ npm i @daeinc/sketch-wrapper
 ## Features
 
 - **TypeScript**: It can work both in JavaScript or TypeScript projects.
-- **Multiple sketch modes**: It supports vanilla Canvas 2D API, WebGL context, or use with other Canvas libraries (OGL, Two.js, Pts.js) as long as they support an existing canvas and context.
+- **Multiple sketch modes**: It supports vanilla Canvas 2D API, WebGL context, or use with other Canvas libraries (Three.js, OGL, Two.js, Pts.js) as long as they support an existing canvas and context. (p5.js instance mode is not supported in the current version)
 - **Animation loop**: It has `playhead` prop that repeats `0..1` and makes it easy to create a seamless animation loop. Other props such as `time`, `deltaTime` are provided as well. You can also adjust frame rate for both playing and recording.
 - **Sketch settings**: Use `settings` object to reduce boilerplate code in your sketch - set up animation duration, playback frame rate, filename, etc.
 - **Sketch props**: Use props for each mode to help your coding.
@@ -28,7 +28,7 @@ In 2022, I started using [`canvas-sketch`](https://github.com/mattdesl/canvas-sk
 
 ## How to use
 
-Documentation is updated for `v0.12.0`
+Documentation is updated for `v0.13.0`
 
 - [Basic](./docs/basic.md)
 - [Sketch Settings](./docs/settings.md)
