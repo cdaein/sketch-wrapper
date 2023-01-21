@@ -3,14 +3,12 @@ import { prepareCanvas } from "./modes/canvas";
 import { saveCanvasFrame } from "./recorders/export-frame";
 import type {
   BaseProps,
-  OGLProps,
   SketchProps,
   SketchSettings,
   SketchSettingsInternal,
   SketchStates,
   WebGLProps,
 } from "./types";
-import type { OGLRenderingContext, Renderer } from "ogl-typescript";
 
 type CanvasProps = {
   canvas: HTMLCanvasElement;
@@ -19,8 +17,6 @@ type CanvasProps = {
   height: number;
   pixelRatio: number;
   gl: WebGLRenderingContext;
-  oglContext: OGLRenderingContext;
-  oglRenderer: Renderer;
 };
 
 export const createProps = async ({
@@ -30,16 +26,8 @@ export const createProps = async ({
   settings: SketchSettingsInternal;
   states: SketchStates;
 }) => {
-  const {
-    canvas,
-    context,
-    width,
-    height,
-    pixelRatio,
-    gl,
-    oglContext,
-    oglRenderer,
-  } = (await prepareCanvas(settings)) as CanvasProps;
+  const { canvas, context, width, height, pixelRatio, gl } =
+    (await prepareCanvas(settings)) as CanvasProps;
 
   // function props
   const { exportFrame, update, togglePlay } = createFunctionProps({
@@ -67,19 +55,13 @@ export const createProps = async ({
     update,
   };
 
-  let props: SketchProps | WebGLProps | OGLProps;
+  let props: SketchProps | WebGLProps;
 
   if (settings.mode === "2d") {
     props = {
       ...baseProps,
       context: context as CanvasRenderingContext2D,
     } as SketchProps;
-  } else if (settings.mode === "ogl") {
-    props = {
-      ...baseProps,
-      oglContext: oglContext as OGLRenderingContext,
-      oglRenderer: oglRenderer as Renderer,
-    } as OGLProps;
   } else {
     props = {
       ...baseProps,

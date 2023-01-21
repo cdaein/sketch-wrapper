@@ -17,7 +17,6 @@ import type {
   SketchSettingsInternal,
   SketchProps,
   WebGLProps,
-  OGLProps,
 } from "../types";
 import { formatFilename } from "../helpers";
 
@@ -34,7 +33,7 @@ export const saveCanvasFrames = ({
   canvas: HTMLCanvasElement;
   states: SketchStates;
   settings: SketchSettingsInternal;
-  props: SketchProps | WebGLProps | OGLProps;
+  props: SketchProps | WebGLProps;
 }) => {
   const { filename, prefix, suffix, framesFormat: format } = settings;
 

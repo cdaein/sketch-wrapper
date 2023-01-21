@@ -1,5 +1,4 @@
 import type {
-  OGLProps,
   SketchLoop,
   SketchProps,
   SketchSettingsInternal,
@@ -7,10 +6,7 @@ import type {
   WebGLProps,
 } from "../types";
 
-export default (
-  props: SketchProps | OGLProps | WebGLProps,
-  states: SketchStates
-) => {
+export default (props: SketchProps | WebGLProps, states: SketchStates) => {
   const handleKeydown = (ev: KeyboardEvent) => {
     if (ev.key === " ") {
       ev.preventDefault();

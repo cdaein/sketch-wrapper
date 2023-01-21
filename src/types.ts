@@ -1,23 +1,22 @@
-import type { Renderer, OGLRenderingContext } from "ogl-typescript";
 import type p5 from "p5";
 
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
 export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
 /** sketch function to be used as argument for sketchWrapper() */
 export type Sketch = (
-  props: SketchProps | OGLProps | WebGLProps
+  props: SketchProps | WebGLProps
 ) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-export type SketchRender = (props: SketchProps | OGLProps | WebGLProps) => void;
+export type SketchRender = (props: SketchProps | WebGLProps) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-export type SketchResize = (props: SketchProps | OGLProps | WebGLProps) => void;
+export type SketchResize = (props: SketchProps | WebGLProps) => void;
 export type SketchLoop = (timestamp: number) => void;
 
-export type SketchMode = "2d" | "webgl" | "ogl";
+export type SketchMode = "2d" | "webgl";
 
 // gif is not supported by default
 export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
@@ -67,9 +66,9 @@ export type SketchSettings = {
   prefix?: string;
   /** set suffix to file name */
   suffix?: string;
-  /** set file format for image export */
+  /** set file format for image export (ie. png, jpeg) */
   frameFormat?: FrameFormat;
-  /** set file format for video/sequence export (doesn't work yet) */
+  /** set file format for video/sequence export (ie. webm, gif) */
   framesFormat?: FramesFormat;
   // sketch
   /** set to `false` to not use sketch-wrapper provided hot keys (ex. `CMD+S` for image export) */
@@ -175,12 +174,12 @@ export interface SketchProps extends BaseProps {
 /**
  * props type specific to `mode: "ogl"`
  * */
-export interface OGLProps extends BaseProps {
-  /** OGL context */
-  oglContext: OGLRenderingContext;
-  /** OGL renderer object */
-  oglRenderer: Renderer;
-}
+// export interface OGLProps extends BaseProps {
+//   /** OGL context */
+//   oglContext: OGLRenderingContext;
+//   /** OGL renderer object */
+//   oglRenderer: Renderer;
+// }
 
 export interface P5Props extends BaseProps {
   p5: p5;

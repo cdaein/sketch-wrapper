@@ -1,5 +1,4 @@
 import { create2dCanvas } from "./2d";
-// import { createOglCanvas } from "./ogl";
 import { createWebglCanvas } from "./webgl";
 import type { SketchSettingsInternal } from "../types";
 import type { Renderer, OGLRenderingContext } from "ogl-typescript";
@@ -24,8 +23,9 @@ export const prepareCanvas = async (
   } else if (settings.mode === "webgl") {
     return createWebglCanvas(settings);
   } else if (settings.mode === "ogl") {
+    throw new Error("ogl mode is no longer supported");
     // REVIEW: without this, code splitting doesn't work and get missing file error!!
-    return (await import("./ogl")).createOglCanvas(settings);
+    // return (await import("./ogl")).createOglCanvas(settings);
   }
 
   // fallback

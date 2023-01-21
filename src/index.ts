@@ -9,7 +9,6 @@ import type {
   SketchStates,
   SketchProps,
   WebGLProps,
-  OGLProps,
 } from "./types";
 import {
   computeFrame,
@@ -37,9 +36,6 @@ const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
   userSettings: SketchSettings
 ) => {
-  // const isServer = typeof module !== "undefined" && module.exports;
-  // console.log(`is running on server? ${isServer ? "✅" : "❌"}`);
-
   // combine settings; a few may have null or undefined values (ex. canvas)
   const settings = createSettings({
     main: userSettings,
@@ -116,8 +112,6 @@ const sketchWrapper: SketchWrapper = async (
     addKeydown();
   }
 
-  console.log(settings.animate);
-
   const playLoop = ({
     timestamp,
     settings,
@@ -127,10 +121,8 @@ const sketchWrapper: SketchWrapper = async (
     timestamp: number;
     settings: SketchSettingsInternal;
     states: SketchStates;
-    props: SketchProps | WebGLProps | OGLProps;
+    props: SketchProps | WebGLProps;
   }) => {
-    console.log("play loop"); // TEST
-
     // when paused, accumulate pausedDuration
     if (states.paused) {
       states.pausedDuration = timestamp - states.pausedStartTime;
@@ -186,7 +178,7 @@ const sketchWrapper: SketchWrapper = async (
     canvas: HTMLCanvasElement;
     settings: SketchSettingsInternal;
     states: SketchStates;
-    props: SketchProps | WebGLProps | OGLProps;
+    props: SketchProps | WebGLProps;
   }) => {
     // TODO: what if duration is not set?
     if (!states.captureReady) {
@@ -232,8 +224,6 @@ const sketchWrapper: SketchWrapper = async (
         context = (props as SketchProps).context;
       } else if (settings.mode === "webgl") {
         context = (props as WebGLProps).gl;
-      } else if (settings.mode === "ogl") {
-        context = (props as OGLProps).oglContext;
       }
       exportGifAnim({ canvas, context, settings, states, props });
     }
@@ -269,7 +259,6 @@ export type {
   SketchResize,
   SketchSettings,
   SketchProps,
-  OGLProps,
   WebGLProps,
   FrameFormat,
   FramesFormat,
