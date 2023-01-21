@@ -12,7 +12,7 @@ Use `width` and `height` to create a composition proportional to canvas size ins
 | :-------: | :------------------------: | --------------------------------------------------------------- |
 |  `mode`   | `"2d" \| "webgl" \| "ogl"` | Set sketch mode for different types of sketches. default:`"2d"` |
 | `context` | `CanvasRenderingContext2D` | available in `2d` mode.                                         |
-|   `gl`    |  `WebGLRenderingContext`   | available in `webgl` mode.                                      |
+|   `gl`    |  `WebGLRenderingContext | WebGL2RenderingContext`   | available in `webgl` or `webgl2` modes.                                      |
 
 #### Canvas
 
