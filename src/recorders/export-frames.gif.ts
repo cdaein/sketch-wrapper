@@ -51,6 +51,9 @@ export const exportGifAnim = ({
       const delay = fpsInterval * 1000;
       gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
     } else if (settings.mode === "webgl" || settings.mode === "ogl") {
+      // REVIEW: "ogl" uses WebGL2RenderingContext. sketch-wrapper doesn't yet support WebGL2
+      //         but it seems they share many properties, and gif export works for now.
+
       // REVIEW: https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels
       const gl = context as WebGLRenderingContext;
       const pixels = new Uint8Array(
