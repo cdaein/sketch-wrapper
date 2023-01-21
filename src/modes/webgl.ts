@@ -1,21 +1,22 @@
 import { createCanvas, resizeCanvas } from "@daeinc/canvas";
 import { toHTMLElement } from "@daeinc/dom";
-import type { SketchSettingsInternal } from "../types";
+import type { SketchMode, SketchSettingsInternal } from "../types";
 
 export const createWebglCanvas = (settings: SketchSettingsInternal) => {
   let canvas: HTMLCanvasElement;
-  let context: CanvasRenderingContext2D | WebGLRenderingContext;
+  let context:
+    | CanvasRenderingContext2D
+    | WebGLRenderingContext
+    | WebGL2RenderingContext;
   let gl;
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
-
-  const mode = "webgl";
 
   if (settings.canvas === undefined || settings.canvas === null) {
     // new webgl canvas
     ({ canvas, context, gl, width, height } = createCanvas({
       parent: settings.parent,
-      mode,
+      context: settings.mode,
       width,
       height,
       pixelRatio,
@@ -23,7 +24,7 @@ export const createWebglCanvas = (settings: SketchSettingsInternal) => {
       attributes: settings.attributes,
     })) as {
       canvas: HTMLCanvasElement;
-      gl: WebGLRenderingContext;
+      gl: WebGLRenderingContext | WebGL2RenderingContext;
       width: number;
       height: number;
     };
@@ -39,7 +40,7 @@ export const createWebglCanvas = (settings: SketchSettingsInternal) => {
 
     ({ context, gl, width, height } = resizeCanvas({
       canvas,
-      mode,
+      context: settings.mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,

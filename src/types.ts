@@ -16,7 +16,7 @@ export type SketchRender = (props: SketchProps | WebGLProps) => void;
 export type SketchResize = (props: SketchProps | WebGLProps) => void;
 export type SketchLoop = (timestamp: number) => void;
 
-export type SketchMode = "2d" | "webgl";
+export type SketchMode = "2d" | "webgl" | "webgl2";
 
 // gif is not supported by default
 export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
@@ -171,22 +171,12 @@ export interface SketchProps extends BaseProps {
   context: CanvasRenderingContext2D;
 }
 
-/**
- * props type specific to `mode: "ogl"`
- * */
-// export interface OGLProps extends BaseProps {
-//   /** OGL context */
-//   oglContext: OGLRenderingContext;
-//   /** OGL renderer object */
-//   oglRenderer: Renderer;
-// }
-
 export interface P5Props extends BaseProps {
   p5: p5;
 }
 
 /**
- * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
+ * props type specific to `webgl` or `webgl2` mode
  */
 export interface WebGLProps extends BaseProps {
   /** webgl context */

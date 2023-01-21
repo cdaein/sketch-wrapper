@@ -16,7 +16,7 @@ type CanvasProps = {
   width: number;
   height: number;
   pixelRatio: number;
-  gl: WebGLRenderingContext;
+  gl: WebGLRenderingContext | WebGL2RenderingContext;
 };
 
 export const createProps = async ({
@@ -62,10 +62,16 @@ export const createProps = async ({
       ...baseProps,
       context: context as CanvasRenderingContext2D,
     } as SketchProps;
-  } else {
+  } else if (settings.mode === "webgl") {
     props = {
       ...baseProps,
       gl: gl as WebGLRenderingContext,
+    } as WebGLProps;
+  } else {
+    // webgl2
+    props = {
+      ...baseProps,
+      gl: gl as WebGL2RenderingContext,
     } as WebGLProps;
   }
 

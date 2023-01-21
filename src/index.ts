@@ -222,7 +222,7 @@ const sketchWrapper: SketchWrapper = async (
       let context: any; // REVIEW
       if (settings.mode === "2d") {
         context = (props as SketchProps).context;
-      } else if (settings.mode === "webgl") {
+      } else if (settings.mode === "webgl" || settings.mode === "webgl2") {
         context = (props as WebGLProps).gl;
       }
       exportGifAnim({ canvas, context, settings, states, props });

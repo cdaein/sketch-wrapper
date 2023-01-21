@@ -29,7 +29,10 @@ export const exportGifAnim = ({
   props,
 }: {
   canvas: HTMLCanvasElement;
-  context: CanvasRenderingContext2D | WebGLRenderingContext;
+  context:
+    | CanvasRenderingContext2D
+    | WebGLRenderingContext
+    | WebGL2RenderingContext;
   settings: SketchSettingsInternal;
   states: SketchStates;
   props: BaseProps;
@@ -50,9 +53,15 @@ export const exportGifAnim = ({
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1000;
       gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
-    } else if (settings.mode === "webgl") {
+    } else {
       // REVIEW: https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels
-      const gl = context as WebGLRenderingContext;
+      let gl: WebGLRenderingContext | WebGL2RenderingContext;
+      if (settings.mode === "webgl") {
+        gl = context as WebGLRenderingContext;
+      } else {
+        // webgl2
+        gl = context as WebGL2RenderingContext;
+      }
       const pixels = new Uint8Array(
         gl.drawingBufferWidth * gl.drawingBufferHeight * 4
       );

@@ -33,16 +33,14 @@ export default (
       //  2. if parent, don't go into fullscreen at all.
       //  3. inline-styling will override anyways...
 
-      if (settings.mode === "2d" || settings.mode === "webgl") {
-        ({ width: props.width, height: props.height } = resizeCanvas({
-          canvas,
-          mode: settings.mode,
-          width: window.innerWidth,
-          height: window.innerHeight,
-          pixelRatio: Math.max(settings.pixelRatio, 1),
-          scaleContext: settings.scaleContext,
-        }));
-      }
+      ({ width: props.width, height: props.height } = resizeCanvas({
+        canvas,
+        context: settings.mode,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        pixelRatio: Math.max(settings.pixelRatio, 1),
+        scaleContext: settings.scaleContext,
+      }));
       // call only when canvas size has changed (ie. fullscreen)
       resize(props);
     }

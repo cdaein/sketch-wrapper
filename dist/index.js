@@ -116,11 +116,10 @@ var create2dCanvas = (settings) => {
   let context;
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
-  const mode = "2d";
   if (settings.canvas === void 0 || settings.canvas === null) {
     ({ canvas, context, width, height } = createCanvas({
       parent: settings.parent,
-      mode,
+      context: settings.mode,
       width,
       height,
       pixelRatio,
@@ -137,7 +136,7 @@ var create2dCanvas = (settings) => {
     }
     ({ context, width, height } = resizeCanvas({
       canvas,
-      mode,
+      context: settings.mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
@@ -167,11 +166,10 @@ var createWebglCanvas = (settings) => {
   let gl;
   let [width, height] = settings.dimensions;
   const pixelRatio = Math.max(settings.pixelRatio, 1);
-  const mode = "webgl";
   if (settings.canvas === void 0 || settings.canvas === null) {
     ({ canvas, context, gl, width, height } = createCanvas({
       parent: settings.parent,
-      mode,
+      context: settings.mode,
       width,
       height,
       pixelRatio,
@@ -188,7 +186,7 @@ var createWebglCanvas = (settings) => {
     }
     ({ context, gl, width, height } = resizeCanvas({
       canvas,
-      mode,
+      context: settings.mode,
       width: settings.dimensions ? settings.dimensions[0] : canvas.width,
       height: settings.dimensions ? settings.dimensions[1] : canvas.height,
       pixelRatio,
@@ -217,7 +215,7 @@ var createWebglCanvas = (settings) => {
 var prepareCanvas = async (settings) => {
   if (settings.mode === "2d") {
     return create2dCanvas(settings);
-  } else if (settings.mode === "webgl") {
+  } else if (settings.mode === "webgl" || settings.mode === "webgl2") {
     return createWebglCanvas(settings);
   } else if (settings.mode === "ogl") {
     throw new Error("ogl mode is no longer supported");
@@ -312,6 +310,11 @@ var createProps = async ({
       ...baseProps,
       context
     };
+  } else if (settings.mode === "webgl") {
+    props = {
+      ...baseProps,
+      gl
+    };
   } else {
     props = {
       ...baseProps,
@@ -366,16 +369,14 @@ var createUpdateProp = ({
 var resize_default = (canvas, props, userSettings, settings, render, resize) => {
   const handleResize = () => {
     if (userSettings.dimensions === void 0 && userSettings.canvas === void 0) {
-      if (settings.mode === "2d" || settings.mode === "webgl") {
-        ({ width: props.width, height: props.height } = resizeCanvas({
-          canvas,
-          mode: settings.mode,
-          width: window.innerWidth,
-          height: window.innerHeight,
-          pixelRatio: Math.max(settings.pixelRatio, 1),
-          scaleContext: settings.scaleContext
-        }));
-      }
+      ({ width: props.width, height: props.height } = resizeCanvas({
+        canvas,
+        context: settings.mode,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        pixelRatio: Math.max(settings.pixelRatio, 1),
+        scaleContext: settings.scaleContext
+      }));
       resize(props);
     }
     render(props);
@@ -562,8 +563,13 @@ var exportGifAnim = ({
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1e3;
       gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
-    } else if (settings.mode === "webgl") {
-      const gl = context;
+    } else {
+      let gl;
+      if (settings.mode === "webgl") {
+        gl = context;
+      } else {
+        gl = context;
+      }
       const pixels = new Uint8Array(
         gl.drawingBufferWidth * gl.drawingBufferHeight * 4
       );
@@ -741,7 +747,7 @@ var sketchWrapper = async (sketch, userSettings) => {
       let context;
       if (settings2.mode === "2d") {
         context = props2.context;
-      } else if (settings2.mode === "webgl") {
+      } else if (settings2.mode === "webgl" || settings2.mode === "webgl2") {
         context = props2.gl;
       }
       exportGifAnim({ canvas: canvas2, context, settings: settings2, states: states2, props: props2 });

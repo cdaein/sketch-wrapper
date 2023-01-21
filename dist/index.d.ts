@@ -10,7 +10,7 @@ interface SketchReturnObject {
 type SketchRender = (props: SketchProps | WebGLProps) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
 type SketchResize = (props: SketchProps | WebGLProps) => void;
-type SketchMode = "2d" | "webgl";
+type SketchMode = "2d" | "webgl" | "webgl2";
 type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
 /**
@@ -98,7 +98,7 @@ interface SketchProps extends BaseProps {
     context: CanvasRenderingContext2D;
 }
 /**
- * props type specific to `mode: "webgl"`; to use with canvas with webgl context sketches
+ * props type specific to `webgl` or `webgl2` mode
  */
 interface WebGLProps extends BaseProps {
     /** webgl context */
