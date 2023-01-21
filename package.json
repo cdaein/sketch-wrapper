@@ -20,7 +20,7 @@
   "author": "Daeinc",
   "license": "MIT",
   "dependencies": {
-    "@daeinc/canvas": "^0.12.1",
+    "@daeinc/canvas": "^0.13.0",
     "@daeinc/dom": "^0.4.1",
     "gifenc": "^1.0.3",
     "webm-muxer": "^1.1.5"
