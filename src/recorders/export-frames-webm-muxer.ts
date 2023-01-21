@@ -5,34 +5,11 @@
 
 import type { SketchStates, SketchSettingsInternal, BaseProps } from "../types";
 import WebMMuxer from "webm-muxer";
-import { formatFilename } from "../helpers";
+import { downloadBlob } from "../helpers";
 
 let muxer: WebMMuxer | null = null;
 let videoEncoder: VideoEncoder | null = null;
 let lastKeyframe: number | null = null;
-
-export const exportWebM = async ({
-  canvas,
-  settings,
-  states,
-  props,
-}: {
-  canvas: HTMLCanvasElement;
-  states: SketchStates;
-  settings: SketchSettingsInternal;
-  props: BaseProps;
-}) => {
-  const { framesFormat: format } = settings;
-
-  if (format !== "webm") {
-    throw new Error("currently, only webm video format is supported");
-  }
-
-  if (!states.captureDone) {
-    // record frame
-    encodeVideoFrame({ canvas, settings, states, props });
-  }
-};
 
 export const setupWebMRecord = ({
   canvas,
@@ -42,10 +19,6 @@ export const setupWebMRecord = ({
   settings: SketchSettingsInternal;
 }) => {
   const { framesFormat: format } = settings;
-
-  if (format !== "webm") {
-    throw new Error("currently, only webm video format is supported");
-  }
 
   muxer = new WebMMuxer({
     target: "buffer",
@@ -77,28 +50,21 @@ export const setupWebMRecord = ({
   console.log(`recording (${format}) started`);
 };
 
-export const endWebMRecord = async ({
+export const exportWebM = async ({
   canvas,
   settings,
+  states,
+  props,
 }: {
   canvas: HTMLCanvasElement;
+  states: SketchStates;
   settings: SketchSettingsInternal;
+  props: BaseProps;
 }) => {
-  // end record
-  const { framesFormat: format } = settings;
-
-  await videoEncoder?.flush();
-  const buffer = muxer?.finalize();
-
-  downloadBlob(new Blob([buffer!]), settings);
-
-  muxer = null;
-  videoEncoder = null;
-
-  canvas.style.outline = "none";
-  canvas.style.outlineOffset = `0 `;
-
-  console.log(`recording (${format}) complete`);
+  if (!states.captureDone) {
+    // record frame
+    encodeVideoFrame({ canvas, settings, states, props });
+  }
 };
 
 export const encodeVideoFrame = ({
@@ -133,16 +99,26 @@ export const encodeVideoFrame = ({
   );
 };
 
-const downloadBlob = (blob: Blob, settings: SketchSettingsInternal) => {
-  const { filename, prefix, suffix, framesFormat: format } = settings;
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${formatFilename({
-    filename,
-    prefix,
-    suffix,
-  })}.${format}`;
-  a.click();
-  window.URL.revokeObjectURL(url);
+export const endWebMRecord = async ({
+  canvas,
+  settings,
+}: {
+  canvas: HTMLCanvasElement;
+  settings: SketchSettingsInternal;
+}) => {
+  // end record
+  const { framesFormat: format } = settings;
+
+  await videoEncoder?.flush();
+  const buffer = muxer?.finalize();
+
+  downloadBlob(new Blob([buffer!], { type: "video/webm" }), settings);
+
+  muxer = null;
+  videoEncoder = null;
+
+  canvas.style.outline = "none";
+  canvas.style.outlineOffset = `0 `;
+
+  console.log(`recording (${format}) complete`);
 };

@@ -27,6 +27,11 @@ import {
   exportWebM,
   setupWebMRecord,
 } from "./recorders/export-frames-webm-muxer";
+import {
+  endGifAnimRecord,
+  exportGifAnim,
+  setupGifAnimRecord,
+} from "./recorders/export-frames.gif";
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
@@ -97,11 +102,12 @@ const sketchWrapper: SketchWrapper = async (
       recordLoop({ canvas, settings, states, props });
     }
   };
+  if (settings.animate) window.requestAnimationFrame(loop);
 
   if (settings.animate) {
     document.addEventListener("DOMContentLoaded", () => {
       window.onload = () => {
-        window.requestAnimationFrame(loop);
+        // REVIEW: rAF here doesn't work in OGL mode
       };
     });
   }
@@ -109,6 +115,8 @@ const sketchWrapper: SketchWrapper = async (
     addResize();
     addKeydown();
   }
+
+  console.log(settings.animate);
 
   const playLoop = ({
     timestamp,
@@ -121,6 +129,8 @@ const sketchWrapper: SketchWrapper = async (
     states: SketchStates;
     props: SketchProps | WebGLProps | OGLProps;
   }) => {
+    console.log("play loop"); // TEST
+
     // when paused, accumulate pausedDuration
     if (states.paused) {
       states.pausedDuration = timestamp - states.pausedStartTime;
@@ -183,7 +193,15 @@ const sketchWrapper: SketchWrapper = async (
       // reset time only if looping (duration set)
       // REVIEW: whether to resetTime() needs more testing
       if (props.duration) resetTime({ settings, states, props });
-      setupWebMRecord({ canvas, settings });
+
+      if (settings.framesFormat === "webm") {
+        setupWebMRecord({ canvas, settings });
+      } else if (settings.framesFormat === "gif") {
+        setupGifAnimRecord({ canvas, settings });
+      } else {
+        throw new Error("currently, only webm video format is supported");
+      }
+
       states.captureReady = true;
       props.recording = true;
     }
@@ -206,14 +224,30 @@ const sketchWrapper: SketchWrapper = async (
     window.requestAnimationFrame(loop);
 
     // save frames
-    exportWebM({ canvas, settings, states, props });
+    if (settings.framesFormat === "webm") {
+      exportWebM({ canvas, settings, states, props });
+    } else if (settings.framesFormat === "gif") {
+      let context: any; // REVIEW
+      if (settings.mode === "2d") {
+        context = (props as SketchProps).context;
+      } else if (settings.mode === "webgl") {
+        context = (props as WebGLProps).gl;
+      } else if (settings.mode === "ogl") {
+        context = (props as OGLProps).oglContext;
+      }
+      exportGifAnim({ canvas, context, settings, states, props });
+    }
 
     if (props.frame >= settings.exportTotalFrames - 1) {
       states.captureDone = true;
     }
 
     if (states.captureDone) {
-      endWebMRecord({ canvas, settings });
+      if (settings.framesFormat === "webm") {
+        endWebMRecord({ canvas, settings });
+      } else if (settings.framesFormat === "gif") {
+        endGifAnimRecord({ canvas, settings });
+      }
 
       states.captureReady = false;
       states.captureDone = false;
