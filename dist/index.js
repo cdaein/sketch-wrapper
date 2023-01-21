@@ -1,6 +1,7 @@
 import { createCanvas, resizeCanvas } from '@daeinc/canvas';
 import { toHTMLElement } from '@daeinc/dom';
 import WebMMuxer from 'webm-muxer';
+import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 
 // src/time.ts
 var computePlayhead = ({
@@ -225,6 +226,19 @@ var prepareCanvas = async (settings) => {
 };
 
 // src/helpers.ts
+var downloadBlob = (blob, settings) => {
+  const { filename, prefix, suffix, framesFormat: format } = settings;
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${formatFilename({
+    filename,
+    prefix,
+    suffix
+  })}.${format}`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
 var formatFilename = ({
   filename,
   prefix = "",
@@ -457,28 +471,11 @@ var createStates = ({
 var muxer = null;
 var videoEncoder = null;
 var lastKeyframe = null;
-var exportWebM = async ({
-  canvas,
-  settings,
-  states,
-  props
-}) => {
-  const { framesFormat: format } = settings;
-  if (format !== "webm") {
-    throw new Error("currently, only webm video format is supported");
-  }
-  if (!states.captureDone) {
-    encodeVideoFrame({ canvas, settings, states, props });
-  }
-};
 var setupWebMRecord = ({
   canvas,
   settings
 }) => {
   const { framesFormat: format } = settings;
-  if (format !== "webm") {
-    throw new Error("currently, only webm video format is supported");
-  }
   muxer = new WebMMuxer({
     target: "buffer",
     video: {
@@ -503,19 +500,15 @@ var setupWebMRecord = ({
   canvas.style.outlineOffset = `-3px`;
   console.log(`recording (${format}) started`);
 };
-var endWebMRecord = async ({
+var exportWebM = async ({
   canvas,
-  settings
+  settings,
+  states,
+  props
 }) => {
-  const { framesFormat: format } = settings;
-  await videoEncoder?.flush();
-  const buffer = muxer?.finalize();
-  downloadBlob(new Blob([buffer]), settings);
-  muxer = null;
-  videoEncoder = null;
-  canvas.style.outline = "none";
-  canvas.style.outlineOffset = `0 `;
-  console.log(`recording (${format}) complete`);
+  if (!states.captureDone) {
+    encodeVideoFrame({ canvas, settings, states, props });
+  }
 };
 var encodeVideoFrame = ({
   canvas,
@@ -538,18 +531,98 @@ var encodeVideoFrame = ({
     `color:#9aa`
   );
 };
-var downloadBlob = (blob, settings) => {
-  const { filename, prefix, suffix, framesFormat: format } = settings;
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${formatFilename({
-    filename,
-    prefix,
-    suffix
-  })}.${format}`;
-  a.click();
-  window.URL.revokeObjectURL(url);
+var endWebMRecord = async ({
+  canvas,
+  settings
+}) => {
+  const { framesFormat: format } = settings;
+  await videoEncoder?.flush();
+  const buffer = muxer?.finalize();
+  downloadBlob(new Blob([buffer], { type: "video/webm" }), settings);
+  muxer = null;
+  videoEncoder = null;
+  canvas.style.outline = "none";
+  canvas.style.outlineOffset = `0 `;
+  console.log(`recording (${format}) complete`);
+};
+var gif;
+var setupGifAnimRecord = ({
+  canvas,
+  settings
+}) => {
+  const { framesFormat: format } = settings;
+  gif = GIFEncoder();
+  canvas.style.outline = `3px solid red`;
+  canvas.style.outlineOffset = `-3px`;
+  console.log(`recording (${format}) started`);
+};
+var exportGifAnim = ({
+  canvas,
+  context,
+  settings,
+  states,
+  props
+}) => {
+  if (!states.captureDone) {
+    let data;
+    if (settings.mode === "2d") {
+      data = context.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      ).data;
+      const palette = quantize(data, 256);
+      const index = applyPalette(data, palette);
+      const fpsInterval = 1 / settings.exportFps;
+      const delay = fpsInterval * 1e3;
+      gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
+    } else if (settings.mode === "webgl" || settings.mode === "ogl") {
+      const gl = context;
+      const pixels = new Uint8Array(
+        gl.drawingBufferWidth * gl.drawingBufferHeight * 4
+      );
+      gl.readPixels(
+        0,
+        0,
+        gl.drawingBufferWidth,
+        gl.drawingBufferHeight,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        pixels
+      );
+      const palette = quantize(pixels, 256);
+      const index = applyPalette(pixels, palette);
+      const fpsInterval = 1 / settings.exportFps;
+      const delay = fpsInterval * 1e3;
+      gif.writeFrame(index, canvas.width, canvas.height, { palette, delay });
+    }
+  }
+  if (settings.exportFps > 50) {
+    console.warn(
+      "clamping fps to 50, which is the maximum for GIF. animation duration will be inaccurate."
+    );
+  }
+  const totalFrames = Math.floor(
+    settings.exportFps * settings.duration / 1e3
+  );
+  console.log(
+    `%crecording frame... %c${props.frame + 1} of ${totalFrames}`,
+    `color:black`,
+    `color:#9aa`
+  );
+};
+var endGifAnimRecord = ({
+  canvas,
+  settings
+}) => {
+  const { framesFormat: format } = settings;
+  gif.finish();
+  const buffer = gif.bytesView();
+  downloadBlob(new Blob([buffer], { type: "image/gif" }), settings);
+  canvas.style.outline = "none";
+  canvas.style.outlineOffset = `0 `;
+  console.log(`recording (${format}) complete`);
 };
 
 // src/index.ts
@@ -600,10 +673,11 @@ var sketchWrapper = async (sketch, userSettings) => {
       recordLoop({ canvas, settings, states, props });
     }
   };
+  if (settings.animate)
+    window.requestAnimationFrame(loop);
   if (settings.animate) {
     document.addEventListener("DOMContentLoaded", () => {
       window.onload = () => {
-        window.requestAnimationFrame(loop);
       };
     });
   }
@@ -611,12 +685,14 @@ var sketchWrapper = async (sketch, userSettings) => {
     addResize();
     addKeydown();
   }
+  console.log(settings.animate);
   const playLoop = ({
     timestamp,
     settings: settings2,
     states: states2,
     props: props2
   }) => {
+    console.log("play loop");
     if (states2.paused) {
       states2.pausedDuration = timestamp - states2.pausedStartTime;
       window.requestAnimationFrame(loop);
@@ -655,7 +731,13 @@ var sketchWrapper = async (sketch, userSettings) => {
     if (!states2.captureReady) {
       if (props2.duration)
         resetTime({ settings: settings2, states: states2, props: props2 });
-      setupWebMRecord({ canvas: canvas2, settings: settings2 });
+      if (settings2.framesFormat === "webm") {
+        setupWebMRecord({ canvas: canvas2, settings: settings2 });
+      } else if (settings2.framesFormat === "gif") {
+        setupGifAnimRecord({ canvas: canvas2, settings: settings2 });
+      } else {
+        throw new Error("currently, only webm video format is supported");
+      }
       states2.captureReady = true;
       props2.recording = true;
     }
@@ -670,12 +752,28 @@ var sketchWrapper = async (sketch, userSettings) => {
     frameCount += 1;
     render(props2);
     window.requestAnimationFrame(loop);
-    exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
+    if (settings2.framesFormat === "webm") {
+      exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
+    } else if (settings2.framesFormat === "gif") {
+      let context;
+      if (settings2.mode === "2d") {
+        context = props2.context;
+      } else if (settings2.mode === "webgl") {
+        context = props2.gl;
+      } else if (settings2.mode === "ogl") {
+        context = props2.oglContext;
+      }
+      exportGifAnim({ canvas: canvas2, context, settings: settings2, states: states2, props: props2 });
+    }
     if (props2.frame >= settings2.exportTotalFrames - 1) {
       states2.captureDone = true;
     }
     if (states2.captureDone) {
-      endWebMRecord({ canvas: canvas2, settings: settings2 });
+      if (settings2.framesFormat === "webm") {
+        endWebMRecord({ canvas: canvas2, settings: settings2 });
+      } else if (settings2.framesFormat === "gif") {
+        endGifAnimRecord({ canvas: canvas2, settings: settings2 });
+      }
       states2.captureReady = false;
       states2.captureDone = false;
       states2.savingFrames = false;
