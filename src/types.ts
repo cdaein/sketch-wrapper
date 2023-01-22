@@ -22,7 +22,8 @@ export type SketchMode = "2d" | "webgl" | "webgl2";
 export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 
 // video or image sequence
-export type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
+// export type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
+export type FramesFormat = "gif" | "webm";
 
 /**
  * User provided settings. all optional properties must either come from user. If not, it will be filled internally with default settings.
@@ -66,9 +67,9 @@ export type SketchSettings = {
   prefix?: string;
   /** set suffix to file name */
   suffix?: string;
-  /** set file format for image export (ie. png, jpeg) */
+  /** set file format for image export (ie. png, jpeg). you can also use array to export multiple formats at the same time. ex. ["webp", "png"] */
   frameFormat?: FrameFormat | FrameFormat[];
-  /** set file format for video/sequence export (ie. webm, gif) */
+  /** set file format for video/sequence export (ie. webm, gif). you can also use array to export multiple formats at the same time. ex. ["gif", "webm"] */
   framesFormat?: FramesFormat | FramesFormat[];
   // sketch
   /** set to `false` to not use sketch-wrapper provided hot keys (ex. `CMD+S` for image export) */
