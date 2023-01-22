@@ -30,7 +30,7 @@ import {
   endGifAnimRecord,
   exportGifAnim,
   setupGifAnimRecord,
-} from "./recorders/export-frames.gif";
+} from "./recorders/export-frames-gif";
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,

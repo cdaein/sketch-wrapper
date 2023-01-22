@@ -80,7 +80,10 @@ export const exportGifAnim = ({
       //prettier-ignore
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, 
                     gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-      const palette = quantize(pixels, 256);
+
+      const palette =
+        settings.gifOptions.palette ||
+        quantize(pixels, settings.gifOptions.maxColors || 256);
       const index = applyPalette(pixels, palette);
       // const index = getIndexedFrame(pixels, palette);
 
@@ -133,6 +136,7 @@ export const endGifAnimRecord = ({
 
 /**
  * this solves an occasional flickering issue.
+ * REVIEW: this didn't work for 2-color (white, gray) animation. (complete blank screen)
  * by davepagurek from: https://github.com/mattdesl/gifenc/issues/13
  * @param frame
  * @param palette
