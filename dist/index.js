@@ -79,7 +79,7 @@ var createSettings = ({
     filename: "",
     prefix: "",
     suffix: "",
-    frameFormat: "png",
+    frameFormat: ["png"],
     framesFormat: ["webm"],
     hotkeys: true,
     mode: "2d"
@@ -108,6 +108,9 @@ var createSettings = ({
     combined.exportTotalFrames = Math.floor(
       combined.exportFps * combined.duration / 1e3
     );
+  }
+  if (!Array.isArray(combined.frameFormat)) {
+    combined.frameFormat = [combined.frameFormat];
   }
   if (!Array.isArray(combined.framesFormat)) {
     combined.framesFormat = [combined.framesFormat];
@@ -210,18 +213,20 @@ var saveCanvasFrame = ({
   states,
   settings
 }) => {
-  let { filename, prefix, suffix, frameFormat: format } = settings;
-  if (format === "jpg")
-    format = "jpeg";
-  const dataURL = canvas.toDataURL(`image/${format}`);
-  const link = document.createElement("a");
-  link.download = `${formatFilename({
-    filename,
-    prefix,
-    suffix
-  })}.${format}`;
-  link.href = dataURL;
-  link.click();
+  let { filename, prefix, suffix, frameFormat } = settings;
+  frameFormat.forEach((format) => {
+    if (format === "jpg")
+      format = "jpeg";
+    const dataURL = canvas.toDataURL(`image/${format}`);
+    const link = document.createElement("a");
+    link.download = `${formatFilename({
+      filename,
+      prefix,
+      suffix
+    })}.${format}`;
+    link.href = dataURL;
+    link.click();
+  });
   states.savingFrame = false;
   states.playMode = "play";
 };

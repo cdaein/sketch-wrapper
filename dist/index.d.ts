@@ -52,7 +52,7 @@ type SketchSettings = {
     /** set suffix to file name */
     suffix?: string;
     /** set file format for image export (ie. png, jpeg) */
-    frameFormat?: FrameFormat;
+    frameFormat?: FrameFormat | FrameFormat[];
     /** set file format for video/sequence export (ie. webm, gif) */
     framesFormat?: FramesFormat | FramesFormat[];
     /** set to `false` to not use sketch-wrapper provided hot keys (ex. `CMD+S` for image export) */

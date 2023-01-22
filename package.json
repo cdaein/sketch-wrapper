@@ -13,7 +13,7 @@
     "test": "jest --watch",
     "license": "license-checker --exclude 'MIT, MIT OR X11, BSD, ISC' -production",
     "prebuild": "",
-    "build": "tsup",
+    "build": "tsc --noemit && tsup",
     "build-vite": "vite build --config vite.build.config.js",
     "demo": "vite ./demo --config vite.demo.config.js"
   },
