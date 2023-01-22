@@ -67,7 +67,7 @@ export type SketchSettings = {
   /** set suffix to file name */
   suffix?: string;
   /** set file format for image export (ie. png, jpeg) */
-  frameFormat?: FrameFormat;
+  frameFormat?: FrameFormat | FrameFormat[];
   /** set file format for video/sequence export (ie. webm, gif) */
   framesFormat?: FramesFormat | FramesFormat[];
   // sketch
@@ -104,7 +104,7 @@ export interface SketchSettingsInternal {
   filename: string;
   prefix: string;
   suffix: string;
-  frameFormat: FrameFormat;
+  frameFormat: FrameFormat[];
   framesFormat: FramesFormat[];
   // sketch
   hotkeys: boolean;

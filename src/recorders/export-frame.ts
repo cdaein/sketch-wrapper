@@ -21,19 +21,21 @@ export const saveCanvasFrame = ({
   states: SketchStates;
   settings: SketchSettingsInternal;
 }) => {
-  let { filename, prefix, suffix, frameFormat: format } = settings;
+  let { filename, prefix, suffix, frameFormat } = settings;
 
-  if (format === "jpg") format = "jpeg";
-  // may add additional quality to string, but will leave at default for now
-  const dataURL = canvas.toDataURL(`image/${format}`);
-  const link = document.createElement("a");
-  link.download = `${formatFilename({
-    filename,
-    prefix,
-    suffix,
-  })}.${format}`;
-  link.href = dataURL;
-  link.click();
+  frameFormat.forEach((format) => {
+    if (format === "jpg") format = "jpeg";
+    // may add additional quality to string, but will leave at default for now
+    const dataURL = canvas.toDataURL(`image/${format}`);
+    const link = document.createElement("a");
+    link.download = `${formatFilename({
+      filename,
+      prefix,
+      suffix,
+    })}.${format}`;
+    link.href = dataURL;
+    link.click();
+  });
 
   states.savingFrame = false;
   states.playMode = "play";

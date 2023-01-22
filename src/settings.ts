@@ -40,7 +40,7 @@ export const createSettings = ({
     filename: "",
     prefix: "",
     suffix: "",
-    frameFormat: "png",
+    frameFormat: ["png"],
     framesFormat: ["webm"],
     // sketch
     hotkeys: true,
@@ -87,7 +87,10 @@ export const createSettings = ({
     );
   }
 
-  // conver to array format
+  // convert to array format
+  if (!Array.isArray(combined.frameFormat)) {
+    combined.frameFormat = [combined.frameFormat];
+  }
   if (!Array.isArray(combined.framesFormat)) {
     combined.framesFormat = [combined.framesFormat];
   }
