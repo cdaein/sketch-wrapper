@@ -26,9 +26,12 @@ export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 // export type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
 export type FramesFormat = "gif" | "webm";
 
+/** GIF encoding options */
 export type GifOptions = {
+  /** max number of colors to use for quantizing each frame */
   maxColors?: number;
   format?: GifFormat;
+  /** use a palette instead of quantizing */
   palette?: number[][];
   // knownColors?: string[]
 };
