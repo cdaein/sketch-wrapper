@@ -42,6 +42,7 @@ export const createSettings = ({
     suffix: "",
     frameFormat: ["png"],
     framesFormat: ["webm"],
+    gifOptions: {},
     // sketch
     hotkeys: true,
     mode: "2d",

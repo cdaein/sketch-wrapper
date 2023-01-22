@@ -1,8 +1,15 @@
-import { GIFEncoder, quantize, applyPalette } from "gifenc";
+import {
+  GIFEncoder,
+  quantize,
+  applyPalette,
+  nearestColorIndex,
+  snapColorsToPalette,
+} from "gifenc";
+import type { Encoder } from "gifenc";
 import { downloadBlob } from "../helpers";
 import { BaseProps, SketchSettingsInternal, SketchStates } from "../types";
 
-let gif: any;
+let gif: Encoder;
 
 export const setupGifAnimRecord = ({
   canvas,
@@ -48,8 +55,12 @@ export const exportGifAnim = ({
         canvas.width,
         canvas.height
       ).data;
-      const palette = quantize(data, 256);
+
+      const palette =
+        settings.gifOptions.palette ||
+        quantize(data, settings.gifOptions.maxColors || 256);
       const index = applyPalette(data, palette);
+      // const index = getIndexedFrame(data, palette);
 
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1000;
@@ -69,9 +80,9 @@ export const exportGifAnim = ({
       //prettier-ignore
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, 
                     gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-      // console.log(pixels); // Uint8Array
       const palette = quantize(pixels, 256);
       const index = applyPalette(pixels, palette);
+      // const index = getIndexedFrame(pixels, palette);
 
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1000;
@@ -118,4 +129,36 @@ export const endGifAnimRecord = ({
   canvas.style.outlineOffset = `0 `;
 
   console.log(`recording (${format}) complete`);
+};
+
+/**
+ * this solves an occasional flickering issue.
+ * by davepagurek from: https://github.com/mattdesl/gifenc/issues/13
+ * @param frame
+ * @param palette
+ * @returns
+ */
+const getIndexedFrame = (
+  frame: Uint8Array | Uint8ClampedArray,
+  palette: number[][]
+) => {
+  const paletteCache: { [key: number]: number } = {};
+  const length = frame.length / 4;
+  const index = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
+    const key =
+      (frame[i * 4] << 24) |
+      (frame[i * 4 + 1] << 16) |
+      (frame[i * 4 + 2] << 8) |
+      frame[i * 4 + 3];
+    if (paletteCache[key] === undefined) {
+      paletteCache[key] = nearestColorIndex(
+        palette,
+        //@ts-ignore
+        frame.slice(i * 4, (i + 1) * 4)
+      );
+    }
+    index[i] = paletteCache[key];
+  }
+  return index;
 };

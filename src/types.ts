@@ -1,3 +1,4 @@
+import { Format as GifFormat } from "gifenc";
 import type p5 from "p5";
 
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
@@ -24,6 +25,13 @@ export type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 // video or image sequence
 // export type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
 export type FramesFormat = "gif" | "webm";
+
+export type GifOptions = {
+  maxColors?: number;
+  format?: GifFormat;
+  palette?: number[][];
+  // knownColors?: string[]
+};
 
 /**
  * User provided settings. all optional properties must either come from user. If not, it will be filled internally with default settings.
@@ -71,6 +79,8 @@ export type SketchSettings = {
   frameFormat?: FrameFormat | FrameFormat[];
   /** set file format for video/sequence export (ie. webm, gif). you can also use array to export multiple formats at the same time. ex. ["gif", "webm"] */
   framesFormat?: FramesFormat | FramesFormat[];
+  /** GIF export options. */
+  gifOptions?: GifOptions;
   // sketch
   /** set to `false` to not use sketch-wrapper provided hot keys (ex. `CMD+S` for image export) */
   hotkeys?: boolean;
@@ -86,6 +96,7 @@ export interface SketchSettingsInternal {
   title: string;
   background: string;
   // canvas
+  mode: SketchMode;
   parent: HTMLElement | string;
   canvas: HTMLCanvasElement | null; // if null, new canvas will be created
   dimensions: [number, number];
@@ -107,9 +118,9 @@ export interface SketchSettingsInternal {
   suffix: string;
   frameFormat: FrameFormat[];
   framesFormat: FramesFormat[];
+  gifOptions: GifOptions;
   // sketch
   hotkeys: boolean;
-  mode: SketchMode;
 }
 
 export interface SketchStates {

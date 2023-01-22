@@ -271,4 +271,5 @@ export type {
   WebGLProps,
   FrameFormat,
   FramesFormat,
+  GifOptions,
 } from "./types";
