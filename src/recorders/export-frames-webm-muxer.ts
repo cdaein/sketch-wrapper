@@ -18,7 +18,8 @@ export const setupWebMRecord = ({
   canvas: HTMLCanvasElement;
   settings: SketchSettingsInternal;
 }) => {
-  const { framesFormat: format } = settings;
+  // const { framesFormat: format } = settings;
+  const format = "webm";
 
   muxer = new WebMMuxer({
     target: "buffer",
@@ -107,12 +108,13 @@ export const endWebMRecord = async ({
   settings: SketchSettingsInternal;
 }) => {
   // end record
-  const { framesFormat: format } = settings;
+  // const { framesFormat: format } = settings;
+  const format = "webm";
 
   await videoEncoder?.flush();
   const buffer = muxer?.finalize();
 
-  downloadBlob(new Blob([buffer!], { type: "video/webm" }), settings);
+  downloadBlob(new Blob([buffer!], { type: "video/webm" }), settings, format);
 
   muxer = null;
   videoEncoder = null;

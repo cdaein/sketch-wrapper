@@ -186,13 +186,16 @@ const sketchWrapper: SketchWrapper = async (
       // REVIEW: whether to resetTime() needs more testing
       if (props.duration) resetTime({ settings, states, props });
 
-      if (settings.framesFormat === "webm") {
-        setupWebMRecord({ canvas, settings });
-      } else if (settings.framesFormat === "gif") {
-        setupGifAnimRecord({ canvas, settings });
-      } else {
-        throw new Error("currently, only webm video format is supported");
-      }
+      settings.framesFormat.forEach((format) => {
+        if (format !== "webm" && format !== "gif") {
+          throw new Error(`${format} export is not supported`);
+        }
+        if (format === "webm") {
+          setupWebMRecord({ canvas, settings });
+        } else if (format === "gif") {
+          setupGifAnimRecord({ canvas, settings });
+        }
+      });
 
       states.captureReady = true;
       props.recording = true;
@@ -216,28 +219,34 @@ const sketchWrapper: SketchWrapper = async (
     window.requestAnimationFrame(loop);
 
     // save frames
-    if (settings.framesFormat === "webm") {
-      exportWebM({ canvas, settings, states, props });
-    } else if (settings.framesFormat === "gif") {
-      let context: any; // REVIEW
-      if (settings.mode === "2d") {
-        context = (props as SketchProps).context;
-      } else if (settings.mode === "webgl" || settings.mode === "webgl2") {
-        context = (props as WebGLProps).gl;
+    settings.framesFormat.forEach((format) => {
+      if (format === "webm") {
+        exportWebM({ canvas, settings, states, props });
+      } else if (format === "gif") {
+        {
+          let context: any; // REVIEW
+          if (settings.mode === "2d") {
+            context = (props as SketchProps).context;
+          } else if (settings.mode === "webgl" || settings.mode === "webgl2") {
+            context = (props as WebGLProps).gl;
+          }
+          exportGifAnim({ canvas, context, settings, states, props });
+        }
       }
-      exportGifAnim({ canvas, context, settings, states, props });
-    }
+    });
 
     if (props.frame >= settings.exportTotalFrames - 1) {
       states.captureDone = true;
     }
 
     if (states.captureDone) {
-      if (settings.framesFormat === "webm") {
-        endWebMRecord({ canvas, settings });
-      } else if (settings.framesFormat === "gif") {
-        endGifAnimRecord({ canvas, settings });
-      }
+      settings.framesFormat.forEach((format) => {
+        if (format === "webm") {
+          endWebMRecord({ canvas, settings });
+        } else if (format === "gif") {
+          endGifAnimRecord({ canvas, settings });
+        }
+      });
 
       states.captureReady = false;
       states.captureDone = false;

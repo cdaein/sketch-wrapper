@@ -41,7 +41,7 @@ export const createSettings = ({
     prefix: "",
     suffix: "",
     frameFormat: "png",
-    framesFormat: "webm",
+    framesFormat: ["webm"],
     // sketch
     hotkeys: true,
     mode: "2d",
@@ -85,6 +85,11 @@ export const createSettings = ({
     combined.exportTotalFrames = Math.floor(
       (combined.exportFps * combined.duration) / 1000
     );
+  }
+
+  // conver to array format
+  if (!Array.isArray(combined.framesFormat)) {
+    combined.framesFormat = [combined.framesFormat];
   }
 
   return combined;

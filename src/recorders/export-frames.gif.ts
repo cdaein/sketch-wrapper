@@ -11,7 +11,8 @@ export const setupGifAnimRecord = ({
   canvas: HTMLCanvasElement;
   settings: SketchSettingsInternal;
 }) => {
-  const { framesFormat: format } = settings;
+  // const { framesFormat: format } = settings;
+  const format = "gif";
 
   gif = GIFEncoder();
 
@@ -104,13 +105,14 @@ export const endGifAnimRecord = ({
   canvas: HTMLCanvasElement;
   settings: SketchSettingsInternal;
 }) => {
-  const { framesFormat: format } = settings;
+  // const { framesFormat: format } = settings;
+  const format = "gif";
 
   gif.finish();
   // REVIEW: buffer type
   const buffer: ArrayBuffer = gif.bytesView();
 
-  downloadBlob(new Blob([buffer], { type: "image/gif" }), settings);
+  downloadBlob(new Blob([buffer], { type: "image/gif" }), settings, format);
 
   canvas.style.outline = "none";
   canvas.style.outlineOffset = `0 `;

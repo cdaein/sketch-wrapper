@@ -69,7 +69,7 @@ export type SketchSettings = {
   /** set file format for image export (ie. png, jpeg) */
   frameFormat?: FrameFormat;
   /** set file format for video/sequence export (ie. webm, gif) */
-  framesFormat?: FramesFormat;
+  framesFormat?: FramesFormat | FramesFormat[];
   // sketch
   /** set to `false` to not use sketch-wrapper provided hot keys (ex. `CMD+S` for image export) */
   hotkeys?: boolean;
@@ -105,7 +105,7 @@ export interface SketchSettingsInternal {
   prefix: string;
   suffix: string;
   frameFormat: FrameFormat;
-  framesFormat: FramesFormat;
+  framesFormat: FramesFormat[];
   // sketch
   hotkeys: boolean;
   mode: SketchMode;

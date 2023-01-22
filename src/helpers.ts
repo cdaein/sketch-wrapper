@@ -1,7 +1,11 @@
-import { SketchSettingsInternal } from "./types";
+import { FramesFormat, SketchSettingsInternal } from "./types";
 
-export const downloadBlob = (blob: Blob, settings: SketchSettingsInternal) => {
-  const { filename, prefix, suffix, framesFormat: format } = settings;
+export const downloadBlob = (
+  blob: Blob,
+  settings: SketchSettingsInternal,
+  format: FramesFormat
+) => {
+  const { filename, prefix, suffix } = settings;
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

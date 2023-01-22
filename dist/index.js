@@ -80,7 +80,7 @@ var createSettings = ({
     prefix: "",
     suffix: "",
     frameFormat: "png",
-    framesFormat: "webm",
+    framesFormat: ["webm"],
     hotkeys: true,
     mode: "2d"
   };
@@ -109,58 +109,12 @@ var createSettings = ({
       combined.exportFps * combined.duration / 1e3
     );
   }
+  if (!Array.isArray(combined.framesFormat)) {
+    combined.framesFormat = [combined.framesFormat];
+  }
   return combined;
 };
-var create2dCanvas = (settings) => {
-  let canvas;
-  let context;
-  let [width, height] = settings.dimensions;
-  const pixelRatio = Math.max(settings.pixelRatio, 1);
-  if (settings.canvas === void 0 || settings.canvas === null) {
-    ({ canvas, context, width, height } = createCanvas({
-      parent: settings.parent,
-      context: settings.mode,
-      width,
-      height,
-      pixelRatio,
-      scaleContext: settings.scaleContext,
-      attributes: settings.attributes
-    }));
-  } else {
-    if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
-      throw new Error("provided canvas must be an HTMLCanvasElement");
-    }
-    canvas = settings.canvas;
-    if (settings.parent) {
-      toHTMLElement(settings.parent).appendChild(canvas);
-    }
-    ({ context, width, height } = resizeCanvas({
-      canvas,
-      context: settings.mode,
-      width: settings.dimensions ? settings.dimensions[0] : canvas.width,
-      height: settings.dimensions ? settings.dimensions[1] : canvas.height,
-      pixelRatio,
-      scaleContext: settings.scaleContext,
-      attributes: settings.attributes
-    }));
-  }
-  if (settings.centered === true) {
-    const canvasContainer = canvas.parentElement;
-    canvasContainer.style.width = "100vw";
-    canvasContainer.style.height = "100vh";
-    canvasContainer.style.display = "flex";
-    canvasContainer.style.justifyContent = "center";
-    canvasContainer.style.alignItems = "center";
-    if (settings.scaleContext === false) ;
-  } else {
-    canvas.style.width = 100 + "%";
-    canvas.style.height = 100 + "%";
-    canvas.style.maxWidth = `${settings.dimensions[0]}px`;
-    canvas.style.maxHeight = `${settings.dimensions[1]}px`;
-  }
-  return { canvas, context, width, height, pixelRatio };
-};
-var createWebglCanvas = (settings) => {
+var create2dOrWebGLCanvas = (settings) => {
   let canvas;
   let context;
   let gl;
@@ -177,9 +131,6 @@ var createWebglCanvas = (settings) => {
       attributes: settings.attributes
     }));
   } else {
-    if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
-      throw new Error("provided canvas must be an HTMLCanvasElement");
-    }
     canvas = settings.canvas;
     if (settings.parent) {
       toHTMLElement(settings.parent).appendChild(canvas);
@@ -213,19 +164,17 @@ var createWebglCanvas = (settings) => {
 
 // src/modes/canvas.ts
 var prepareCanvas = async (settings) => {
-  if (settings.mode === "2d") {
-    return create2dCanvas(settings);
-  } else if (settings.mode === "webgl" || settings.mode === "webgl2") {
-    return createWebglCanvas(settings);
-  } else if (settings.mode === "ogl") {
-    throw new Error("ogl mode is no longer supported");
+  if (settings.canvas !== null && settings.canvas !== void 0) {
+    if (settings.canvas.nodeName.toLowerCase() !== "canvas") {
+      throw new Error("provided canvas must be an HTMLCanvasElement");
+    }
   }
-  return create2dCanvas(settings);
+  return create2dOrWebGLCanvas(settings);
 };
 
 // src/helpers.ts
-var downloadBlob = (blob, settings) => {
-  const { filename, prefix, suffix, framesFormat: format } = settings;
+var downloadBlob = (blob, settings, format) => {
+  const { filename, prefix, suffix } = settings;
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -282,7 +231,7 @@ var createProps = async ({
   settings,
   states
 }) => {
-  const { canvas, context, width, height, pixelRatio, gl } = await prepareCanvas(settings);
+  const { canvas, context, gl, width, height, pixelRatio } = await prepareCanvas(settings);
   const { exportFrame, update, togglePlay } = createFunctionProps({
     canvas,
     settings,
@@ -360,7 +309,7 @@ var createTogglePlay = ({ states }) => {
 var createUpdateProp = ({
   canvas,
   prevSettings,
-  resizeCanvas: resizeCanvas5
+  resizeCanvas: resizeCanvas4
 }) => {
   return (settings) => {
     console.log("update() prop is not yet implemented.");
@@ -461,7 +410,7 @@ var setupWebMRecord = ({
   canvas,
   settings
 }) => {
-  const { framesFormat: format } = settings;
+  const format = "webm";
   muxer = new WebMMuxer({
     target: "buffer",
     video: {
@@ -521,10 +470,10 @@ var endWebMRecord = async ({
   canvas,
   settings
 }) => {
-  const { framesFormat: format } = settings;
+  const format = "webm";
   await videoEncoder?.flush();
   const buffer = muxer?.finalize();
-  downloadBlob(new Blob([buffer], { type: "video/webm" }), settings);
+  downloadBlob(new Blob([buffer], { type: "video/webm" }), settings, format);
   muxer = null;
   videoEncoder = null;
   canvas.style.outline = "none";
@@ -536,7 +485,7 @@ var setupGifAnimRecord = ({
   canvas,
   settings
 }) => {
-  const { framesFormat: format } = settings;
+  const format = "gif";
   gif = GIFEncoder();
   canvas.style.outline = `3px solid red`;
   canvas.style.outlineOffset = `-3px`;
@@ -607,10 +556,10 @@ var endGifAnimRecord = ({
   canvas,
   settings
 }) => {
-  const { framesFormat: format } = settings;
+  const format = "gif";
   gif.finish();
   const buffer = gif.bytesView();
-  downloadBlob(new Blob([buffer], { type: "image/gif" }), settings);
+  downloadBlob(new Blob([buffer], { type: "image/gif" }), settings, format);
   canvas.style.outline = "none";
   canvas.style.outlineOffset = `0 `;
   console.log(`recording (${format}) complete`);
@@ -720,13 +669,16 @@ var sketchWrapper = async (sketch, userSettings) => {
     if (!states2.captureReady) {
       if (props2.duration)
         resetTime({ settings: settings2, states: states2, props: props2 });
-      if (settings2.framesFormat === "webm") {
-        setupWebMRecord({ canvas: canvas2, settings: settings2 });
-      } else if (settings2.framesFormat === "gif") {
-        setupGifAnimRecord({ canvas: canvas2, settings: settings2 });
-      } else {
-        throw new Error("currently, only webm video format is supported");
-      }
+      settings2.framesFormat.forEach((format) => {
+        if (format !== "webm" && format !== "gif") {
+          throw new Error(`${format} export is not supported`);
+        }
+        if (format === "webm") {
+          setupWebMRecord({ canvas: canvas2, settings: settings2 });
+        } else if (format === "gif") {
+          setupGifAnimRecord({ canvas: canvas2, settings: settings2 });
+        }
+      });
       states2.captureReady = true;
       props2.recording = true;
     }
@@ -741,26 +693,32 @@ var sketchWrapper = async (sketch, userSettings) => {
     frameCount += 1;
     render(props2);
     window.requestAnimationFrame(loop);
-    if (settings2.framesFormat === "webm") {
-      exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
-    } else if (settings2.framesFormat === "gif") {
-      let context;
-      if (settings2.mode === "2d") {
-        context = props2.context;
-      } else if (settings2.mode === "webgl" || settings2.mode === "webgl2") {
-        context = props2.gl;
+    settings2.framesFormat.forEach((format) => {
+      if (format === "webm") {
+        exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
+      } else if (format === "gif") {
+        {
+          let context;
+          if (settings2.mode === "2d") {
+            context = props2.context;
+          } else if (settings2.mode === "webgl" || settings2.mode === "webgl2") {
+            context = props2.gl;
+          }
+          exportGifAnim({ canvas: canvas2, context, settings: settings2, states: states2, props: props2 });
+        }
       }
-      exportGifAnim({ canvas: canvas2, context, settings: settings2, states: states2, props: props2 });
-    }
+    });
     if (props2.frame >= settings2.exportTotalFrames - 1) {
       states2.captureDone = true;
     }
     if (states2.captureDone) {
-      if (settings2.framesFormat === "webm") {
-        endWebMRecord({ canvas: canvas2, settings: settings2 });
-      } else if (settings2.framesFormat === "gif") {
-        endGifAnimRecord({ canvas: canvas2, settings: settings2 });
-      }
+      settings2.framesFormat.forEach((format) => {
+        if (format === "webm") {
+          endWebMRecord({ canvas: canvas2, settings: settings2 });
+        } else if (format === "gif") {
+          endGifAnimRecord({ canvas: canvas2, settings: settings2 });
+        }
+      });
       states2.captureReady = false;
       states2.captureDone = false;
       states2.savingFrames = false;
