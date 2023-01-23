@@ -11,8 +11,8 @@
   "scripts": {
     "watch": "tsc --watch",
     "test": "jest --watch",
-    "license": "license-checker --exclude 'MIT, MIT OR X11, BSD, ISC' -production",
-    "prebuild": "",
+    "prebuild": "license-checker --exclude 'MIT, MIT OR X11, BSD, ISC' -production",
+    "prepublish": "npm run build",
     "build": "tsc --noemit && tsup",
     "build-vite": "vite build --config vite.build.config.js",
     "demo": "vite ./demo --config vite.demo.config.js"
@@ -31,7 +31,6 @@
     "@daeinc/math": "^0.5.0",
     "@types/node": "^18.11.18",
     "@types/p5": "^1.4.3",
-    "@types/three": "^0.148.0",
     "jest": "^29.3.1",
     "jest-canvas-mock": "^2.4.0",
     "jest-environment-jsdom": "^29.3.1",
@@ -40,7 +39,6 @@
     "parcel": "^2.8.3",
     "pts": "^0.11.3",
     "rollup-plugin-dts": "^5.1.1",
-    "three": "^0.148.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
     "tsup": "^6.5.0",
