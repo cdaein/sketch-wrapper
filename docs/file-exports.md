@@ -43,3 +43,9 @@ const settings = {
   // ...
 };
 ```
+
+MP4 encoding is not yet supported. If you have `ffmpeg` installed on your machine, you can batch convert WebM videos to MP4s in CLI:
+
+```sh
+for i in *.webm; do ffmpeg -i "$i" -c:v libx264 -crf 21 "${i%.*}.mp4"; done
+```
