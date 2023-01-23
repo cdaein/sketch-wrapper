@@ -93,7 +93,12 @@ const sketchWrapper: SketchWrapper = async (
     states.timestamp = timestamp - firstLoopRenderTime - states.pausedDuration;
 
     if (!states.savingFrames) {
-      playLoop({ timestamp, settings, states, props });
+      playLoop({
+        timestamp: timestamp - firstLoopRenderTime,
+        settings,
+        states,
+        props,
+      });
     } else {
       recordLoop({ canvas, settings, states, props });
     }
@@ -126,9 +131,12 @@ const sketchWrapper: SketchWrapper = async (
     // when paused, accumulate pausedDuration
     if (states.paused) {
       states.pausedDuration = timestamp - states.pausedStartTime;
+
+      // console.log({ timestamp });
       window.requestAnimationFrame(loop);
       return;
     }
+    // console.log({ pausedDuration: states.pausedDuration });
 
     if (states.timeResetted) {
       resetTime({ settings, states, props });
