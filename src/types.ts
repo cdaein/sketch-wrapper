@@ -5,16 +5,16 @@ import type p5 from "p5";
 export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
 /** sketch function to be used as argument for sketchWrapper() */
 export type Sketch = (
-  props: SketchProps | WebGLProps
+  props?: SketchProps | WebGLProps
 ) => SketchRender | SketchReturnObject;
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-export type SketchRender = (props: SketchProps | WebGLProps) => void;
+export type SketchRender = (props?: SketchProps | WebGLProps) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-export type SketchResize = (props: SketchProps | WebGLProps) => void;
+export type SketchResize = (props?: SketchProps | WebGLProps) => void;
 export type SketchLoop = (timestamp: number) => void;
 
 export type SketchMode = "2d" | "webgl" | "webgl2";
@@ -169,6 +169,8 @@ export interface BaseProps {
   totalFrames: number;
   /** true if recording in progress */
   recording: boolean;
+  /** manually call render function */
+  // render?: SketchRender;
   /** call to export canvas as image */
   exportFrame: () => void;
   /** call to play or pause sketch */

@@ -50,16 +50,24 @@ const sketchWrapper: SketchWrapper = async (
   // canvas is created for props
   const { canvas } = props;
 
-  const returned = sketch(props);
-
   let render: SketchRender = () => {};
   let resize: SketchResize = () => {};
+
+  const returned = sketch(props);
+
   if (typeof returned === "function") {
     render = returned;
   } else {
     render = returned.render || render;
     resize = returned.resize || resize;
   }
+
+  // add render to props for render-on-demand
+  // TODO: it only works in return function props, not init props
+  // props.render = render;
+
+  // this will put props.render into sketch, but then, sketch() is called twice.
+  // sketch(props);
 
   // window resize event
   const { add: addResize, handleResize } = resizeHandler(
