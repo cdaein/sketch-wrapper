@@ -1,18 +1,28 @@
+import { Format } from 'gifenc';
+
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
 type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
 /** sketch function to be used as argument for sketchWrapper() */
-type Sketch = (props: SketchProps | WebGLProps) => SketchRender | SketchReturnObject;
+type Sketch = (props?: SketchProps | WebGLProps) => SketchRender | SketchReturnObject;
 interface SketchReturnObject {
     render?: SketchRender;
     resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-type SketchRender = (props: SketchProps | WebGLProps) => void;
+type SketchRender = (props?: SketchProps | WebGLProps) => void;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-type SketchResize = (props: SketchProps | WebGLProps) => void;
+type SketchResize = (props?: SketchProps | WebGLProps) => void;
 type SketchMode = "2d" | "webgl" | "webgl2";
 type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
-type FramesFormat = "mp4" | "png" | "jpg" | "jpeg" | "gif" | "webm";
+type FramesFormat = "gif" | "webm";
+/** GIF encoding options */
+type GifOptions = {
+    /** max number of colors to use for quantizing each frame */
+    maxColors?: number;
+    format?: Format;
+    /** use a palette instead of quantizing */
+    palette?: number[][];
+};
 /**
  * User provided settings. all optional properties must either come from user. If not, it will be filled internally with default settings.
  */
@@ -51,10 +61,12 @@ type SketchSettings = {
     prefix?: string;
     /** set suffix to file name */
     suffix?: string;
-    /** set file format for image export (ie. png, jpeg) */
+    /** set file format for image export (ie. png, jpeg). you can also use array to export multiple formats at the same time. ex. ["webp", "png"] */
     frameFormat?: FrameFormat | FrameFormat[];
-    /** set file format for video/sequence export (ie. webm, gif) */
+    /** set file format for video/sequence export (ie. webm, gif). you can also use array to export multiple formats at the same time. ex. ["gif", "webm"] */
     framesFormat?: FramesFormat | FramesFormat[];
+    /** GIF export options. */
+    gifOptions?: GifOptions;
     /** set to `false` to not use sketch-wrapper provided hot keys (ex. `CMD+S` for image export) */
     hotkeys?: boolean;
     /** set sketch mode to use or integrate with other libraries */
@@ -84,6 +96,7 @@ interface BaseProps {
     totalFrames: number;
     /** true if recording in progress */
     recording: boolean;
+    /** manually call render function */
     /** call to export canvas as image */
     exportFrame: () => void;
     /** call to play or pause sketch */
@@ -107,4 +120,4 @@ interface WebGLProps extends BaseProps {
 
 declare const sketchWrapper: SketchWrapper;
 
-export { FrameFormat, FramesFormat, Sketch, SketchProps, SketchRender, SketchResize, SketchSettings, WebGLProps, sketchWrapper as default };
+export { FrameFormat, FramesFormat, GifOptions, Sketch, SketchProps, SketchRender, SketchResize, SketchSettings, WebGLProps, sketchWrapper as default };

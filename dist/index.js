@@ -81,6 +81,7 @@ var createSettings = ({
     suffix: "",
     frameFormat: ["png"],
     framesFormat: ["webm"],
+    gifOptions: {},
     hotkeys: true,
     mode: "2d"
   };
@@ -512,7 +513,7 @@ var exportGifAnim = ({
         canvas.width,
         canvas.height
       ).data;
-      const palette = quantize(data, 256);
+      const palette = settings.gifOptions.palette || quantize(data, settings.gifOptions.maxColors || 256);
       const index = applyPalette(data, palette);
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1e3;
@@ -536,7 +537,7 @@ var exportGifAnim = ({
         gl.UNSIGNED_BYTE,
         pixels
       );
-      const palette = quantize(pixels, 256);
+      const palette = settings.gifOptions.palette || quantize(pixels, settings.gifOptions.maxColors || 256);
       const index = applyPalette(pixels, palette);
       const fpsInterval = 1 / settings.exportFps;
       const delay = fpsInterval * 1e3;
@@ -581,11 +582,11 @@ var sketchWrapper = async (sketch, userSettings) => {
     states
   });
   const { canvas } = props;
-  const returned = sketch(props);
   let render = () => {
   };
   let resize = () => {
   };
+  const returned = sketch(props);
   if (typeof returned === "function") {
     render = returned;
   } else {
@@ -613,7 +614,12 @@ var sketchWrapper = async (sketch, userSettings) => {
     }
     states.timestamp = timestamp - firstLoopRenderTime - states.pausedDuration;
     if (!states.savingFrames) {
-      playLoop({ timestamp, settings, states, props });
+      playLoop({
+        timestamp: timestamp - firstLoopRenderTime,
+        settings,
+        states,
+        props
+      });
     } else {
       recordLoop({ canvas, settings, states, props });
     }
