@@ -22,7 +22,6 @@ export default (
   resize: SketchResize
 ) => {
   const handleResize = () => {
-    // keep canvas at full window size
     // when fullscreen & new canvas
     if (
       userSettings.dimensions === undefined &&
@@ -48,7 +47,7 @@ export default (
     render(props);
 
     // resizing canvas style (when !fullscreen & centered)
-    // REVIEW: this should be better done with CSS rules.
+    // REVIEW: this should be better done with CSS class rules.
     if (userSettings.dimensions !== undefined && settings.centered) {
       const margin = 50; // px // TODO: add to settings
       const canvasParent = canvas.parentElement!;

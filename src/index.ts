@@ -31,6 +31,7 @@ import {
   exportGifAnim,
   setupGifAnimRecord,
 } from "./recorders/export-frames-gif";
+import { resizeCanvas } from "@daeinc/canvas";
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
@@ -85,6 +86,8 @@ const sketchWrapper: SketchWrapper = async (
 
   // run it very first time (render, too)
   handleResize();
+  // resize runs first frame when dimensions are set
+  if (userSettings.dimensions) resize(props);
 
   // there's time delay between first render in handleResize() and first loop render, resulting in animatiom jump. this compesates for that delay
   let firstLoopRender = true;
