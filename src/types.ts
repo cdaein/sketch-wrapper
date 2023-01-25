@@ -4,24 +4,32 @@ import type p5 from "p5";
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
 export type SketchWrapper = (
   sketch: Sketch,
-  settings: SketchSettings
-) => Promise<void>;
+  settings: Partial<SketchSettings>
+) => void | Promise<void>;
+
 /** sketch function to be used as argument for sketchWrapper() */
 export type Sketch = (
-  props?: SketchProps | WebGLProps
-) => Promise<SketchRender> | Promise<SketchReturnObject>;
+  props: Partial<SketchProps> | Partial<WebGLProps>
+) =>
+  | SketchRender
+  | SketchReturnObject
+  | Promise<SketchRender>
+  | Promise<SketchReturnObject>;
+
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
 export type SketchRender = (
-  props?: SketchProps | WebGLProps
+  props: Partial<SketchProps> | Partial<WebGLProps>
 ) => void | Promise<void>;
+
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
 export type SketchResize = (
-  props?: SketchProps | WebGLProps
+  props: Partial<SketchProps> | Partial<WebGLProps>
 ) => void | Promise<void>;
+
 export type SketchLoop = (timestamp: number) => void;
 
 export type SketchMode = "2d" | "webgl" | "webgl2";
@@ -195,14 +203,14 @@ export interface SketchProps extends BaseProps {
   context: CanvasRenderingContext2D;
 }
 
-export interface P5Props extends BaseProps {
-  p5: p5;
-}
-
 /**
  * props type specific to `webgl` or `webgl2` mode
  */
 export interface WebGLProps extends BaseProps {
   /** webgl context */
   gl: WebGLRenderingContext;
+}
+
+export interface P5Props extends BaseProps {
+  p5: p5;
 }
