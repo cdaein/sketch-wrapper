@@ -638,7 +638,7 @@ var sketchWrapper = async (sketch, userSettings) => {
     addResize();
     addKeydown();
   }
-  const playLoop = ({
+  const playLoop = async ({
     timestamp,
     settings: settings2,
     states: states2,
@@ -669,11 +669,11 @@ var sketchWrapper = async (sketch, userSettings) => {
     });
     computeFrame({ settings: settings2, states: states2, props: props2 });
     computeLastTimestamp({ states: states2, props: props2 });
-    render(props2);
+    await render(props2);
     window.requestAnimationFrame(loop);
   };
-  let frameCount = 0;
-  const recordLoop = ({
+  let _frameCount = 0;
+  const recordLoop = async ({
     canvas: canvas2,
     settings: settings2,
     states: states2,
@@ -696,16 +696,16 @@ var sketchWrapper = async (sketch, userSettings) => {
       props2.recording = true;
     }
     props2.deltaTime = 1e3 / settings2.exportFps;
-    props2.time = frameCount * props2.deltaTime;
+    props2.time = _frameCount * props2.deltaTime;
     computePlayhead({
       settings: settings2,
       props: props2
     });
-    props2.frame = frameCount;
+    props2.frame = _frameCount;
     computeLastTimestamp({ states: states2, props: props2 });
-    frameCount += 1;
-    render(props2);
+    await render(props2);
     window.requestAnimationFrame(loop);
+    _frameCount += 1;
     settings2.framesFormat.forEach((format) => {
       if (format === "webm") {
         exportWebM({ canvas: canvas2, settings: settings2, states: states2, props: props2 });
@@ -737,7 +737,7 @@ var sketchWrapper = async (sketch, userSettings) => {
       states2.savingFrames = false;
       states2.timeResetted = true;
       props2.recording = false;
-      frameCount = 0;
+      _frameCount = 0;
     }
   };
 };

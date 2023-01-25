@@ -9,9 +9,9 @@ interface SketchReturnObject {
     resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-type SketchRender = (props?: SketchProps | WebGLProps) => void;
+type SketchRender = (props?: SketchProps | WebGLProps) => void | Promise<void>;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-type SketchResize = (props?: SketchProps | WebGLProps) => void;
+type SketchResize = (props?: SketchProps | WebGLProps) => void | Promise<void>;
 type SketchMode = "2d" | "webgl" | "webgl2";
 type FrameFormat = "png" | "jpg" | "jpeg" | "webp";
 type FramesFormat = "gif" | "webm";
