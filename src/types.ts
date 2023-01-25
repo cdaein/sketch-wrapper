@@ -2,11 +2,14 @@ import { Format as GifFormat } from "gifenc";
 import type p5 from "p5";
 
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
-export type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
+export type SketchWrapper = (
+  sketch: Sketch,
+  settings: SketchSettings
+) => Promise<void>;
 /** sketch function to be used as argument for sketchWrapper() */
 export type Sketch = (
   props?: SketchProps | WebGLProps
-) => SketchRender | SketchReturnObject;
+) => Promise<SketchRender> | Promise<SketchReturnObject>;
 export interface SketchReturnObject {
   render?: SketchRender;
   resize?: SketchResize;

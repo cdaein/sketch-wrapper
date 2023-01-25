@@ -31,7 +31,6 @@ import {
   exportGifAnim,
   setupGifAnimRecord,
 } from "./recorders/export-frames-gif";
-import { resizeCanvas } from "@daeinc/canvas";
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
@@ -54,7 +53,7 @@ const sketchWrapper: SketchWrapper = async (
   let render: SketchRender = () => {};
   let resize: SketchResize = () => {};
 
-  const returned = sketch(props);
+  const returned = await sketch(props);
 
   if (typeof returned === "function") {
     render = returned;
