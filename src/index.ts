@@ -127,7 +127,7 @@ const sketchWrapper: SketchWrapper = async (
     addKeydown();
   }
 
-  const playLoop = ({
+  const playLoop = async ({
     timestamp,
     settings,
     states,
@@ -180,14 +180,14 @@ const sketchWrapper: SketchWrapper = async (
     // update lastTimestamp for deltaTime calculation
     computeLastTimestamp({ states, props });
 
-    render(props);
+    await render(props);
     window.requestAnimationFrame(loop);
   };
 
   // for manual counting when recording (use only for recording)
-  let frameCount = 0;
+  let _frameCount = 0;
 
-  const recordLoop = ({
+  const recordLoop = async ({
     canvas,
     settings,
     states,
@@ -222,19 +222,19 @@ const sketchWrapper: SketchWrapper = async (
     // deltaTime
     props.deltaTime = 1000 / settings.exportFps;
     // time
-    props.time = frameCount * props.deltaTime;
+    props.time = _frameCount * props.deltaTime;
 
     computePlayhead({
       settings,
       props,
     });
-    props.frame = frameCount;
+    props.frame = _frameCount;
     computeLastTimestamp({ states, props });
 
-    frameCount += 1;
-
-    render(props);
+    await render(props);
     window.requestAnimationFrame(loop);
+
+    _frameCount += 1;
 
     // save frames
     settings.framesFormat.forEach((format) => {
@@ -273,7 +273,7 @@ const sketchWrapper: SketchWrapper = async (
 
       props.recording = false;
 
-      frameCount = 0; // reset local frameCount for next recording
+      _frameCount = 0; // reset local frameCount for next recording
     }
   };
 };

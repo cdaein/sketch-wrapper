@@ -15,9 +15,13 @@ export interface SketchReturnObject {
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
-export type SketchRender = (props?: SketchProps | WebGLProps) => void;
+export type SketchRender = (
+  props?: SketchProps | WebGLProps
+) => void | Promise<void>;
 /** sketch resize callback function; runs when window is resized. it also runs when sketch is first loaded */
-export type SketchResize = (props?: SketchProps | WebGLProps) => void;
+export type SketchResize = (
+  props?: SketchProps | WebGLProps
+) => void | Promise<void>;
 export type SketchLoop = (timestamp: number) => void;
 
 export type SketchMode = "2d" | "webgl" | "webgl2";
