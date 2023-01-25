@@ -1,9 +1,9 @@
 import { Format } from 'gifenc';
 
 /** SketchWrapper takes sketch function and settings object to set up new or existing canvas, and provides props for users */
-type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => void;
+type SketchWrapper = (sketch: Sketch, settings: SketchSettings) => Promise<void>;
 /** sketch function to be used as argument for sketchWrapper() */
-type Sketch = (props?: SketchProps | WebGLProps) => SketchRender | SketchReturnObject;
+type Sketch = (props?: SketchProps | WebGLProps) => Promise<SketchRender> | Promise<SketchReturnObject>;
 interface SketchReturnObject {
     render?: SketchRender;
     resize?: SketchResize;

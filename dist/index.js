@@ -586,7 +586,7 @@ var sketchWrapper = async (sketch, userSettings) => {
   };
   let resize = () => {
   };
-  const returned = sketch(props);
+  const returned = await sketch(props);
   if (typeof returned === "function") {
     render = returned;
   } else {
@@ -603,6 +603,8 @@ var sketchWrapper = async (sketch, userSettings) => {
   );
   const { add: addKeydown } = keydown_default(props, states);
   handleResize();
+  if (userSettings.dimensions)
+    resize(props);
   let firstLoopRender = true;
   let firstLoopRenderTime = 0;
   const loop = (timestamp) => {
