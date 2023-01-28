@@ -1,7 +1,16 @@
-import { create2dCanvas } from "./2d";
-import { createWebglCanvas } from "./webgl";
 import type { SketchSettingsInternal } from "../types";
 import { create2dOrWebGLCanvas } from "./2d-or-webgl";
+
+export const destroyCanvas = (canvas: HTMLCanvasElement) => {
+  if (canvas) {
+    canvas.width = 0;
+    canvas.height = 0;
+    canvas.remove();
+  }
+
+  // TODO
+  // also remove any reference to canvas
+};
 
 export const prepareCanvas = async (
   settings: SketchSettingsInternal
@@ -25,19 +34,5 @@ export const prepareCanvas = async (
       throw new Error("provided canvas must be an HTMLCanvasElement");
     }
   }
-
   return create2dOrWebGLCanvas(settings);
-
-  // if (settings.mode === "2d") {
-  //   return create2dCanvas(settings);
-  // } else if (settings.mode === "webgl" || settings.mode === "webgl2") {
-  //   return createWebglCanvas(settings);
-  // } else if (settings.mode === "ogl") {
-  //   throw new Error("ogl mode is no longer supported");
-  //   // REVIEW: without this, code splitting doesn't work and get missing file error!!
-  //   // return (await import("./ogl")).createOglCanvas(settings);
-  // }
-
-  // // fallback
-  // return create2dCanvas(settings);
 };
