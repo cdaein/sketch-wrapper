@@ -11,8 +11,8 @@
     "strict": true,
     "skipLibCheck": true,
     // "allowJs": true,
-    "rootDir": "./src",
+    "rootDir": "./",
     "outDir": "./dist"
   },
-  "exclude": ["./dist", "demo", "./process/*", "./test/*"]
+  "exclude": ["./dist", "./demo", "./process/*", "./test/*"]
 }
