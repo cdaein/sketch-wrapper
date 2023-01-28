@@ -31,6 +31,11 @@ import {
   exportGifAnim,
   setupGifAnimRecord,
 } from "./recorders/export-frames-gif";
+import { statesV2 } from "./states-v2";
+
+// if (import.meta.hot) {
+//   console.log("hot");
+// }
 
 const sketchWrapper: SketchWrapper = async (
   sketch: Sketch,
@@ -46,13 +51,26 @@ const sketchWrapper: SketchWrapper = async (
   const props = await createProps({
     settings,
     states,
+    renderProp,
   });
+
+  async function renderProp() {
+    if (typeof returned === "function") {
+      return returned(props);
+    } else if (typeof returned.render === "function") {
+      return returned.render(props);
+    }
+    return returned;
+  }
+
   // canvas is created for props
   const { canvas } = props;
 
   let render: SketchRender = () => {};
   let resize: SketchResize = () => {};
 
+  // FIX: function statement cannot be called before init
+  //      hoisting doesn't work here. may need to use class structure
   const returned = await sketch(props);
 
   if (typeof returned === "function") {

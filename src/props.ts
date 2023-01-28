@@ -22,9 +22,11 @@ type CanvasProps = {
 export const createProps = async ({
   settings,
   states,
+  renderProp,
 }: {
   settings: SketchSettingsInternal;
   states: SketchStates;
+  renderProp: () => void; // TODO: proper typing. should i move this to createFunctionProps()?
 }) => {
   const { canvas, context, gl, width, height, pixelRatio } =
     (await prepareCanvas(settings)) as CanvasProps;
@@ -52,6 +54,7 @@ export const createProps = async ({
     recording: false,
     exportFrame,
     togglePlay,
+    render: renderProp,
     update,
   };
 

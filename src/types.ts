@@ -17,7 +17,7 @@ export type Sketch = (
   | Promise<SketchReturnObject>;
 
 export interface SketchReturnObject {
-  render?: SketchRender;
+  render: SketchRender;
   resize?: SketchResize;
 }
 /** sketch render callback function; will be called every frame */
@@ -184,12 +184,12 @@ export interface BaseProps {
   totalFrames: number;
   /** true if recording in progress */
   recording: boolean;
-  /** manually call render function */
-  // render?: SketchRender;
   /** call to export canvas as image */
   exportFrame: () => void;
   /** call to play or pause sketch */
   togglePlay: () => void;
+  /** call without any props for rendering-on-demand. it will call sketch's returned function. good for manually advancing animation frame-by-frame. */
+  render: () => void;
   /** not yet implemented */
   update: (settings: SketchSettings) => void;
 }
